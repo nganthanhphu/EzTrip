@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>war</packaging>
+                <packaging>ear</packaging>
+                <packaging>ejb</packaging>
+            </packagings>
+            <goals>
+                <goal>package</goal>
+            </goals>
+            <properties>
+                <netbeans.deploy>true</netbeans.deploy>
+                <DB_USER>root</DB_USER>
+                <DB_PASSWORD>root</DB_PASSWORD>
+                <CLOUDINARY_CLOUD_NAME>dkzzyue98</CLOUDINARY_CLOUD_NAME>
+                <CLOUDINARY_API_KEY>379276738137352</CLOUDINARY_API_KEY>
+                <CLOUDINARY_API_SECRET>npwNXV6bQEsxMwj_iZLFBkvOODU</CLOUDINARY_API_SECRET>
+            </properties>
+        </action>
+    </actions>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+  <!-- Define Persistence Unit -->
+  <persistence-unit name="my_persistence_unit">
+    <class>com.hp.pojo.Role</class>
+    <class>com.hp.pojo.Customerprofile</class>
+    <class>com.hp.pojo.Typeoftransportation</class>
+    <class>com.hp.pojo.Providerprofile</class>
+    <class>com.hp.pojo.Paymentmethod</class>
+    <class>com.hp.pojo.Typeofservice</class>
+    <class>com.hp.pojo.Review</class>
+    <class>com.hp.pojo.Image</class>
+    <class>com.hp.pojo.Booking</class>
+    <class>com.hp.pojo.Gender</class>
+    <class>com.hp.pojo.Baseuser</class>
+    <class>com.hp.pojo.Servicetransportation</class>
+    <class>com.hp.pojo.Typeofprovider</class>
+    <class>com.hp.pojo.Servicetourism</class>
+    <class>com.hp.pojo.Service</class>
+    <class>com.hp.pojo.Bookingstatus</class>
+    <class>com.hp.pojo.Serviceaccommodation</class>
+    <class>com.hp.pojo.CustomerProfile</class>
+    <class>com.hp.pojo.TypeOfTransportation</class>
+    <class>com.hp.pojo.TypeOfService</class>
+    <class>com.hp.pojo.TypeOfProvider</class>
+    <class>com.hp.pojo.BaseUser</class>
+    <class>com.hp.pojo.PaymentMethod</class>
+    <class>com.hp.pojo.BookingStatus</class>
+    <class>com.hp.pojo.ServiceTransportation</class>
+    <class>com.hp.pojo.ProviderProfile</class>
+    <class>com.hp.pojo.ServiceTourism</class>
+    <class>com.hp.pojo.ServiceAccommodation</class>
+  </persistence-unit>
+</persistence>
