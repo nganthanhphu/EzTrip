@@ -3,56 +3,56 @@ CREATE DATABASE IF NOT EXISTS EzTrip_Db;
 
 USE EzTrip_Db;
 
-CREATE TABLE Role (
+CREATE TABLE role (
     id int PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO Role (name) VALUES ('ADMIN'), ('CUSTOMER'), ('PROVIDER');
+INSERT INTO role (name) VALUES ('ADMIN'), ('CUSTOMER'), ('PROVIDER');
 
-CREATE TABLE Gender (
+CREATE TABLE gender (
     id int PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(20) NOT NULL UNIQUE
 );
 
-INSERT INTO Gender (name) VALUES ('MALE'), ('FEMALE'), ('OTHER');
+INSERT INTO gender (name) VALUES ('MALE'), ('FEMALE'), ('OTHER');
 
-CREATE TABLE TypeOfProvider (
+CREATE TABLE type_of_provider (
     id int PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO TypeOfProvider (name) VALUES ('TRAVEL_AGENCY'), ('ACCOMMODATION'), ('BUS_OPERATOR'), ('AIRLINE');
+INSERT INTO type_of_provider (name) VALUES ('TRAVEL_AGENCY'), ('ACCOMMODATION'), ('BUS_OPERATOR'), ('AIRLINE');
 
-CREATE TABLE TypeOfService (
+CREATE TABLE type_of_service (
     id int PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO TypeOfService (name) VALUES ('TOURISM'), ('ACCOMMODATION'), ('TRANSPORTATION');
+INSERT INTO type_of_service (name) VALUES ('TOURISM'), ('ACCOMMODATION'), ('TRANSPORTATION');
 
-CREATE TABLE TypeOfTransportation (
+CREATE TABLE type_of_transportation (
     id int PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO TypeOfTransportation (name) VALUES ('BUS'), ('AIRPLANE'), ('TRAIN'), ('CAR_RENTAL');
+INSERT INTO type_of_transportation (name) VALUES ('BUS'), ('AIRPLANE'), ('TRAIN'), ('CAR_RENTAL');
 
-CREATE TABLE PaymentMethod (
+CREATE TABLE payment_method (
     id int PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO PaymentMethod (name) VALUES ('CASH'), ("MOMO"), ('BANK_TRANSFER');
+INSERT INTO payment_method (name) VALUES ('CASH'), ("MOMO"), ('BANK_TRANSFER');
 
-CREATE TABLE BookingStatus (
+CREATE TABLE booking_status (
     id int PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO BookingStatus (name) VALUES ('PENDING'), ('CONFIRMED'), ('COMPLETED'), ('CANCELLED');
+INSERT INTO booking_status (name) VALUES ('PENDING'), ('CONFIRMED'), ('COMPLETED'), ('CANCELLED');
 
-CREATE TABLE BaseUser (
+CREATE TABLE base_user (
     id int PRIMARY KEY AUTO_INCREMENT,
     fullname VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -62,31 +62,31 @@ CREATE TABLE BaseUser (
     phone_number VARCHAR(20) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
 
-    FOREIGN KEY (role_id) REFERENCES Role(id)
+    FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
-CREATE TABLE CustomerProfile (
+CREATE TABLE customer_profile (
     id int PRIMARY KEY AUTO_INCREMENT,
     user_id int NOT NULL UNIQUE,
     dob DATE NULL,
     gender_id int NULL,
 
-    FOREIGN KEY (gender_id) REFERENCES Gender(id),
-    FOREIGN KEY (user_id) REFERENCES BaseUser(id) ON DELETE CASCADE
+    FOREIGN KEY (gender_id) REFERENCES gender(id),
+    FOREIGN KEY (user_id) REFERENCES base_user(id) ON DELETE CASCADE
 );
 
-CREATE TABLE ProviderProfile (
+CREATE TABLE provider_profile (
     id int PRIMARY KEY AUTO_INCREMENT,
     user_id int NOT NULL UNIQUE,
     company_name VARCHAR(255) NULL,
     company_address VARCHAR(255) NULL,
     type_of_provider_id int NULL,
 
-    FOREIGN KEY (type_of_provider_id) REFERENCES TypeOfProvider(id),
-    FOREIGN KEY (user_id) REFERENCES BaseUser(id) ON DELETE CASCADE
+    FOREIGN KEY (type_of_provider_id) REFERENCES type_of_provider(id),
+    FOREIGN KEY (user_id) REFERENCES base_user(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Service (
+CREATE TABLE service (
     id int PRIMARY KEY AUTO_INCREMENT,
     provider_id int NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -95,29 +95,29 @@ CREATE TABLE Service (
     quantity INT NOT NULL DEFAULT 1,
     type_of_service_id int NULL,
 
-    FOREIGN KEY (provider_id) REFERENCES ProviderProfile(id) ON DELETE CASCADE,
-    FOREIGN KEY (type_of_service_id) REFERENCES TypeOfService(id)
+    FOREIGN KEY (provider_id) REFERENCES provider_profile(id) ON DELETE CASCADE,
+    FOREIGN KEY (type_of_service_id) REFERENCES type_of_service(id)
 );
 
-CREATE TABLE Image (
+CREATE TABLE image (
     id int PRIMARY KEY AUTO_INCREMENT,
     service_id int NOT NULL,
     url VARCHAR(255) NOT NULL,
 
-    FOREIGN KEY (service_id) REFERENCES Service(id) ON DELETE CASCADE
+    FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE CASCADE
 );
 
-CREATE TABLE ServiceTourism (
+CREATE TABLE service_tourism (
     id int PRIMARY KEY AUTO_INCREMENT,
     service_id int NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     location VARCHAR(255) NOT NULL,
 
-    FOREIGN KEY (service_id) REFERENCES Service(id) ON DELETE CASCADE
+    FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE CASCADE
 );
 
-CREATE TABLE ServiceAccommodation (
+CREATE TABLE service_accommodation (
     id int PRIMARY KEY AUTO_INCREMENT,
     service_id int NOT NULL,
     check_in_date DATE NOT NULL,
@@ -126,10 +126,10 @@ CREATE TABLE ServiceAccommodation (
     area FLOAT NOT NULL,
     location VARCHAR(255) NOT NULL,
 
-    FOREIGN KEY (service_id) REFERENCES Service(id) ON DELETE CASCADE
+    FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE CASCADE
 );
 
-CREATE TABLE ServiceTransportation (
+CREATE TABLE service_transportation (
     id int PRIMARY KEY AUTO_INCREMENT,
     service_id int NOT NULL,
     type_of_transportation_id int NULL,
@@ -138,11 +138,11 @@ CREATE TABLE ServiceTransportation (
     departure_time DATETIME NOT NULL,
     arrival_time DATETIME NOT NULL, -- hay thêm này luôn ha
 
-    FOREIGN KEY (service_id) REFERENCES Service(id) ON DELETE CASCADE,
-    FOREIGN KEY (type_of_transportation_id) REFERENCES TypeOfTransportation(id)
+    FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE CASCADE,
+    FOREIGN KEY (type_of_transportation_id) REFERENCES type_of_transportation(id)
 );
 
-CREATE TABLE Booking (
+CREATE TABLE booking (
     id int PRIMARY KEY AUTO_INCREMENT,
     customer_id int NOT NULL,
     service_id int NOT NULL,
@@ -150,19 +150,19 @@ CREATE TABLE Booking (
     payment_method_id int NULL,
     status_id int NOT NULL DEFAULT 1, -- Mặc định là PENDING, ê nhớ đổ dữ liệu ở trên trước á
 
-    FOREIGN KEY (customer_id) REFERENCES CustomerProfile(id) ON DELETE RESTRICT,
-    FOREIGN KEY (service_id) REFERENCES Service(id) ON DELETE RESTRICT,
-    FOREIGN KEY (payment_method_id) REFERENCES PaymentMethod(id),
-    FOREIGN KEY (status_id) REFERENCES BookingStatus(id)
+    FOREIGN KEY (customer_id) REFERENCES customer_profile(id) ON DELETE RESTRICT,
+    FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE RESTRICT,
+    FOREIGN KEY (payment_method_id) REFERENCES payment_method(id),
+    FOREIGN KEY (status_id) REFERENCES booking_status(id)
 );
 
-CREATE TABLE Review (
+CREATE TABLE review (
     id int PRIMARY KEY AUTO_INCREMENT,
     booking_id int NOT NULL UNIQUE,
     rating INT NOT NULL,
     comment TEXT NULL,
     review_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (booking_id) REFERENCES Booking(id) ON DELETE RESTRICT
+    FOREIGN KEY (booking_id) REFERENCES booking(id) ON DELETE RESTRICT
 );
 
