@@ -78,9 +78,9 @@ CREATE TABLE customer_profile (
 CREATE TABLE provider_profile (
     id int PRIMARY KEY AUTO_INCREMENT,
     user_id int NOT NULL UNIQUE,
-    company_name VARCHAR(255) NULL,
+    company_name VARCHAR(255) NOT NULL,
     company_address VARCHAR(255) NULL,
-    type_of_provider_id int NULL,
+    type_of_provider_id int NOT NULL,
 
     FOREIGN KEY (type_of_provider_id) REFERENCES type_of_provider(id),
     FOREIGN KEY (user_id) REFERENCES base_user(id) ON DELETE CASCADE
