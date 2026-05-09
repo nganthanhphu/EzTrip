@@ -19,6 +19,8 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  *
  * @author Joon
@@ -29,6 +31,7 @@ import java.util.Set;
     @NamedQuery(name = "TypeOfProvider.findAll", query = "SELECT t FROM TypeOfProvider t"),
     @NamedQuery(name = "TypeOfProvider.findById", query = "SELECT t FROM TypeOfProvider t WHERE t.id = :id"),
     @NamedQuery(name = "TypeOfProvider.findByName", query = "SELECT t FROM TypeOfProvider t WHERE t.name = :name")})
+@JsonIgnoreProperties({"providerProfileSet"})
 public class TypeOfProvider implements Serializable {
 
     private static final long serialVersionUID = 1L;

@@ -19,6 +19,8 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  *
  * @author Joon
@@ -29,6 +31,7 @@ import java.util.Set;
     @NamedQuery(name = "Gender.findAll", query = "SELECT g FROM Gender g"),
     @NamedQuery(name = "Gender.findById", query = "SELECT g FROM Gender g WHERE g.id = :id"),
     @NamedQuery(name = "Gender.findByName", query = "SELECT g FROM Gender g WHERE g.name = :name")})
+@JsonIgnoreProperties({"customerProfileSet"})
 public class Gender implements Serializable {
 
     private static final long serialVersionUID = 1L;

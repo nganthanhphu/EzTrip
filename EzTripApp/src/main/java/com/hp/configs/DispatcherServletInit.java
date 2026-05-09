@@ -4,8 +4,10 @@
  */
 package com.hp.configs;
 
+import jakarta.servlet.Filter;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletRegistration;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
@@ -18,7 +20,8 @@ public class DispatcherServletInit extends AbstractAnnotationConfigDispatcherSer
     protected Class<?>[] getRootConfigClasses() {
         return new Class[] {
             ThymeleafConfigs.class,
-            HibernateConfigs.class
+            HibernateConfigs.class,
+            SpringSecurityConfigs.class
         };
     }
 
@@ -36,6 +39,11 @@ public class DispatcherServletInit extends AbstractAnnotationConfigDispatcherSer
 
     @Override
     protected void customizeRegistration(ServletRegistration.Dynamic registration) {
-        registration.setMultipartConfig(new MultipartConfigElement("/", 5000000, 15000000, 0));
+        registration.setMultipartConfig(new MultipartConfigElement("/", 5242880, 20971520, 0));
+    }
+    
+    @Override
+    protected Filter[] getServletFilters() {
+        return new Filter[] { new DelegatingFilterProxy("jwtFilter") };
     }
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -69,13 +70,13 @@ public class BaseUser implements Serializable {
     @Column(name = "phone_number")
     private String phoneNumber;
     @Column(name = "is_active")
-    private Boolean isActive;
+    private Boolean isActive = true;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     private CustomerProfile customerProfile;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     private ProviderProfile providerProfile;
     @JoinColumn(name = "role_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Role roleId;
 
     public BaseUser() {

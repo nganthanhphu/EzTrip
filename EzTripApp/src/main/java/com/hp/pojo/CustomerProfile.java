@@ -8,6 +8,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,6 +25,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  *
  * @author Joon
@@ -34,6 +37,7 @@ import java.util.Set;
     @NamedQuery(name = "CustomerProfile.findAll", query = "SELECT c FROM CustomerProfile c"),
     @NamedQuery(name = "CustomerProfile.findById", query = "SELECT c FROM CustomerProfile c WHERE c.id = :id"),
     @NamedQuery(name = "CustomerProfile.findByDob", query = "SELECT c FROM CustomerProfile c WHERE c.dob = :dob")})
+@JsonIgnoreProperties({"bookingSet", "userId"})
 public class CustomerProfile implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,7 +53,7 @@ public class CustomerProfile implements Serializable {
     @OneToOne(optional = false)
     private BaseUser userId;
     @JoinColumn(name = "gender_id", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Gender genderId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId")
     private Set<Booking> bookingSet;
