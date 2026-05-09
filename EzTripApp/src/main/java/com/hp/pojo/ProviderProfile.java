@@ -8,6 +8,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,9 +19,12 @@ import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  *
@@ -33,6 +37,7 @@ import java.util.Set;
     @NamedQuery(name = "ProviderProfile.findById", query = "SELECT p FROM ProviderProfile p WHERE p.id = :id"),
     @NamedQuery(name = "ProviderProfile.findByCompanyName", query = "SELECT p FROM ProviderProfile p WHERE p.companyName = :companyName"),
     @NamedQuery(name = "ProviderProfile.findByCompanyAddress", query = "SELECT p FROM ProviderProfile p WHERE p.companyAddress = :companyAddress")})
+@JsonIgnoreProperties({"serviceSet", "userId"})
 public class ProviderProfile implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,6 +48,7 @@ public class ProviderProfile implements Serializable {
     private Integer id;
     @Size(max = 255)
     @Column(name = "company_name")
+    @NotNull
     private String companyName;
     @Size(max = 255)
     @Column(name = "company_address")
@@ -51,7 +57,8 @@ public class ProviderProfile implements Serializable {
     @OneToOne(optional = false)
     private BaseUser userId;
     @JoinColumn(name = "type_of_provider_id", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull
     private TypeOfProvider typeOfProviderId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "providerId")
     private Set<Service> serviceSet;
