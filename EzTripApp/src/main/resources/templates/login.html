@@ -1,0 +1,29 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+    <head>
+        <title>Đăng nhập</title>
+        <th:block th:replace="base :: css"></th:block>
+    </head>
+    <body>
+        <div th:replace="base :: header"></div>
+
+        <section class="container">
+            <h1>Đăng nhập</h1>
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Tên người dùng</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mật khẩu</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Đăng nhập</button>
+            </form>
+            <div th:if="${param.error}" class="alert alert-danger mt-3">Tên người dùng hoặc mật khẩu không đúng.</div>
+        </section>
+
+        <div th:replace="base :: footer"></div>
+    </body>
+</html>

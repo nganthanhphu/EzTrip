@@ -1,9 +1,17 @@
 <!doctype html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+    <head>
+        <title>Trang chủ</title>
+    <th:block th:replace="base :: css"></th:block>
+</head>
 <body>
+    <div th:replace="base :: header"></div>
 
-<h1>Hello World!</h1>
-<p>Hello World!</p>
+    <section class="container">
+        <h1>Chào mừng đến với EzTrip Admin Dashboard</h1>
+    </section>
 
+    <div th:replace="base :: footer"></div>
 </body>
 </html>

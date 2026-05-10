@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author Joon
  */
 @Controller
-public class HomeController {
+public class AdminHomeController {
     
-    @RequestMapping("/")
+    @GetMapping("/admin")
     public String index(Model model, @RequestParam Map<String, String> params) {
         return "index";
     }

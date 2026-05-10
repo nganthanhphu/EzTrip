@@ -58,12 +58,12 @@ public class SpringSecurityConfigs {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(c -> c.disable()).authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/admin").hasRole("ADMIN")
+                        .requestMatchers("/admin").hasRole("ADMIN")
                         .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form.loginPage("/admin/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/admin", true)
                         .failureUrl("/admin/login?error=true")
                         .permitAll())
                 .logout((logout) -> logout.logoutSuccessUrl("/admin/login").permitAll());
