@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRoleId().getName()));
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRoleId().getName()));
 
         return new MyUserDetails(user.getId(), user.getPhoneNumber(), user.getPassword(), authorities);
     }
