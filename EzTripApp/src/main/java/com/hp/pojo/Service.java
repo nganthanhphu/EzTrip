@@ -32,11 +32,12 @@ import java.util.Set;
 @Entity
 @Table(name = "service")
 @NamedQueries({
-    @NamedQuery(name = "Service.findAll", query = "SELECT s FROM Service s"),
-    @NamedQuery(name = "Service.findById", query = "SELECT s FROM Service s WHERE s.id = :id"),
-    @NamedQuery(name = "Service.findByName", query = "SELECT s FROM Service s WHERE s.name = :name"),
-    @NamedQuery(name = "Service.findByPrice", query = "SELECT s FROM Service s WHERE s.price = :price"),
-    @NamedQuery(name = "Service.findByQuantity", query = "SELECT s FROM Service s WHERE s.quantity = :quantity")})
+        @NamedQuery(name = "Service.findAll", query = "SELECT s FROM Service s"),
+        @NamedQuery(name = "Service.findById", query = "SELECT s FROM Service s WHERE s.id = :id"),
+        @NamedQuery(name = "Service.findByName", query = "SELECT s FROM Service s WHERE s.name = :name"),
+        @NamedQuery(name = "Service.findByPrice", query = "SELECT s FROM Service s WHERE s.price = :price"),
+        @NamedQuery(name = "Service.findByQuantity", query = "SELECT s FROM Service s WHERE s.quantity = :quantity"),
+        @NamedQuery(name = "Service.findByIsActive", query = "SELECT s FROM Service s WHERE s.isActive = :isActive") })
 public class Service implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -54,7 +55,8 @@ public class Service implements Serializable {
     @Size(max = 65535)
     @Column(name = "description")
     private String description;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+    // consider using these annotations to enforce field validation
     @Basic(optional = false)
     @NotNull
     @Column(name = "price")
@@ -63,6 +65,8 @@ public class Service implements Serializable {
     @NotNull
     @Column(name = "quantity")
     private int quantity;
+    @Column(name = "is_active")
+    private Boolean isActive = true;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
     private Set<Image> imageSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
@@ -132,6 +136,14 @@ public class Service implements Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 
     public Set<Image> getImageSet() {
@@ -214,5 +226,5 @@ public class Service implements Serializable {
     public String toString() {
         return "com.hp.pojo.Service[ id=" + id + " ]";
     }
-    
+
 }

@@ -94,6 +94,7 @@ CREATE TABLE service (
     price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL DEFAULT 1,
     type_of_service_id int NULL,
+    is_active BOOLEAN DEFAULT TRUE,
 
     FOREIGN KEY (provider_id) REFERENCES provider_profile(id) ON DELETE CASCADE,
     FOREIGN KEY (type_of_service_id) REFERENCES type_of_service(id)
