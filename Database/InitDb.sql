@@ -109,7 +109,7 @@ CREATE TABLE image (
 
 CREATE TABLE service_tourism (
     id int PRIMARY KEY AUTO_INCREMENT,
-    service_id int NOT NULL,
+    service_id int NOT NULL UNIQUE,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
     location VARCHAR(255) NOT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE service_tourism (
 
 CREATE TABLE service_accommodation (
     id int PRIMARY KEY AUTO_INCREMENT,
-    service_id int NOT NULL,
+    service_id int NOT NULL UNIQUE,
     check_in_date DATE NOT NULL,
     check_out_date DATE NOT NULL,
     quantity_of_bed INT NOT NULL DEFAULT 1,
@@ -131,7 +131,7 @@ CREATE TABLE service_accommodation (
 
 CREATE TABLE service_transportation (
     id int PRIMARY KEY AUTO_INCREMENT,
-    service_id int NOT NULL,
+    service_id int NOT NULL UNIQUE,
     type_of_transportation_id int NULL,
     departure_location VARCHAR(255) NOT NULL,
     arrival_location VARCHAR(255) NOT NULL,

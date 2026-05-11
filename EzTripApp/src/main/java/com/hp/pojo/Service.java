@@ -17,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -66,18 +67,18 @@ public class Service implements Serializable {
     private Set<Image> imageSet;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
     private Set<Booking> bookingSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
-    private Set<ServiceAccommodation> serviceAccommodationSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
-    private Set<ServiceTourism> serviceTourismSet;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId")
+    private ServiceAccommodation serviceAccommodation;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId")
+    private ServiceTourism serviceTourism;
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private ProviderProfile providerId;
     @JoinColumn(name = "type_of_service_id", referencedColumnName = "id")
     @ManyToOne
     private TypeOfService typeOfServiceId;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
-    private Set<ServiceTransportation> serviceTransportationSet;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId")
+    private ServiceTransportation serviceTransportation;
 
     public Service() {
     }
@@ -149,20 +150,20 @@ public class Service implements Serializable {
         this.bookingSet = bookingSet;
     }
 
-    public Set<ServiceAccommodation> getServiceAccommodationSet() {
-        return serviceAccommodationSet;
+    public ServiceAccommodation getServiceAccommodation() {
+        return serviceAccommodation;
     }
 
-    public void setServiceAccommodationSet(Set<ServiceAccommodation> serviceAccommodationSet) {
-        this.serviceAccommodationSet = serviceAccommodationSet;
+    public void setServiceAccommodation(ServiceAccommodation serviceAccommodation) {
+        this.serviceAccommodation = serviceAccommodation;
     }
 
-    public Set<ServiceTourism> getServiceTourismSet() {
-        return serviceTourismSet;
+    public ServiceTourism getServiceTourism() {
+        return serviceTourism;
     }
 
-    public void setServiceTourismSet(Set<ServiceTourism> serviceTourismSet) {
-        this.serviceTourismSet = serviceTourismSet;
+    public void setServiceTourism(ServiceTourism serviceTourism) {
+        this.serviceTourism = serviceTourism;
     }
 
     public ProviderProfile getProviderId() {
@@ -181,12 +182,12 @@ public class Service implements Serializable {
         this.typeOfServiceId = typeOfServiceId;
     }
 
-    public Set<ServiceTransportation> getServiceTransportationSet() {
-        return serviceTransportationSet;
+    public ServiceTransportation getServiceTransportation() {
+        return serviceTransportation;
     }
 
-    public void setServiceTransportationSet(Set<ServiceTransportation> serviceTransportationSet) {
-        this.serviceTransportationSet = serviceTransportationSet;
+    public void setServiceTransportation(ServiceTransportation serviceTransportation) {
+        this.serviceTransportation = serviceTransportation;
     }
 
     @Override

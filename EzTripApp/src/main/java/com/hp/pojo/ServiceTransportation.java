@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
@@ -63,8 +64,8 @@ public class ServiceTransportation implements Serializable {
     @Column(name = "arrival_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date arrivalTime;
-    @JoinColumn(name = "service_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @JoinColumn(name = "service_id", referencedColumnName = "id", unique = true)
+    @OneToOne(optional = false)
     private Service serviceId;
     @JoinColumn(name = "type_of_transportation_id", referencedColumnName = "id")
     @ManyToOne

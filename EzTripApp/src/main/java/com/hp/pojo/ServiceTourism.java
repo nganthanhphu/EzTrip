@@ -11,7 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
@@ -57,8 +57,8 @@ public class ServiceTourism implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "location")
     private String location;
-    @JoinColumn(name = "service_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @JoinColumn(name = "service_id", referencedColumnName = "id", unique = true)
+    @OneToOne(optional = false)
     private Service serviceId;
 
     public ServiceTourism() {
