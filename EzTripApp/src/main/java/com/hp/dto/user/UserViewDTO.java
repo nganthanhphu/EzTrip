@@ -16,7 +16,7 @@ public class UserViewDTO {
     private String phoneNumber;
     private String avatar;
     private Boolean isActive;
-    private RoleDTO role;
+    private String role;
     private CustomerProfileDTO customerProfile;
     private ProviderProfileDTO providerProfile;
 
@@ -68,11 +68,11 @@ public class UserViewDTO {
         this.isActive = isActive;
     }
 
-    public RoleDTO getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(RoleDTO role) {
+    public void setRole(String role) {
         this.role = role;
     }
 

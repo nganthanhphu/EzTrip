@@ -7,17 +7,12 @@ package com.hp.services.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.user.CustomerProfileDTO;
-import com.hp.dto.user.GenderDTO;
 import com.hp.dto.user.ProviderProfileDTO;
-import com.hp.dto.user.RoleDTO;
-import com.hp.dto.user.TypeOfProviderDTO;
 import com.hp.dto.user.UserViewDTO;
 import com.hp.dto.user.UserRegisterDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
 import com.hp.pojo.ProviderProfile;
-import com.hp.pojo.Role;
-import com.hp.pojo.TypeOfProvider;
 import com.hp.pojo.Gender;
 import com.hp.repositories.UserRepository;
 import com.hp.security.MyUserDetails;
@@ -128,8 +123,7 @@ public class UserServiceImpl implements UserService {
         userDTO.setPhoneNumber(user.getPhoneNumber());
         userDTO.setAvatar(user.getAvatar());
         userDTO.setIsActive(user.getIsActive());
-        Role role = user.getRoleId();
-        userDTO.setRole(new RoleDTO(role.getId(), role.getName()));
+        userDTO.setRole(user.getRoleId().getName());
 
         CustomerProfile customerProfile = user.getCustomerProfile();
         if (customerProfile == null) {
@@ -143,7 +137,7 @@ public class UserServiceImpl implements UserService {
             if (gender == null) {
                 customerProfileDto.setGender(null);
             } else {
-                customerProfileDto.setGender(new GenderDTO(gender.getId(), gender.getName()));
+                customerProfileDto.setGender(gender.getName());
             }
 
             userDTO.setCustomerProfile(customerProfileDto);
@@ -158,8 +152,7 @@ public class UserServiceImpl implements UserService {
             providerProfileDto.setCompanyName(providerProfile.getCompanyName());
             providerProfileDto.setCompanyAddress(providerProfile.getCompanyAddress());
 
-            TypeOfProvider typeOfProvider = providerProfile.getTypeOfProviderId();
-            providerProfileDto.setTypeOfProvider(new TypeOfProviderDTO(typeOfProvider.getId(), typeOfProvider.getName()));
+            providerProfileDto.setTypeOfProvider(providerProfile.getTypeOfProviderId().getName());
             userDTO.setProviderProfile(providerProfileDto);
         }
         return userDTO;

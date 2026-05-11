@@ -13,7 +13,7 @@ public class ProviderProfileDTO {
     private Integer id;
     private String companyName;
     private String companyAddress;
-    private TypeOfProviderDTO typeOfProvider;
+    private String typeOfProvider;
 
     public Integer getId() {
         return id;
@@ -39,11 +39,11 @@ public class ProviderProfileDTO {
         this.companyAddress = companyAddress;
     }
 
-    public TypeOfProviderDTO getTypeOfProvider() {
+    public String getTypeOfProvider() {
         return typeOfProvider;
     }
 
-    public void setTypeOfProvider(TypeOfProviderDTO typeOfProvider) {
+    public void setTypeOfProvider(String typeOfProvider) {
         this.typeOfProvider = typeOfProvider;
     }
 }

@@ -14,7 +14,7 @@ public class CustomerProfileDTO {
 
     private Integer id;
     private Date dob;
-    private GenderDTO gender;
+    private String gender;
 
     public Integer getId() {
         return id;
@@ -32,11 +32,11 @@ public class CustomerProfileDTO {
         this.dob = dob;
     }
 
-    public GenderDTO getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(GenderDTO gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 }
