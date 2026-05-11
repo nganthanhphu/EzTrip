@@ -4,6 +4,7 @@
  */
 package com.hp.services.handler.profile;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 
@@ -51,8 +52,9 @@ public class CustomProfileHandler implements UserProfileHandler {
         profile.setGenderId(gender);
 
         String dobString = u.getDob();
-        Instant dob = Instant.parse(dobString);
-        profile.setDob(Date.from(dob));
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date dob = sdf.parse(dobString);
+        profile.setDob(dob);
 
         user.setCustomerProfile(profile);
         user.setIsActive(true);
