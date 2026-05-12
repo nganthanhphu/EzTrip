@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -58,7 +57,6 @@ public class ApiUserController {
     }
 
     @RequestMapping("/secure/profile")
-    @ResponseBody
     public ResponseEntity<UserViewDTO> getProfile(Principal principal) {
         String phoneNumber = principal.getName();
         return new ResponseEntity<>(this.userService.getUserByPhone(phoneNumber), HttpStatus.OK);
