@@ -90,6 +90,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         List<Predicate> havingPredicates = new ArrayList<>();
 
         predicates.add(b.equal(root.get("isActive"), true));
+        predicates.add(b.greaterThan(root.get("quantity"), 0));
 
         if (params != null) {
 
@@ -100,7 +101,8 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
             String departureLocation = params.get("departureLocation");
             if (departureLocation != null && !departureLocation.isEmpty()) {
-                predicates.add(b.like(transportation.get("departureLocation"), String.format("%%%s%%", departureLocation)));
+                predicates.add(
+                        b.like(transportation.get("departureLocation"), String.format("%%%s%%", departureLocation)));
             }
 
             String fromPrice = params.get("fromPrice");

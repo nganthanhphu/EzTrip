@@ -87,6 +87,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
         List<Predicate> havingPredicates = new ArrayList<>();
 
         predicates.add(b.equal(root.get("isActive"), true));
+        predicates.add(b.greaterThan(root.get("quantity"), 0));
 
         if (params != null) {
 
