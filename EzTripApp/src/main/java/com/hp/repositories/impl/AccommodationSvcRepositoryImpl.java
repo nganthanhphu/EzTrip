@@ -21,7 +21,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.dto.service.ListAccommodationSvcDTO;
+import com.hp.dto.service.ListViewAccommodationSvcDTO;
 import com.hp.repositories.AccommodationSvcRepository;
 import com.hp.pojo.Booking;
 import com.hp.pojo.Image;
@@ -53,10 +53,10 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
     private Environment env;
 
     @Override
-    public List<ListAccommodationSvcDTO> getAccommodationServices(Map<String, String> params) {
+    public List<ListViewAccommodationSvcDTO> getAccommodationServices(Map<String, String> params) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<ListAccommodationSvcDTO> q = b.createQuery(ListAccommodationSvcDTO.class);
+        CriteriaQuery<ListViewAccommodationSvcDTO> q = b.createQuery(ListViewAccommodationSvcDTO.class);
         Root<Service> root = q.from(Service.class);
 
         Subquery<String> imageUrl = q.subquery(String.class);
@@ -68,8 +68,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
         Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
         Join<Booking, Review> review = booking.join("review", JoinType.LEFT);
 
-        q.select(b.construct(
-                ListAccommodationSvcDTO.class,
+        q.select(b.construct(ListViewAccommodationSvcDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("price"),
@@ -162,7 +161,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
 
         q.groupBy(root.get("id"));
 
-        Query<ListAccommodationSvcDTO> query = s.createQuery(q);
+        Query<ListViewAccommodationSvcDTO> query = s.createQuery(q);
 
         if (params != null) {
             int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);

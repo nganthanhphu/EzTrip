@@ -21,7 +21,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.dto.service.ListTourismSvcDTO;
+import com.hp.dto.service.ListViewTourismSvcDTO;
 import com.hp.pojo.Booking;
 import com.hp.pojo.Image;
 import com.hp.pojo.Review;
@@ -53,10 +53,10 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
     private Environment env;
 
     @Override
-    public List<ListTourismSvcDTO> getTourismServices(Map<String, String> params) {
+    public List<ListViewTourismSvcDTO> getTourismServices(Map<String, String> params) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<ListTourismSvcDTO> q = b.createQuery(ListTourismSvcDTO.class);
+        CriteriaQuery<ListViewTourismSvcDTO> q = b.createQuery(ListViewTourismSvcDTO.class);
         Root<Service> root = q.from(Service.class);
 
         Subquery<String> imageUrl = q.subquery(String.class);
@@ -68,7 +68,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
         Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
         Join<Booking, Review> review = booking.join("review", JoinType.LEFT);
 
-        q.select(b.construct(ListTourismSvcDTO.class,
+        q.select(b.construct(ListViewTourismSvcDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("price"),
@@ -156,7 +156,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
 
         q.groupBy(root.get("id"));
 
-        Query<ListTourismSvcDTO> query = s.createQuery(q);
+        Query<ListViewTourismSvcDTO> query = s.createQuery(q);
 
         if (params != null) {
             int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);

@@ -10,7 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hp.dto.service.ListTransportationSvcDTO;
+import com.hp.dto.service.ListViewTransportationSvcDTO;
 import com.hp.repositories.TransportationSvcRepository;
 import com.hp.services.TransportationSvcService;
 
@@ -24,7 +24,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService{
     @Autowired
     private TransportationSvcRepository transportationSvcRepository;
     
-    public List<ListTransportationSvcDTO> getTransportationServices(Map<String, String> params) {
+    public List<ListViewTransportationSvcDTO> getTransportationServices(Map<String, String> params) {
         return this.transportationSvcRepository.getTransportationServices(params);
     }
 }

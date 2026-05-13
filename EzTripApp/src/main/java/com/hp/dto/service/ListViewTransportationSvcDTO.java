@@ -13,21 +13,21 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  *
  * @author Joon
  */
-public class ListTransportationSvcDTO {
-    private ListBaseServiceDTO baseInfo;
+public class ListViewTransportationSvcDTO {
+    private ListViewBaseServiceDTO baseInfo;
     private String arrivalLocation;
     private String departureLocation;
     @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm")
     private Date arrivalTime;
     private String typeOfTransportation;
 
-    public ListTransportationSvcDTO() {
+    public ListViewTransportationSvcDTO() {
     }
 
-    public ListTransportationSvcDTO(Integer id, String name, BigDecimal price, String image,
+    public ListViewTransportationSvcDTO(Integer id, String name, BigDecimal price, String image,
             Double avgRating, Long reviewCount, Long bookingCount, String arrivalLocation, String departureLocation,
             Date arrivalTime, String typeOfTransportation) {
-        this.baseInfo = new ListBaseServiceDTO(id, name, price, image, avgRating, reviewCount,
+        this.baseInfo = new ListViewBaseServiceDTO(id, name, price, image, avgRating, reviewCount,
                 bookingCount);
         this.arrivalLocation = arrivalLocation;
         this.departureLocation = departureLocation;
@@ -38,14 +38,14 @@ public class ListTransportationSvcDTO {
     /**
      * @return the baseInfo
      */
-    public ListBaseServiceDTO getBaseInfo() {
+    public ListViewBaseServiceDTO getBaseInfo() {
         return baseInfo;
     }
 
     /**
      * @param baseInfo the baseInfo to set
      */
-    public void setBaseInfo(ListBaseServiceDTO baseInfo) {
+    public void setBaseInfo(ListViewBaseServiceDTO baseInfo) {
         this.baseInfo = baseInfo;
     }
 

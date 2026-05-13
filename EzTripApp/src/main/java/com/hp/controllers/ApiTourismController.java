@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hp.dto.service.ListTourismSvcDTO;
+import com.hp.dto.service.ListViewTourismSvcDTO;
 import com.hp.services.TourismSvcService;
 
 /**
@@ -30,8 +30,8 @@ public class ApiTourismController {
     private TourismSvcService tourismService;
 
     @GetMapping("/tourisms")
-    public ResponseEntity<List<ListTourismSvcDTO>> getTourisms(@RequestParam Map<String, String> params) {
-        List<ListTourismSvcDTO> tourisms = this.tourismService.getTourismServices(params);
+    public ResponseEntity<List<ListViewTourismSvcDTO>> getTourisms(@RequestParam Map<String, String> params) {
+        List<ListViewTourismSvcDTO> tourisms = this.tourismService.getTourismServices(params);
         return new ResponseEntity<>(tourisms, HttpStatus.OK);
     }
 }

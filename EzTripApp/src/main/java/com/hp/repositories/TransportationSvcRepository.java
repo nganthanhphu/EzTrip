@@ -7,12 +7,12 @@ package com.hp.repositories;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.ListTransportationSvcDTO;
+import com.hp.dto.service.ListViewTransportationSvcDTO;
 
 /**
  *
  * @author Joon
  */
 public interface TransportationSvcRepository {
-    List<ListTransportationSvcDTO> getTransportationServices(Map<String, String> params);
+    List<ListViewTransportationSvcDTO> getTransportationServices(Map<String, String> params);
 }

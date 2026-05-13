@@ -21,7 +21,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.dto.service.ListTransportationSvcDTO;
+import com.hp.dto.service.ListViewTransportationSvcDTO;
 import com.hp.pojo.Booking;
 import com.hp.pojo.Image;
 import com.hp.pojo.Review;
@@ -54,10 +54,10 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
     private Environment env;
 
     @Override
-    public List<ListTransportationSvcDTO> getTransportationServices(Map<String, String> params) {
+    public List<ListViewTransportationSvcDTO> getTransportationServices(Map<String, String> params) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<ListTransportationSvcDTO> q = b.createQuery(ListTransportationSvcDTO.class);
+        CriteriaQuery<ListViewTransportationSvcDTO> q = b.createQuery(ListViewTransportationSvcDTO.class);
         Root<Service> root = q.from(Service.class);
 
         Subquery<String> imageUrl = q.subquery(String.class);
@@ -71,7 +71,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
         Join<Booking, Review> review = booking.join("review", JoinType.LEFT);
 
-        q.select(b.construct(ListTransportationSvcDTO.class,
+        q.select(b.construct(ListViewTransportationSvcDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("price"),
@@ -165,7 +165,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
         q.groupBy(root.get("id"));
 
-        Query<ListTransportationSvcDTO> query = s.createQuery(q);
+        Query<ListViewTransportationSvcDTO> query = s.createQuery(q);
 
         if (params != null) {
             int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);

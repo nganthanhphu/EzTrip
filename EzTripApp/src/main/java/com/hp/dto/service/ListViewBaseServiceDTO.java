@@ -10,7 +10,7 @@ import java.math.BigDecimal;
  *
  * @author Joon
  */
-public class ListBaseServiceDTO {
+public class ListViewBaseServiceDTO {
 
     private Integer id;
     private String name;
@@ -20,10 +20,10 @@ public class ListBaseServiceDTO {
     private Long reviewCount;
     private Long bookingCount;
 
-    public ListBaseServiceDTO() {
+    public ListViewBaseServiceDTO() {
     }
 
-    public ListBaseServiceDTO(Integer id, String name, BigDecimal price, String image, Double avgRating,
+    public ListViewBaseServiceDTO(Integer id, String name, BigDecimal price, String image, Double avgRating,
             Long reviewCount, Long bookingCount) {
         this.id = id;
         this.name = name;

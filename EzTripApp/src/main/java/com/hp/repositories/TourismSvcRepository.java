@@ -7,12 +7,12 @@ package com.hp.repositories;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.ListTourismSvcDTO;
+import com.hp.dto.service.ListViewTourismSvcDTO;
 
 /**
  *
  * @author Joon
  */
 public interface TourismSvcRepository {
-    List<ListTourismSvcDTO> getTourismServices(Map<String, String> params);
+    List<ListViewTourismSvcDTO> getTourismServices(Map<String, String> params);
 }

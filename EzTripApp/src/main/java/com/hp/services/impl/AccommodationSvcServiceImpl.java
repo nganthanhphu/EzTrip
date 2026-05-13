@@ -10,7 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hp.dto.service.ListAccommodationSvcDTO;
+import com.hp.dto.service.ListViewAccommodationSvcDTO;
 import com.hp.repositories.AccommodationSvcRepository;
 import com.hp.services.AccommodationSvcService;
 
@@ -25,7 +25,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService{
     private AccommodationSvcRepository accommodationSvcRepository;
 
     @Override
-    public List<ListAccommodationSvcDTO> getAccommodationServices(Map<String, String> params) {
+    public List<ListViewAccommodationSvcDTO> getAccommodationServices(Map<String, String> params) {
         return this.accommodationSvcRepository.getAccommodationServices(params);
     }
     

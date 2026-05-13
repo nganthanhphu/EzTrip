@@ -10,7 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.hp.dto.service.ListTourismSvcDTO;
+import com.hp.dto.service.ListViewTourismSvcDTO;
 import com.hp.repositories.TourismSvcRepository;
 import com.hp.services.TourismSvcService;
 
@@ -25,7 +25,7 @@ public class TourismSvcServiceImpl implements TourismSvcService{
     private TourismSvcRepository tourismSvcRepository;
     
     @Override
-    public List<ListTourismSvcDTO> getTourismServices(Map<String, String> params) {
+    public List<ListViewTourismSvcDTO> getTourismServices(Map<String, String> params) {
         return this.tourismSvcRepository.getTourismServices(params);
     }
 }

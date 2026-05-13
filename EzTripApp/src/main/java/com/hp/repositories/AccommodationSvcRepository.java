@@ -7,13 +7,13 @@ package com.hp.repositories;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.ListAccommodationSvcDTO;
+import com.hp.dto.service.ListViewAccommodationSvcDTO;
 
 /**
  *
  * @author Joon
  */
 public interface AccommodationSvcRepository {
-    List<ListAccommodationSvcDTO> getAccommodationServices(Map<String, String> params);
+    List<ListViewAccommodationSvcDTO> getAccommodationServices(Map<String, String> params);
     
 }
