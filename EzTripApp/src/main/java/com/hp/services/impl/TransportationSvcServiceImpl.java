@@ -57,7 +57,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
         detail.setDepartureLocation(svc.getServiceTransportation().getDepartureLocation());
         detail.setArrivalTime(svc.getServiceTransportation().getArrivalTime());
         detail.setDepartureTime(svc.getServiceTransportation().getDepartureTime());
-        detail.setTypeOfTransportation(svc.getTypeOfServiceId().getName());
+        detail.setTypeOfTransportation(svc.getServiceTransportation().getTypeOfTransportationId().getName());
         return detail;
     }
 }
