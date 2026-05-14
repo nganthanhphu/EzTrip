@@ -13,15 +13,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.hp.services.UserService;
+import com.hp.security.MyUserDetails;
 import com.hp.utils.JwtUtils;
+import com.nimbusds.jwt.JWTClaimsSet;
 
 /**
  *
@@ -29,9 +34,6 @@ import com.hp.utils.JwtUtils;
  */
 @Component("jwtFilter")
 public class JwtFilter implements Filter {
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -52,9 +54,14 @@ public class JwtFilter implements Filter {
             } else {
                 String token = header.substring(7);
                 try {
-                    String username = this.jwtUtils.validateTokenAndGetUsername(token);
-                    if (username != null) {
-                        UserDetails userDetails = this.userService.loadUserByUsername(username);
+                    JWTClaimsSet claimsSet = this.jwtUtils.validateTokenAndGetClaimsSet(token);
+                    if (claimsSet != null) {
+                        String username = claimsSet.getSubject();
+                        Integer id = Integer.parseInt(claimsSet.getClaimAsString("id"));
+                        String role = claimsSet.getClaimAsString("role");
+                        Set<GrantedAuthority> authorities = new HashSet<>();
+                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+                        UserDetails userDetails = new MyUserDetails(id, username, "", authorities);
                         if (userDetails != null) {
                             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities());

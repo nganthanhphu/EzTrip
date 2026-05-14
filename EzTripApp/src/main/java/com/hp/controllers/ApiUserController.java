@@ -6,6 +6,7 @@ package com.hp.controllers;
 
 import com.hp.dto.user.UserLoginDTO;
 import com.hp.dto.user.UserViewDTO;
+import com.hp.pojo.BaseUser;
 import com.hp.dto.user.UserRegisterDTO;
 import com.hp.services.UserService;
 import com.hp.utils.JwtUtils;
@@ -44,10 +45,10 @@ public class ApiUserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO u) {
-
-        if (this.userService.authenticate(u.getPhoneNumber(), u.getPassword())) {
+        BaseUser user = this.userService.authenticate(u.getPhoneNumber(), u.getPassword());
+        if (user != null) {
             try {
-                String token = this.jwtUtils.generateToken(u.getPhoneNumber());
+                String token = this.jwtUtils.generateToken(user.getId(), user.getPhoneNumber(), user.getRoleId().getName());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {
                 return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo JWT"));

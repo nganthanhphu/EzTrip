@@ -7,6 +7,7 @@ package com.hp.services;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.hp.dto.user.UserViewDTO;
+import com.hp.pojo.BaseUser;
 import com.hp.dto.user.UserRegisterDTO;
 
 /**
@@ -16,5 +17,5 @@ import com.hp.dto.user.UserRegisterDTO;
 public interface UserService extends UserDetailsService {
     UserViewDTO getUserByPhone(String phoneNumber);
     UserViewDTO addUser(UserRegisterDTO request) throws Exception;
-    boolean authenticate(String phoneNumber, String password);
+    BaseUser authenticate(String phoneNumber, String password);
 }

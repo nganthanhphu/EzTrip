@@ -107,7 +107,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean authenticate(String phoneNumber, String password) {
+    public BaseUser authenticate(String phoneNumber, String password) {
         return this.userRepository.authenticate(phoneNumber, password);
     }
 

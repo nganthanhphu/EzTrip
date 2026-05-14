@@ -44,12 +44,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public boolean authenticate(String phoneNumber, String password) {
+    public BaseUser authenticate(String phoneNumber, String password) {
         BaseUser u = this.getUserByPhone(phoneNumber);
         if (u != null) {
-            return passwordEncoder.matches(password, u.getPassword());
+            if (passwordEncoder.matches(password, u.getPassword())) {
+                return u;
+            }
         }
-        return false;
+        return null;
     }
 
 }

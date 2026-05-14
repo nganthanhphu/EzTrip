@@ -36,13 +36,15 @@ public class JwtUtils {
         this.EXPIRATION_MS = Long.parseLong(env.getProperty("JWT_EXPIRATION"));
     }
 
-    public String generateToken(String username) throws Exception {
+    public String generateToken(int id, String username, String role) throws Exception {
         JWSSigner signer = new MACSigner(SECRET);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(username)
                 .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .issueTime(new Date())
+                .claim("id", id)
+                .claim("role", role)
                 .build();
 
         SignedJWT signedJWT = new SignedJWT(
@@ -55,14 +57,14 @@ public class JwtUtils {
         return signedJWT.serialize();
     }
 
-    public String validateTokenAndGetUsername(String token) throws Exception {
+    public JWTClaimsSet validateTokenAndGetClaimsSet(String token) throws Exception {
         SignedJWT signedJWT = SignedJWT.parse(token);
         JWSVerifier verifier = new MACVerifier(SECRET);
 
         if (signedJWT.verify(verifier)) {
             Date expiration = signedJWT.getJWTClaimsSet().getExpirationTime();
             if (expiration.after(new Date())) {
-                return signedJWT.getJWTClaimsSet().getSubject();
+                return signedJWT.getJWTClaimsSet();
             }
         }
         return null;
