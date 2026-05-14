@@ -8,6 +8,7 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,7 +34,7 @@ import java.util.Set;
 @Table(name = "service")
 @NamedQueries({
         @NamedQuery(name = "Service.findAll", query = "SELECT s FROM Service s"),
-        @NamedQuery(name = "Service.findById", query = "SELECT s FROM Service s WHERE s.id = :id"),
+        @NamedQuery(name = "Service.findById", query = "SELECT s FROM Service s LEFT JOIN FETCH s.serviceAccommodation LEFT JOIN FETCH s.serviceTourism LEFT JOIN FETCH s.serviceTransportation LEFT JOIN FETCH s.serviceTransportation.typeOfTransportationId WHERE s.id = :id"),
         @NamedQuery(name = "Service.findByName", query = "SELECT s FROM Service s WHERE s.name = :name"),
         @NamedQuery(name = "Service.findByPrice", query = "SELECT s FROM Service s WHERE s.price = :price"),
         @NamedQuery(name = "Service.findByQuantity", query = "SELECT s FROM Service s WHERE s.quantity = :quantity"),
@@ -76,10 +77,10 @@ public class Service implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId")
     private ServiceTourism serviceTourism;
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private ProviderProfile providerId;
     @JoinColumn(name = "type_of_service_id", referencedColumnName = "id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private TypeOfService typeOfServiceId;
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId")
     private ServiceTransportation serviceTransportation;

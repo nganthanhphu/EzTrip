@@ -35,7 +35,7 @@ import java.io.Serializable;
     @NamedQuery(name = "BaseUser.findByEmail", query = "SELECT b FROM BaseUser b WHERE b.email = :email"),
     @NamedQuery(name = "BaseUser.findByPassword", query = "SELECT b FROM BaseUser b WHERE b.password = :password"),
     @NamedQuery(name = "BaseUser.findByAvatar", query = "SELECT b FROM BaseUser b WHERE b.avatar = :avatar"),
-    @NamedQuery(name = "BaseUser.findByPhoneNumber", query = "SELECT b FROM BaseUser b WHERE b.phoneNumber = :phoneNumber"),
+    @NamedQuery(name = "BaseUser.findByPhoneNumber", query = "SELECT b FROM BaseUser b LEFT JOIN FETCH b.customerProfile LEFT JOIN FETCH b.providerProfile LEFT JOIN FETCH b.roleId LEFT JOIN FETCH b.customerProfile.genderId LEFT JOIN FETCH b.providerProfile.typeOfProviderId WHERE b.phoneNumber = :phoneNumber"),
     @NamedQuery(name = "BaseUser.findByIsActive", query = "SELECT b FROM BaseUser b WHERE b.isActive = :isActive")})
 public class BaseUser implements Serializable {
 
