@@ -42,6 +42,9 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     }
 
     private DetailTourismSvcDTO toDetailTourismSvcDTO(com.hp.pojo.Service svc) {
+        if (svc == null)
+            return null;
+
         DetailBaseServiceDTO baseInfo = new DetailBaseServiceDTO();
         baseInfo.setId(svc.getId());
         baseInfo.setName(svc.getName());

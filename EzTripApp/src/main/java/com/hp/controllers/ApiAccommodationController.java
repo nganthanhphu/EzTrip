@@ -41,6 +41,11 @@ public class ApiAccommodationController {
     @GetMapping("/accommodations/{id}")
     public ResponseEntity<DetailAccommodationSvcDTO> getAccommodationById(@PathVariable(value = "id") int id) {
         DetailAccommodationSvcDTO accommodation = this.accommodationService.getAccommodationById(id);
-        return new ResponseEntity<>(accommodation, HttpStatus.OK);
+        
+        if (accommodation != null) {
+            return new ResponseEntity<>(accommodation, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

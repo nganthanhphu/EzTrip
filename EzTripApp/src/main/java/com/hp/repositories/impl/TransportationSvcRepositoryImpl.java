@@ -184,7 +184,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         Session s = this.factory.getObject().getCurrentSession();
         Query<Service> q = s.createNamedQuery("Service.findById", Service.class);
         q.setParameter("id", id);
-        return q.getSingleResult();
+        return q.uniqueResult();
     }
 
 }

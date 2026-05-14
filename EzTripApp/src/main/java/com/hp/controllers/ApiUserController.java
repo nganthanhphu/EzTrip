@@ -59,7 +59,13 @@ public class ApiUserController {
     @RequestMapping("/secure/profile")
     public ResponseEntity<UserViewDTO> getProfile(Principal principal) {
         String phoneNumber = principal.getName();
-        return new ResponseEntity<>(this.userService.getUserByPhone(phoneNumber), HttpStatus.OK);
+        UserViewDTO user = this.userService.getUserByPhone(phoneNumber);
+
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 }

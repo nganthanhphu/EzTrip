@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
         MultipartFile avatar = u.getAvatar();
         if (avatar != null && !avatar.isEmpty()) {
             try {
-                Map res = this.cloudinary.uploader().upload(avatar.getBytes(),
+                Map<?, ?> res = this.cloudinary.uploader().upload(avatar.getBytes(),
                         ObjectUtils.asMap("resource_type", "auto"));
                 user.setAvatar(res.get("secure_url").toString());
             } catch (IOException ex) {

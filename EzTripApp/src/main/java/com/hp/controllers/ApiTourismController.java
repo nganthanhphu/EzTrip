@@ -40,6 +40,11 @@ public class ApiTourismController {
     @GetMapping("/tourisms/{id}")
     public ResponseEntity<DetailTourismSvcDTO> getTourismById(@PathVariable(value = "id") int id) {
         DetailTourismSvcDTO tourism = this.tourismService.getTourismById(id);
-        return new ResponseEntity<>(tourism, HttpStatus.OK);
+        
+        if (tourism != null) {
+            return new ResponseEntity<>(tourism, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

@@ -42,6 +42,11 @@ public class ApiTransportationController {
     @GetMapping("/transportations/{id}")
     public ResponseEntity<DetailTransportationSvcDTO> getTransportationById(@PathVariable(value = "id") int id) {
         DetailTransportationSvcDTO transportation = this.transportationService.getTransportationById(id);
-        return new ResponseEntity<>(transportation, HttpStatus.OK);
+
+        if (transportation != null) {
+            return new ResponseEntity<>(transportation, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
