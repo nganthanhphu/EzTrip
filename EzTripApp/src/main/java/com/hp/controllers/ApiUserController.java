@@ -50,10 +50,10 @@ public class ApiUserController {
                 String token = this.jwtUtils.generateToken(u.getPhoneNumber());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {
-                return ResponseEntity.status(500).body("Lỗi khi tạo JWT");
+                return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo JWT"));
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Số điện thoại hoặc mật khẩu không đúng"));
     }
 
     @RequestMapping("/secure/profile")
