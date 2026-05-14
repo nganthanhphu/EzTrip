@@ -12,9 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.hp.dto.service.DetailTourismSvcDTO;
 import com.hp.dto.service.ListViewTourismSvcDTO;
 import com.hp.services.TourismSvcService;
 
@@ -25,7 +27,7 @@ import com.hp.services.TourismSvcService;
 @Controller
 @RequestMapping("/api")
 public class ApiTourismController {
-    
+
     @Autowired
     private TourismSvcService tourismService;
 
@@ -33,5 +35,11 @@ public class ApiTourismController {
     public ResponseEntity<List<ListViewTourismSvcDTO>> getTourisms(@RequestParam Map<String, String> params) {
         List<ListViewTourismSvcDTO> tourisms = this.tourismService.getTourismServices(params);
         return new ResponseEntity<>(tourisms, HttpStatus.OK);
+    }
+
+    @GetMapping("/tourisms/{id}")
+    public ResponseEntity<DetailTourismSvcDTO> getTourismById(@PathVariable(value = "id") int id) {
+        DetailTourismSvcDTO tourism = this.tourismService.getTourismById(id);
+        return new ResponseEntity<>(tourism, HttpStatus.OK);
     }
 }

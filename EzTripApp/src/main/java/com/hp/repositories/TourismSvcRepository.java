@@ -8,11 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.hp.dto.service.ListViewTourismSvcDTO;
+import com.hp.pojo.Service;
 
 /**
  *
  * @author Joon
  */
 public interface TourismSvcRepository {
+
     List<ListViewTourismSvcDTO> getTourismServices(Map<String, String> params);
+
+    Service getTourismById(Integer id);
 }

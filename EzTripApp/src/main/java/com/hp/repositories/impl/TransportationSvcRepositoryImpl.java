@@ -179,4 +179,12 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         return query.getResultList();
     }
 
+    @Override
+    public Service getTransportationById(Integer id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query<Service> q = s.createNamedQuery("Service.findById", Service.class);
+        q.setParameter("id", id);
+        return q.getSingleResult();
+    }
+
 }

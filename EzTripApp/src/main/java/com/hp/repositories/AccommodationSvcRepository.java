@@ -8,12 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 import com.hp.dto.service.ListViewAccommodationSvcDTO;
+import com.hp.pojo.Service;
 
 /**
  *
  * @author Joon
  */
 public interface AccommodationSvcRepository {
+
     List<ListViewAccommodationSvcDTO> getAccommodationServices(Map<String, String> params);
-    
+
+    Service getAccommodationById(Integer id);
+
 }

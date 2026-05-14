@@ -174,4 +174,13 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
 
         return query.getResultList();
     }
+
+    @Override
+    public Service getAccommodationById(Integer id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query<Service> q = s.createNamedQuery("Service.findById", Service.class);
+        q.setParameter("id", id);
+        return q.getSingleResult();
+    }
+
 }

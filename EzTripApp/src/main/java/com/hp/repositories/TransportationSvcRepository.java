@@ -8,11 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import com.hp.dto.service.ListViewTransportationSvcDTO;
+import com.hp.pojo.Service;
 
 /**
  *
  * @author Joon
  */
 public interface TransportationSvcRepository {
+
     List<ListViewTransportationSvcDTO> getTransportationServices(Map<String, String> params);
+
+    Service getTransportationById(Integer id);
 }

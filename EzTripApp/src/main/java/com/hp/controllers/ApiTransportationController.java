@@ -12,9 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.hp.dto.service.DetailTransportationSvcDTO;
 import com.hp.dto.service.ListViewTransportationSvcDTO;
 import com.hp.services.TransportationSvcService;
 
@@ -25,13 +27,21 @@ import com.hp.services.TransportationSvcService;
 @Controller
 @RequestMapping("/api")
 public class ApiTransportationController {
-    
+
     @Autowired
     private TransportationSvcService transportationService;
 
     @GetMapping("/transportations")
-    public ResponseEntity<List<ListViewTransportationSvcDTO>> getTransportations(@RequestParam Map<String, String> params) {
-        List<ListViewTransportationSvcDTO> transportations = this.transportationService.getTransportationServices(params);
+    public ResponseEntity<List<ListViewTransportationSvcDTO>> getTransportations(
+            @RequestParam Map<String, String> params) {
+        List<ListViewTransportationSvcDTO> transportations = this.transportationService
+                .getTransportationServices(params);
         return new ResponseEntity<>(transportations, HttpStatus.OK);
+    }
+
+    @GetMapping("/transportations/{id}")
+    public ResponseEntity<DetailTransportationSvcDTO> getTransportationById(@PathVariable(value = "id") int id) {
+        DetailTransportationSvcDTO transportation = this.transportationService.getTransportationById(id);
+        return new ResponseEntity<>(transportation, HttpStatus.OK);
     }
 }

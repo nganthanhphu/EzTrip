@@ -168,4 +168,12 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
 
         return query.getResultList();
     }
+
+    @Override
+    public Service getTourismById(Integer id) {
+        Session s  = this.factory.getObject().getCurrentSession();
+        Query<Service> q = s.createNamedQuery("Service.findById", Service.class);
+        q.setParameter("id", id);
+        return q.getSingleResult();
+    }
 }
