@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import com.hp.security.MyUserDetails;
 import com.hp.utils.JwtUtils;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 /**
@@ -71,7 +73,7 @@ public class JwtFilter implements Filter {
                             return;
                         }
                     }
-                } catch (Exception e) {
+                } catch (ParseException | JOSEException ex) {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ!");
                     return;
                 }

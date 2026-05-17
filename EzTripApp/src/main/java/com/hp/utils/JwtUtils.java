@@ -9,14 +9,18 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.KeyLengthException;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -36,7 +40,7 @@ public class JwtUtils {
         this.EXPIRATION_MS = Long.parseLong(env.getProperty("JWT_EXPIRATION"));
     }
 
-    public String generateToken(int id, String username, String role) throws Exception {
+    public String generateToken(int id, String username, String role) throws KeyLengthException, JOSEException {
         JWSSigner signer = new MACSigner(SECRET);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
@@ -57,7 +61,7 @@ public class JwtUtils {
         return signedJWT.serialize();
     }
 
-    public JWTClaimsSet validateTokenAndGetClaimsSet(String token) throws Exception {
+    public JWTClaimsSet validateTokenAndGetClaimsSet(String token) throws ParseException, JOSEException{
         SignedJWT signedJWT = SignedJWT.parse(token);
         JWSVerifier verifier = new MACVerifier(SECRET);
 
