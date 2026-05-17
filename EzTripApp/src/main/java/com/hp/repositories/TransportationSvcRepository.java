@@ -19,4 +19,6 @@ public interface TransportationSvcRepository {
     List<ListViewTransportationSvcDTO> getTransportationServices(Map<String, String> params);
 
     Service getTransportationById(Integer id);
+
+    Service addOrUpdateTransportation(Service svc);
 }

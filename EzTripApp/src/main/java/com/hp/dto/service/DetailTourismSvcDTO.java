@@ -7,12 +7,41 @@ package com.hp.dto.service;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
  * @author Joon
  */
 public class DetailTourismSvcDTO {
+
+    /**
+     * @return the startDt
+     */
+    public String getStartDt() {
+        return startDt;
+    }
+
+    /**
+     * @param startDt the startDt to set
+     */
+    public void setStartDt(String startDt) {
+        this.startDt = startDt;
+    }
+
+    /**
+     * @return the endDt
+     */
+    public String getEndDt() {
+        return endDt;
+    }
+
+    /**
+     * @param endDt the endDt to set
+     */
+    public void setEndDt(String endDt) {
+        this.endDt = endDt;
+    }
     private DetailBaseServiceDTO baseInfo;
     private Integer id;
     @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
@@ -20,6 +49,10 @@ public class DetailTourismSvcDTO {
     @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
     private Date endDate;
     private String location;
+    @JsonIgnore
+    private String startDt;
+    @JsonIgnore
+    private String endDt;
 
     public DetailTourismSvcDTO() {
     }

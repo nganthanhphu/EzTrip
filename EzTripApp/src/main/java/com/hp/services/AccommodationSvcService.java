@@ -18,4 +18,6 @@ public interface AccommodationSvcService {
     List<ListViewAccommodationSvcDTO> getAccommodationServices(Map<String, String> params);
 
     DetailAccommodationSvcDTO getAccommodationById(Integer id);
+
+    DetailAccommodationSvcDTO addAccommodation(DetailAccommodationSvcDTO accommodation) throws Exception;
 }

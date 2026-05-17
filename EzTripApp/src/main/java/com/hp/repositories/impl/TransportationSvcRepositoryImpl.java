@@ -187,4 +187,14 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         return q.uniqueResult();
     }
 
+    @Override
+    public Service addOrUpdateTransportation(Service svc) {
+        Session s = this.factory.getObject().getCurrentSession();
+        if (svc.getId() != null)
+            s.merge(svc);
+        else
+            s.persist(svc);
+
+        return svc;
+    }
 }

@@ -7,6 +7,7 @@ package com.hp.dto.service;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -23,6 +24,10 @@ public class DetailTransportationSvcDTO {
     @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm")
     private Date departureTime;
     private String typeOfTransportation;
+    @JsonIgnore
+    private String arrivalTm;
+    @JsonIgnore
+    private String departureTm;
 
     public DetailTransportationSvcDTO() {
     }
@@ -133,6 +138,34 @@ public class DetailTransportationSvcDTO {
      */
     public void setTypeOfTransportation(String typeOfTransportation) {
         this.typeOfTransportation = typeOfTransportation;
+    }
+
+    /**
+     * @return the arrivalTm
+     */
+    public String getArrivalTm() {
+        return arrivalTm;
+    }
+
+    /**
+     * @param arrivalTm the arrivalTm to set
+     */
+    public void setArrivalTm(String arrivalTm) {
+        this.arrivalTm = arrivalTm;
+    }
+
+    /**
+     * @return the departureTm
+     */
+    public String getDepartureTm() {
+        return departureTm;
+    }
+
+    /**
+     * @param departureTm the departureTm to set
+     */
+    public void setDepartureTm(String departureTm) {
+        this.departureTm = departureTm;
     }
 
 }

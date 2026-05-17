@@ -19,4 +19,6 @@ public interface TourismSvcRepository {
     List<ListViewTourismSvcDTO> getTourismServices(Map<String, String> params);
 
     Service getTourismById(Integer id);
+
+    Service addOrUpdateTourism(Service svc);
 }

@@ -20,4 +20,6 @@ public interface AccommodationSvcRepository {
 
     Service getAccommodationById(Integer id);
 
+    Service addOrUpdateAccommodation(Service svc);
+
 }

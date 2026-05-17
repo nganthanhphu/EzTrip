@@ -18,4 +18,6 @@ public interface TourismSvcService {
     List<ListViewTourismSvcDTO> getTourismServices(Map<String, String> params);
 
     DetailTourismSvcDTO getTourismById(Integer id);
+    
+    DetailTourismSvcDTO addTourism(DetailTourismSvcDTO tourism) throws Exception;
 }

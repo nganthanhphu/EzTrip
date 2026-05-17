@@ -16,5 +16,8 @@ import com.hp.dto.service.ListViewTransportationSvcDTO;
  */
 public interface TransportationSvcService {
     List<ListViewTransportationSvcDTO> getTransportationServices(Map<String, String> params);
+
     DetailTransportationSvcDTO getTransportationById(Integer id);
+
+    DetailTransportationSvcDTO addTransportation(DetailTransportationSvcDTO transportation) throws Exception;
 }

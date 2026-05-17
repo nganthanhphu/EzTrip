@@ -5,7 +5,12 @@
 package com.hp.dto.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -19,6 +24,8 @@ public class DetailBaseServiceDTO {
     private BigDecimal price;
     private Integer quantity;
     private Set<String> images;
+    @JsonIgnore
+    private List<MultipartFile> imgFiles;
 
     public DetailBaseServiceDTO() {
     }
@@ -115,6 +122,20 @@ public class DetailBaseServiceDTO {
      */
     public void setImages(Set<String> images) {
         this.images = images;
+    }
+
+    /**
+     * @return the imgFiles
+     */
+    public List<MultipartFile> getImgFiles() {
+        return imgFiles;
+    }
+
+    /**
+     * @param imgFiles the imgFiles to set
+     */
+    public void setImgFiles(List<MultipartFile> imgFiles) {
+        this.imgFiles = imgFiles;
     }
 
 }

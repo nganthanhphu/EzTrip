@@ -183,4 +183,15 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
         return q.uniqueResult();
     }
 
+    @Override
+    public Service addOrUpdateAccommodation(Service svc) {
+        Session s = this.factory.getObject().getCurrentSession();
+        if (svc.getId() != null)
+            s.merge(svc);
+        else
+            s.persist(svc);
+
+        return svc;
+    }
+
 }

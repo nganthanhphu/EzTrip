@@ -7,6 +7,7 @@ package com.hp.dto.service;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -23,11 +24,16 @@ public class DetailAccommodationSvcDTO {
     private int quantityOfBed;
     private float area;
     private String location;
+    @JsonIgnore
+    private String checkInDt;
+    @JsonIgnore
+    private String checkOutDt;
 
     public DetailAccommodationSvcDTO() {
     }
 
-    public DetailAccommodationSvcDTO(DetailBaseServiceDTO baseInfo, Integer id, Date checkInDate, Date checkOutDate, int quantityOfBed, float area, String location) {
+    public DetailAccommodationSvcDTO(DetailBaseServiceDTO baseInfo, Integer id, Date checkInDate, Date checkOutDate,
+            int quantityOfBed, float area, String location) {
         this.baseInfo = baseInfo;
         this.id = id;
         this.checkInDate = checkInDate;
@@ -133,6 +139,34 @@ public class DetailAccommodationSvcDTO {
      */
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    /**
+     * @return the checkInDt
+     */
+    public String getCheckInDt() {
+        return checkInDt;
+    }
+
+    /**
+     * @param checkInDt the checkInDt to set
+     */
+    public void setCheckInDt(String checkInDt) {
+        this.checkInDt = checkInDt;
+    }
+
+    /**
+     * @return the checkOutDt
+     */
+    public String getCheckOutDt() {
+        return checkOutDt;
+    }
+
+    /**
+     * @param checkOutDt the checkOutDt to set
+     */
+    public void setCheckOutDt(String checkOutDt) {
+        this.checkOutDt = checkOutDt;
     }
 
 }

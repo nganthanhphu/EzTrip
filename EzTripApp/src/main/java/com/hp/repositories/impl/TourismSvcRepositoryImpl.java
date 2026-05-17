@@ -176,4 +176,15 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
         q.setParameter("id", id);
         return q.uniqueResult();
     }
+
+    @Override
+    public Service addOrUpdateTourism(Service svc) {
+        Session s = this.factory.getObject().getCurrentSession();
+        if (svc.getId() != null)
+            s.merge(svc);
+        else
+            s.persist(svc);
+        
+        return svc;
+    }
 }
