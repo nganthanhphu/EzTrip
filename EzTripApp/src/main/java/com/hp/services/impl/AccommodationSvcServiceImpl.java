@@ -50,6 +50,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
         baseInfo.setName(svc.getName());
         baseInfo.setDescription(svc.getDescription());
         baseInfo.setPrice(svc.getPrice());
+        baseInfo.setQuantity(svc.getQuantity());
         Set<String> images = svc.getImageSet().stream().map(img -> img.getUrl()).collect(Collectors.toSet());
         baseInfo.setImages(images);
         DetailAccommodationSvcDTO detail = new DetailAccommodationSvcDTO();
