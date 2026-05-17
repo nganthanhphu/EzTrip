@@ -52,7 +52,7 @@ public class CustomProfileHandler implements UserProfileHandler {
         profile.setGenderId(gender);
 
         String dobString = u.getDob();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date dob = sdf.parse(dobString);
         profile.setDob(dob);
 
