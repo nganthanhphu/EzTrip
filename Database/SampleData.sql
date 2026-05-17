@@ -150,7 +150,13 @@ WHERE n <= 20;
 INSERT INTO image (service_id, url)
 SELECT
   s.id,
-  'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/g6o8vehguon2x7vgxnej.png'
+  CASE i.n
+    WHEN 1 THEN 'https://res.cloudinary.com/dkzzyue98/image/upload/v1779034949/c7n4arpmnzmsi7insysc.jpg'
+    WHEN 2 THEN 'https://res.cloudinary.com/dkzzyue98/image/upload/v1779034949/rd71rpijarprhikmteyt.jpg'
+    WHEN 3 THEN 'https://res.cloudinary.com/dkzzyue98/image/upload/v1779034949/xznfv4zvdilpk4wtwhqj.jpg'
+    WHEN 4 THEN 'https://res.cloudinary.com/dkzzyue98/image/upload/v1779034949/lja8hidxksjvc9uiukni.jpg'
+    WHEN 5 THEN 'https://res.cloudinary.com/dkzzyue98/image/upload/v1779034949/nag7vrr7ecbb7safflq9.jpg'
+  END
 FROM service s
 JOIN tmp_numbers i ON i.n <= (1 + (s.id % 5))
 WHERE s.id BETWEEN 1000 AND 3019;
