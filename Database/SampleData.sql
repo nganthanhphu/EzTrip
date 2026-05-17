@@ -66,10 +66,9 @@ SELECT
   CONCAT('Provider ', 200 + n, ' Co'),
   CONCAT('Address ', 200 + n),
   CASE
-    WHEN n <= 3 THEN 1
-    WHEN n <= 6 THEN 2
-    WHEN n <= 9 THEN 3
-    ELSE 4
+    WHEN n <= 4 THEN 1
+    WHEN n <= 8 THEN 2
+    ELSE 3
   END
 FROM tmp_numbers
 WHERE n <= 12;

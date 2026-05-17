@@ -22,7 +22,7 @@ CREATE TABLE type_of_provider (
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO type_of_provider (name) VALUES ('TRAVEL_AGENCY'), ('ACCOMMODATION'), ('BUS_OPERATOR'), ('AIRLINE');
+INSERT INTO type_of_provider (id, name) VALUES (1, 'TRAVEL_AGENCY'), (2, 'ACCOMMODATION'), (3, 'TRANSPORTATION');
 
 CREATE TABLE type_of_service (
     id int PRIMARY KEY AUTO_INCREMENT,
