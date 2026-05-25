@@ -26,14 +26,14 @@ import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.service.AccommodationSvcDetailDTO;
 import com.hp.dto.service.BaseServiceDetailDTO;
 import com.hp.dto.service.AccommodationSvcListDTO;
-import com.hp.dto.user.UserProfileDTO;
+import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceAccommodation;
 import com.hp.pojo.TypeOfService;
 import com.hp.repositories.AccommodationSvcRepository;
+import com.hp.repositories.UserRepository;
 import com.hp.services.AccommodationSvcService;
-import com.hp.services.UserService;
 import com.hp.utils.UserUtils;
 
 /**
@@ -48,7 +48,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
     private AccommodationSvcRepository accommodationSvcRepository;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
     private Cloudinary cloudinary;
@@ -89,7 +89,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Override
     public AccommodationSvcDetailDTO addAccommodation(AccommodationSvcDetailDTO accommodation) throws ParseException {
-        UserProfileDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(accommodation.getBaseInfo().getName());
         svc.setDescription(accommodation.getBaseInfo().getDescription());

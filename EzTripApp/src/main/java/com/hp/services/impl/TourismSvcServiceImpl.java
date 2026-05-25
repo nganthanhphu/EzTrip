@@ -26,14 +26,14 @@ import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.service.BaseServiceDetailDTO;
 import com.hp.dto.service.TourismSvcDetailDTO;
 import com.hp.dto.service.TourismSvcListDTO;
-import com.hp.dto.user.UserProfileDTO;
+import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceTourism;
 import com.hp.pojo.TypeOfService;
 import com.hp.repositories.TourismSvcRepository;
+import com.hp.repositories.UserRepository;
 import com.hp.services.TourismSvcService;
-import com.hp.services.UserService;
 import com.hp.utils.UserUtils;
 
 /**
@@ -48,7 +48,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     private TourismSvcRepository tourismSvcRepository;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
     private Cloudinary cloudinary;
@@ -87,7 +87,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Override
     public TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws ParseException {
-        UserProfileDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(tourism.getBaseInfo().getName());
         svc.setDescription(tourism.getBaseInfo().getDescription());

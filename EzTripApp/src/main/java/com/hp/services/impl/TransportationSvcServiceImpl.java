@@ -26,7 +26,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.service.BaseServiceDetailDTO;
 import com.hp.dto.service.TransportationSvcDetailDTO;
 import com.hp.dto.service.TransportationSvcListDTO;
-import com.hp.dto.user.UserProfileDTO;
+import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceTransportation;
@@ -34,8 +34,8 @@ import com.hp.pojo.TypeOfService;
 import com.hp.pojo.TypeOfTransportation;
 import com.hp.repositories.TransportationSvcRepository;
 import com.hp.repositories.TypeOfTransportationRepository;
+import com.hp.repositories.UserRepository;
 import com.hp.services.TransportationSvcService;
-import com.hp.services.UserService;
 import com.hp.utils.UserUtils;
 
 /**
@@ -50,7 +50,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
     private TransportationSvcRepository transportationSvcRepository;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Autowired
     private Cloudinary cloudinary;
@@ -98,7 +98,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
             throw new IllegalArgumentException("Loại phương tiện không hợp lệ!");
         }
 
-        UserProfileDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(transportation.getBaseInfo().getName());
         svc.setDescription(transportation.getBaseInfo().getDescription());
