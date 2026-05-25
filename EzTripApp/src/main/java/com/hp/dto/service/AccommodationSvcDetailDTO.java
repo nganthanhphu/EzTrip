@@ -13,9 +13,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author Joon
  */
-public class DetailAccommodationSvcDTO {
+public class AccommodationSvcDetailDTO {
 
-    private DetailBaseServiceDTO baseInfo;
+    private BaseServiceDetailDTO baseInfo;
     private Integer id;
     @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
     private Date checkInDate;
@@ -29,10 +29,10 @@ public class DetailAccommodationSvcDTO {
     @JsonIgnore
     private String checkOutDt;
 
-    public DetailAccommodationSvcDTO() {
+    public AccommodationSvcDetailDTO() {
     }
 
-    public DetailAccommodationSvcDTO(DetailBaseServiceDTO baseInfo, Integer id, Date checkInDate, Date checkOutDate,
+    public AccommodationSvcDetailDTO(BaseServiceDetailDTO baseInfo, Integer id, Date checkInDate, Date checkOutDate,
             int quantityOfBed, float area, String location) {
         this.baseInfo = baseInfo;
         this.id = id;
@@ -46,14 +46,14 @@ public class DetailAccommodationSvcDTO {
     /**
      * @return the baseInfo
      */
-    public DetailBaseServiceDTO getBaseInfo() {
+    public BaseServiceDetailDTO getBaseInfo() {
         return baseInfo;
     }
 
     /**
      * @param baseInfo the baseInfo to set
      */
-    public void setBaseInfo(DetailBaseServiceDTO baseInfo) {
+    public void setBaseInfo(BaseServiceDetailDTO baseInfo) {
         this.baseInfo = baseInfo;
     }
 

@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author Joon
  */
-public class DetailBaseServiceDTO {
+public class BaseServiceDetailDTO {
 
     private Integer id;
     private String name;
@@ -27,10 +27,10 @@ public class DetailBaseServiceDTO {
     @JsonIgnore
     private List<MultipartFile> imgFiles;
 
-    public DetailBaseServiceDTO() {
+    public BaseServiceDetailDTO() {
     }
 
-    public DetailBaseServiceDTO(Integer id, String name, String description, BigDecimal price, Integer quantity, Set<String> images) {
+    public BaseServiceDetailDTO(Integer id, String name, String description, BigDecimal price, Integer quantity, Set<String> images) {
         this.id = id;
         this.name = name;
         this.description = description;

@@ -4,30 +4,62 @@
  */
 package com.hp.dto.service;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
  * @author Joon
  */
-public class ListViewTourismSvcDTO {
-    private ListViewBaseServiceDTO baseInfo;
+public class TourismSvcDetailDTO {
+
+    /**
+     * @return the startDt
+     */
+    public String getStartDt() {
+        return startDt;
+    }
+
+    /**
+     * @param startDt the startDt to set
+     */
+    public void setStartDt(String startDt) {
+        this.startDt = startDt;
+    }
+
+    /**
+     * @return the endDt
+     */
+    public String getEndDt() {
+        return endDt;
+    }
+
+    /**
+     * @param endDt the endDt to set
+     */
+    public void setEndDt(String endDt) {
+        this.endDt = endDt;
+    }
+    private BaseServiceDetailDTO baseInfo;
+    private Integer id;
     @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
     private Date startDate;
     @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
     private Date endDate;
     private String location;
+    @JsonIgnore
+    private String startDt;
+    @JsonIgnore
+    private String endDt;
 
-    public ListViewTourismSvcDTO() {
+    public TourismSvcDetailDTO() {
     }
 
-    public ListViewTourismSvcDTO(Integer id, String name, BigDecimal price,String image,
-            Double avgRating, Long reviewCount, Long bookingCount, Date startDate, Date endDate,
-            String location) {
-        this.baseInfo = new ListViewBaseServiceDTO(id, name, price, image, avgRating, reviewCount, bookingCount);
+    public TourismSvcDetailDTO(BaseServiceDetailDTO baseInfo, Integer id, Date startDate, Date endDate, String location) {
+        this.baseInfo = baseInfo;
+        this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
         this.location = location;
@@ -36,40 +68,54 @@ public class ListViewTourismSvcDTO {
     /**
      * @return the baseInfo
      */
-    public ListViewBaseServiceDTO getBaseInfo() {
+    public BaseServiceDetailDTO getBaseInfo() {
         return baseInfo;
     }
 
     /**
      * @param baseInfo the baseInfo to set
      */
-    public void setBaseInfo(ListViewBaseServiceDTO baseInfo) {
+    public void setBaseInfo(BaseServiceDetailDTO baseInfo) {
         this.baseInfo = baseInfo;
     }
 
     /**
-     * @return the start_date
+     * @return the id
+     */
+    public Integer getId() {
+        return id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    /**
+     * @return the startDate
      */
     public Date getStartDate() {
         return startDate;
     }
 
     /**
-     * @param start_date the start_date to set
+     * @param startDate the startDate to set
      */
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
     }
 
     /**
-     * @return the end_date
+     * @return the endDate
      */
     public Date getEndDate() {
         return endDate;
     }
 
     /**
-     * @param end_date the end_date to set
+     * @param endDate the endDate to set
      */
     public void setEndDate(Date endDate) {
         this.endDate = endDate;

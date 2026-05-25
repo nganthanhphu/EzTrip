@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class DetailTransportationSvcDTO {
 
-    private DetailBaseServiceDTO baseInfo;
+    private BaseServiceDetailDTO baseInfo;
     private Integer id;
     private String arrivalLocation;
     private String departureLocation;
@@ -32,7 +32,7 @@ public class DetailTransportationSvcDTO {
     public DetailTransportationSvcDTO() {
     }
 
-    public DetailTransportationSvcDTO(DetailBaseServiceDTO baseInfo, Integer id, String arrivalLocation, String departureLocation, Date arrivalTime, Date departureTime, String typeOfTransportation) {
+    public DetailTransportationSvcDTO(BaseServiceDetailDTO baseInfo, Integer id, String arrivalLocation, String departureLocation, Date arrivalTime, Date departureTime, String typeOfTransportation) {
         this.baseInfo = baseInfo;
         this.id = id;
         this.arrivalLocation = arrivalLocation;
@@ -45,14 +45,14 @@ public class DetailTransportationSvcDTO {
     /**
      * @return the baseInfo
      */
-    public DetailBaseServiceDTO getBaseInfo() {
+    public BaseServiceDetailDTO getBaseInfo() {
         return baseInfo;
     }
 
     /**
      * @param baseInfo the baseInfo to set
      */
-    public void setBaseInfo(DetailBaseServiceDTO baseInfo) {
+    public void setBaseInfo(BaseServiceDetailDTO baseInfo) {
         this.baseInfo = baseInfo;
     }
 

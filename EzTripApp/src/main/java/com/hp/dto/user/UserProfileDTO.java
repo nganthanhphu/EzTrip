@@ -8,7 +8,7 @@ package com.hp.dto.user;
  *
  * @author Joon
  */
-public class UserViewDTO {
+public class UserProfileDTO {
 
     private Integer id;
     private String fullname;

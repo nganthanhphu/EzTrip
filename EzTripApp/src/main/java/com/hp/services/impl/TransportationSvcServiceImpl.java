@@ -22,10 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hp.dto.service.DetailBaseServiceDTO;
+import com.hp.dto.service.BaseServiceDetailDTO;
 import com.hp.dto.service.DetailTransportationSvcDTO;
-import com.hp.dto.service.ListViewTransportationSvcDTO;
-import com.hp.dto.user.UserViewDTO;
+import com.hp.dto.service.TransportationSvcListDTO;
+import com.hp.dto.user.UserProfileDTO;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceTransportation;
@@ -57,7 +57,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
     @Autowired
     private TypeOfTransportationRepository typeOfTransportationRepository;
 
-    public List<ListViewTransportationSvcDTO> getTransportationServices(Map<String, String> params) {
+    public List<TransportationSvcListDTO> getTransportationServices(Map<String, String> params) {
         return this.transportationSvcRepository.getTransportationServices(params);
     }
 
@@ -70,7 +70,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
     private DetailTransportationSvcDTO toDetailTransportationSvcDTO(com.hp.pojo.Service svc) {
         if (svc == null)
             return null;
-        DetailBaseServiceDTO baseInfo = new DetailBaseServiceDTO();
+        BaseServiceDetailDTO baseInfo = new BaseServiceDetailDTO();
         baseInfo.setId(svc.getId());
         baseInfo.setName(svc.getName());
         baseInfo.setDescription(svc.getDescription());
@@ -97,7 +97,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
             throw new IllegalArgumentException("Loại phương tiện không hợp lệ!");
         }
 
-        UserViewDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+        UserProfileDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(transportation.getBaseInfo().getName());
         svc.setDescription(transportation.getBaseInfo().getDescription());

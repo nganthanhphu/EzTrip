@@ -22,10 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hp.dto.service.DetailBaseServiceDTO;
-import com.hp.dto.service.DetailTourismSvcDTO;
-import com.hp.dto.service.ListViewTourismSvcDTO;
-import com.hp.dto.user.UserViewDTO;
+import com.hp.dto.service.BaseServiceDetailDTO;
+import com.hp.dto.service.TourismSvcDetailDTO;
+import com.hp.dto.service.TourismSvcListDTO;
+import com.hp.dto.user.UserProfileDTO;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceTourism;
@@ -53,21 +53,21 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     private Cloudinary cloudinary;
 
     @Override
-    public List<ListViewTourismSvcDTO> getTourismServices(Map<String, String> params) {
+    public List<TourismSvcListDTO> getTourismServices(Map<String, String> params) {
         return this.tourismSvcRepository.getTourismServices(params);
     }
 
     @Override
-    public DetailTourismSvcDTO getTourismById(Integer id) {
+    public TourismSvcDetailDTO getTourismById(Integer id) {
         com.hp.pojo.Service svc = this.tourismSvcRepository.getTourismById(id);
         return this.toDetailTourismSvcDTO(svc);
     }
 
-    private DetailTourismSvcDTO toDetailTourismSvcDTO(com.hp.pojo.Service svc) {
+    private TourismSvcDetailDTO toDetailTourismSvcDTO(com.hp.pojo.Service svc) {
         if (svc == null)
             return null;
 
-        DetailBaseServiceDTO baseInfo = new DetailBaseServiceDTO();
+        BaseServiceDetailDTO baseInfo = new BaseServiceDetailDTO();
         baseInfo.setId(svc.getId());
         baseInfo.setName(svc.getName());
         baseInfo.setDescription(svc.getDescription());
@@ -75,7 +75,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
         baseInfo.setQuantity(svc.getQuantity());
         Set<String> images = svc.getImageSet().stream().map(img -> img.getUrl()).collect(Collectors.toSet());
         baseInfo.setImages(images);
-        DetailTourismSvcDTO detail = new DetailTourismSvcDTO();
+        TourismSvcDetailDTO detail = new TourismSvcDetailDTO();
         detail.setBaseInfo(baseInfo);
         detail.setId(svc.getServiceTourism().getId());
         detail.setStartDate(svc.getServiceTourism().getStartDate());
@@ -85,8 +85,8 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     }
 
     @Override
-    public DetailTourismSvcDTO addTourism(DetailTourismSvcDTO tourism) throws Exception {
-        UserViewDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+    public TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws Exception {
+        UserProfileDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(tourism.getBaseInfo().getName());
         svc.setDescription(tourism.getBaseInfo().getDescription());

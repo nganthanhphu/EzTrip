@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hp.dto.service.DetailTourismSvcDTO;
-import com.hp.dto.service.ListViewTourismSvcDTO;
+import com.hp.dto.service.TourismSvcDetailDTO;
+import com.hp.dto.service.TourismSvcListDTO;
 import com.hp.services.TourismSvcService;
 
 /**
@@ -35,14 +35,14 @@ public class ApiTourismController {
     private TourismSvcService tourismService;
 
     @GetMapping("/tourisms")
-    public ResponseEntity<List<ListViewTourismSvcDTO>> getTourisms(@RequestParam Map<String, String> params) {
-        List<ListViewTourismSvcDTO> tourisms = this.tourismService.getTourismServices(params);
+    public ResponseEntity<List<TourismSvcListDTO>> getTourisms(@RequestParam Map<String, String> params) {
+        List<TourismSvcListDTO> tourisms = this.tourismService.getTourismServices(params);
         return new ResponseEntity<>(tourisms, HttpStatus.OK);
     }
 
     @GetMapping("/tourisms/{id}")
-    public ResponseEntity<DetailTourismSvcDTO> getTourismById(@PathVariable(value = "id") int id) {
-        DetailTourismSvcDTO tourism = this.tourismService.getTourismById(id);
+    public ResponseEntity<TourismSvcDetailDTO> getTourismById(@PathVariable(value = "id") int id) {
+        TourismSvcDetailDTO tourism = this.tourismService.getTourismById(id);
         
         if (tourism != null) {
             return new ResponseEntity<>(tourism, HttpStatus.OK);
@@ -52,8 +52,8 @@ public class ApiTourismController {
     }
 
     @PostMapping(path = "/secure/tourisms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DetailTourismSvcDTO> addTourism(@ModelAttribute DetailTourismSvcDTO tourism) throws Exception {
-        DetailTourismSvcDTO addedTourism = this.tourismService.addTourism(tourism);
+    public ResponseEntity<TourismSvcDetailDTO> addTourism(@ModelAttribute TourismSvcDetailDTO tourism) throws Exception {
+        TourismSvcDetailDTO addedTourism = this.tourismService.addTourism(tourism);
         return new ResponseEntity<>(addedTourism, HttpStatus.CREATED);
     }
 }

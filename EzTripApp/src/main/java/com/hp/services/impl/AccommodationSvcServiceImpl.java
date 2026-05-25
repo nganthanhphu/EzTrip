@@ -22,10 +22,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hp.dto.service.DetailAccommodationSvcDTO;
-import com.hp.dto.service.DetailBaseServiceDTO;
-import com.hp.dto.service.ListViewAccommodationSvcDTO;
-import com.hp.dto.user.UserViewDTO;
+import com.hp.dto.service.AccommodationSvcDetailDTO;
+import com.hp.dto.service.BaseServiceDetailDTO;
+import com.hp.dto.service.AccommodationSvcListDTO;
+import com.hp.dto.user.UserProfileDTO;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceAccommodation;
@@ -53,21 +53,21 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
     private Cloudinary cloudinary;
 
     @Override
-    public List<ListViewAccommodationSvcDTO> getAccommodationServices(Map<String, String> params) {
+    public List<AccommodationSvcListDTO> getAccommodationServices(Map<String, String> params) {
         return this.accommodationSvcRepository.getAccommodationServices(params);
     }
 
     @Override
-    public DetailAccommodationSvcDTO getAccommodationById(Integer id) {
+    public AccommodationSvcDetailDTO getAccommodationById(Integer id) {
         com.hp.pojo.Service svc = this.accommodationSvcRepository.getAccommodationById(id);
         return this.toDetailAccommodationSvcDTO(svc);
     }
 
-    private DetailAccommodationSvcDTO toDetailAccommodationSvcDTO(com.hp.pojo.Service svc) {
+    private AccommodationSvcDetailDTO toDetailAccommodationSvcDTO(com.hp.pojo.Service svc) {
         if (svc == null)
             return null;
 
-        DetailBaseServiceDTO baseInfo = new DetailBaseServiceDTO();
+        BaseServiceDetailDTO baseInfo = new BaseServiceDetailDTO();
         baseInfo.setId(svc.getId());
         baseInfo.setName(svc.getName());
         baseInfo.setDescription(svc.getDescription());
@@ -75,7 +75,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
         baseInfo.setQuantity(svc.getQuantity());
         Set<String> images = svc.getImageSet().stream().map(img -> img.getUrl()).collect(Collectors.toSet());
         baseInfo.setImages(images);
-        DetailAccommodationSvcDTO detail = new DetailAccommodationSvcDTO();
+        AccommodationSvcDetailDTO detail = new AccommodationSvcDetailDTO();
         detail.setBaseInfo(baseInfo);
         detail.setId(svc.getServiceAccommodation().getId());
         detail.setCheckInDate(svc.getServiceAccommodation().getCheckInDate());
@@ -87,8 +87,8 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
     }
 
     @Override
-    public DetailAccommodationSvcDTO addAccommodation(DetailAccommodationSvcDTO accommodation) throws Exception {
-        UserViewDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+    public AccommodationSvcDetailDTO addAccommodation(AccommodationSvcDetailDTO accommodation) throws Exception {
+        UserProfileDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(accommodation.getBaseInfo().getName());
         svc.setDescription(accommodation.getBaseInfo().getDescription());

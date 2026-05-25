@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.hp.dto.service.DetailTransportationSvcDTO;
-import com.hp.dto.service.ListViewTransportationSvcDTO;
+import com.hp.dto.service.TransportationSvcListDTO;
 
 /**
  *
  * @author Joon
  */
 public interface TransportationSvcService {
-    List<ListViewTransportationSvcDTO> getTransportationServices(Map<String, String> params);
+    List<TransportationSvcListDTO> getTransportationServices(Map<String, String> params);
 
     DetailTransportationSvcDTO getTransportationById(Integer id);
 

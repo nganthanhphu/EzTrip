@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.hp.dto.service.DetailTransportationSvcDTO;
-import com.hp.dto.service.ListViewTransportationSvcDTO;
+import com.hp.dto.service.TransportationSvcListDTO;
 import com.hp.services.TransportationSvcService;
 
 /**
@@ -35,9 +35,9 @@ public class ApiTransportationController {
     private TransportationSvcService transportationService;
 
     @GetMapping("/transportations")
-    public ResponseEntity<List<ListViewTransportationSvcDTO>> getTransportations(
+    public ResponseEntity<List<TransportationSvcListDTO>> getTransportations(
             @RequestParam Map<String, String> params) {
-        List<ListViewTransportationSvcDTO> transportations = this.transportationService
+        List<TransportationSvcListDTO> transportations = this.transportationService
                 .getTransportationServices(params);
         return new ResponseEntity<>(transportations, HttpStatus.OK);
     }

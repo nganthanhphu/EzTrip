@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hp.dto.service.DetailAccommodationSvcDTO;
-import com.hp.dto.service.ListViewAccommodationSvcDTO;
+import com.hp.dto.service.AccommodationSvcDetailDTO;
+import com.hp.dto.service.AccommodationSvcListDTO;
 import com.hp.services.AccommodationSvcService;
 
 /**
@@ -35,15 +35,15 @@ public class ApiAccommodationController {
     private AccommodationSvcService accommodationService;
 
     @GetMapping("/accommodations")
-    public ResponseEntity<List<ListViewAccommodationSvcDTO>> getAccommodations(
+    public ResponseEntity<List<AccommodationSvcListDTO>> getAccommodations(
             @RequestParam Map<String, String> params) {
-        List<ListViewAccommodationSvcDTO> accommodations = this.accommodationService.getAccommodationServices(params);
+        List<AccommodationSvcListDTO> accommodations = this.accommodationService.getAccommodationServices(params);
         return new ResponseEntity<>(accommodations, HttpStatus.OK);
     }
 
     @GetMapping("/accommodations/{id}")
-    public ResponseEntity<DetailAccommodationSvcDTO> getAccommodationById(@PathVariable(value = "id") int id) {
-        DetailAccommodationSvcDTO accommodation = this.accommodationService.getAccommodationById(id);
+    public ResponseEntity<AccommodationSvcDetailDTO> getAccommodationById(@PathVariable(value = "id") int id) {
+        AccommodationSvcDetailDTO accommodation = this.accommodationService.getAccommodationById(id);
         
         if (accommodation != null) {
             return new ResponseEntity<>(accommodation, HttpStatus.OK);
@@ -53,8 +53,8 @@ public class ApiAccommodationController {
     }
 
     @PostMapping(path = "/secure/accommodations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DetailAccommodationSvcDTO> addAccommodation(@ModelAttribute DetailAccommodationSvcDTO accommodation) throws Exception {
-        DetailAccommodationSvcDTO addedAccommodation = this.accommodationService.addAccommodation(accommodation);
+    public ResponseEntity<AccommodationSvcDetailDTO> addAccommodation(@ModelAttribute AccommodationSvcDetailDTO accommodation) throws Exception {
+        AccommodationSvcDetailDTO addedAccommodation = this.accommodationService.addAccommodation(accommodation);
         return new ResponseEntity<>(addedAccommodation, HttpStatus.CREATED);
     }
 }

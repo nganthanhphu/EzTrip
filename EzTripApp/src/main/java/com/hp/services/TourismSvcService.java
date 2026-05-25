@@ -7,17 +7,17 @@ package com.hp.services;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.DetailTourismSvcDTO;
-import com.hp.dto.service.ListViewTourismSvcDTO;
+import com.hp.dto.service.TourismSvcDetailDTO;
+import com.hp.dto.service.TourismSvcListDTO;
 
 /**
  *
  * @author Joon
  */
 public interface TourismSvcService {
-    List<ListViewTourismSvcDTO> getTourismServices(Map<String, String> params);
+    List<TourismSvcListDTO> getTourismServices(Map<String, String> params);
 
-    DetailTourismSvcDTO getTourismById(Integer id);
+    TourismSvcDetailDTO getTourismById(Integer id);
     
-    DetailTourismSvcDTO addTourism(DetailTourismSvcDTO tourism) throws Exception;
+    TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws Exception;
 }

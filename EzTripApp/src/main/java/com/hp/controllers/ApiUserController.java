@@ -5,7 +5,7 @@
 package com.hp.controllers;
 
 import com.hp.dto.user.UserLoginDTO;
-import com.hp.dto.user.UserViewDTO;
+import com.hp.dto.user.UserProfileDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.dto.user.UserRegisterDTO;
 import com.hp.services.UserService;
@@ -37,8 +37,8 @@ public class ApiUserController {
     private UserService userService;
 
     @PostMapping(path = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserViewDTO> create(@ModelAttribute UserRegisterDTO user) throws Exception {
-        UserViewDTO u = this.userService.addUser(user);
+    public ResponseEntity<UserProfileDTO> create(@ModelAttribute UserRegisterDTO user) throws Exception {
+        UserProfileDTO u = this.userService.addUser(user);
 
         return new ResponseEntity<>(u, HttpStatus.CREATED);
     }
@@ -58,9 +58,9 @@ public class ApiUserController {
     }
 
     @RequestMapping("/secure/profile")
-    public ResponseEntity<UserViewDTO> getProfile(Principal principal) {
+    public ResponseEntity<UserProfileDTO> getProfile(Principal principal) {
         String phoneNumber = principal.getName();
-        UserViewDTO user = this.userService.getUserByPhone(phoneNumber);
+        UserProfileDTO user = this.userService.getUserByPhone(phoneNumber);
 
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);

@@ -8,7 +8,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.user.CustomerProfileDTO;
 import com.hp.dto.user.ProviderProfileDTO;
-import com.hp.dto.user.UserViewDTO;
+import com.hp.dto.user.UserProfileDTO;
 import com.hp.dto.user.UserRegisterDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
@@ -70,13 +70,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserViewDTO getUserByPhone(String phoneNumber) {
+    public UserProfileDTO getUserByPhone(String phoneNumber) {
         BaseUser user = this.userRepository.getUserByPhone(phoneNumber);
         return toUserProfileDTO(user);
     }
 
     @Override
-    public UserViewDTO addUser(UserRegisterDTO u) throws Exception {
+    public UserProfileDTO addUser(UserRegisterDTO u) throws Exception {
         BaseUser user = new BaseUser();
         user.setFullname(u.getFullname());
         user.setEmail(u.getEmail());
@@ -111,12 +111,12 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.authenticate(phoneNumber, password);
     }
 
-    private UserViewDTO toUserProfileDTO(BaseUser user) {
+    private UserProfileDTO toUserProfileDTO(BaseUser user) {
         if (user == null) {
             return null;
         }
 
-        UserViewDTO userDTO = new UserViewDTO();
+        UserProfileDTO userDTO = new UserProfileDTO();
         userDTO.setId(user.getId());
         userDTO.setFullname(user.getFullname());
         userDTO.setEmail(user.getEmail());

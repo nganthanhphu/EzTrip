@@ -7,17 +7,17 @@ package com.hp.services;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.DetailAccommodationSvcDTO;
-import com.hp.dto.service.ListViewAccommodationSvcDTO;
+import com.hp.dto.service.AccommodationSvcDetailDTO;
+import com.hp.dto.service.AccommodationSvcListDTO;
 
 /**
  *
  * @author Joon
  */
 public interface AccommodationSvcService {
-    List<ListViewAccommodationSvcDTO> getAccommodationServices(Map<String, String> params);
+    List<AccommodationSvcListDTO> getAccommodationServices(Map<String, String> params);
 
-    DetailAccommodationSvcDTO getAccommodationById(Integer id);
+    AccommodationSvcDetailDTO getAccommodationById(Integer id);
 
-    DetailAccommodationSvcDTO addAccommodation(DetailAccommodationSvcDTO accommodation) throws Exception;
+    AccommodationSvcDetailDTO addAccommodation(AccommodationSvcDetailDTO accommodation) throws Exception;
 }
