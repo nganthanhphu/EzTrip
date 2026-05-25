@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -30,9 +31,12 @@ import java.util.Date;
 @Entity
 @Table(name = "booking")
 @NamedQueries({
-        @NamedQuery(name = "Booking.findAll", query = "SELECT b FROM Booking b"),
-        @NamedQuery(name = "Booking.findById", query = "SELECT b FROM Booking b LEFT JOIN FETCH b.statusId LEFT JOIN FETCH b.customerId bu LEFT JOIN FETCH bu.userId LEFT JOIN FETCH b.paymentMethodId LEFT JOIN FETCH b.serviceId s LEFT JOIN FETCH s.serviceAccommodation LEFT JOIN FETCH s.serviceTourism LEFT JOIN FETCH s.serviceTransportation LEFT JOIN FETCH b.review WHERE b.id = :id"),
-        @NamedQuery(name = "Booking.findByBookingDate", query = "SELECT b FROM Booking b WHERE b.bookingDate = :bookingDate") })
+    @NamedQuery(name = "Booking.findAll", query = "SELECT b FROM Booking b"),
+    @NamedQuery(name = "Booking.findById", query = "SELECT b FROM Booking b LEFT JOIN FETCH b.statusId LEFT JOIN FETCH b.customerId bu LEFT JOIN FETCH bu.userId LEFT JOIN FETCH b.paymentMethodId LEFT JOIN FETCH b.serviceId s LEFT JOIN FETCH s.serviceAccommodation LEFT JOIN FETCH s.serviceTourism LEFT JOIN FETCH s.serviceTransportation LEFT JOIN FETCH b.review WHERE b.id = :id"),
+    @NamedQuery(name = "Booking.findByCreatedDate", query = "SELECT b FROM Booking b WHERE b.createdDate = :createdDate"),
+    @NamedQuery(name = "Booking.findByBookingDay", query = "SELECT b FROM Booking b WHERE b.bookingDay = :bookingDay"),
+    @NamedQuery(name = "Booking.findByTotalAmount", query = "SELECT b FROM Booking b WHERE b.totalAmount = :totalAmount"),
+    @NamedQuery(name = "Booking.findByNote", query = "SELECT b FROM Booking b WHERE b.note = :note")})
 public class Booking implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -43,9 +47,19 @@ public class Booking implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "booking_date")
+    @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date bookingDate;
+    private Date createdDate;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "booking_day")
+    @Temporal(TemporalType.DATE)
+    private Date bookingDay;
+    @Column(name = "total_amount")
+    private Integer totalAmount;
+    @Size(max = 255)
+    @Column(name = "note")
+    private String note;
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private BookingStatus statusId;
@@ -68,9 +82,10 @@ public class Booking implements Serializable {
         this.id = id;
     }
 
-    public Booking(Integer id, Date bookingDate) {
+    public Booking(Integer id, Date createdDate, Date bookingDay) {
         this.id = id;
-        this.bookingDate = bookingDate;
+        this.createdDate = createdDate;
+        this.bookingDay = bookingDay;
     }
 
     public Integer getId() {
@@ -81,12 +96,36 @@ public class Booking implements Serializable {
         this.id = id;
     }
 
-    public Date getBookingDate() {
-        return bookingDate;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setBookingDate(Date bookingDate) {
-        this.bookingDate = bookingDate;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getBookingDay() {
+        return bookingDay;
+    }
+
+    public void setBookingDay(Date bookingDay) {
+        this.bookingDay = bookingDay;
+    }
+
+    public Integer getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(Integer totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public BookingStatus getStatusId() {
@@ -151,7 +190,7 @@ public class Booking implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hp.pojo.Booking[ id=" + id + " ]";
+        return "com.dht.test.Booking[ id=" + id + " ]";
     }
-
+    
 }

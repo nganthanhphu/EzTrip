@@ -11,16 +11,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  *
@@ -31,8 +28,7 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "ServiceTourism.findAll", query = "SELECT s FROM ServiceTourism s"),
     @NamedQuery(name = "ServiceTourism.findById", query = "SELECT s FROM ServiceTourism s WHERE s.id = :id"),
-    @NamedQuery(name = "ServiceTourism.findByStartDate", query = "SELECT s FROM ServiceTourism s WHERE s.startDate = :startDate"),
-    @NamedQuery(name = "ServiceTourism.findByEndDate", query = "SELECT s FROM ServiceTourism s WHERE s.endDate = :endDate"),
+    @NamedQuery(name = "ServiceTourism.findByTourDuration", query = "SELECT s FROM ServiceTourism s WHERE s.tourDuration = :tourDuration"),
     @NamedQuery(name = "ServiceTourism.findByLocation", query = "SELECT s FROM ServiceTourism s WHERE s.location = :location")})
 public class ServiceTourism implements Serializable {
 
@@ -44,20 +40,14 @@ public class ServiceTourism implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "start_date")
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "end_date")
-    @Temporal(TemporalType.DATE)
-    private Date endDate;
+    @Column(name = "tour_duration")
+    private int tourDuration;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
     @Column(name = "location")
     private String location;
-    @JoinColumn(name = "service_id", referencedColumnName = "id", unique = true)
+    @JoinColumn(name = "service_id", referencedColumnName = "id")
     @OneToOne(optional = false)
     private Service serviceId;
 
@@ -68,10 +58,9 @@ public class ServiceTourism implements Serializable {
         this.id = id;
     }
 
-    public ServiceTourism(Integer id, Date startDate, Date endDate, String location) {
+    public ServiceTourism(Integer id, int tourDuration, String location) {
         this.id = id;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.tourDuration = tourDuration;
         this.location = location;
     }
 
@@ -83,20 +72,12 @@ public class ServiceTourism implements Serializable {
         this.id = id;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public int getTourDuration() {
+        return tourDuration;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setTourDuration(int tourDuration) {
+        this.tourDuration = tourDuration;
     }
 
     public String getLocation() {
@@ -137,7 +118,7 @@ public class ServiceTourism implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hp.pojo.ServiceTourism[ id=" + id + " ]";
+        return "com.dht.test.ServiceTourism[ id=" + id + " ]";
     }
     
 }

@@ -12,16 +12,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  *
@@ -57,14 +54,12 @@ public class ServiceTransportation implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "departure_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date departureTime;
+    private int departureTime;
     @Basic(optional = false)
     @NotNull
     @Column(name = "arrival_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date arrivalTime;
-    @JoinColumn(name = "service_id", referencedColumnName = "id", unique = true)
+    private int arrivalTime;
+    @JoinColumn(name = "service_id", referencedColumnName = "id")
     @OneToOne(optional = false)
     private Service serviceId;
     @JoinColumn(name = "type_of_transportation_id", referencedColumnName = "id")
@@ -78,7 +73,7 @@ public class ServiceTransportation implements Serializable {
         this.id = id;
     }
 
-    public ServiceTransportation(Integer id, String departureLocation, String arrivalLocation, Date departureTime, Date arrivalTime) {
+    public ServiceTransportation(Integer id, String departureLocation, String arrivalLocation, int departureTime, int arrivalTime) {
         this.id = id;
         this.departureLocation = departureLocation;
         this.arrivalLocation = arrivalLocation;
@@ -110,19 +105,19 @@ public class ServiceTransportation implements Serializable {
         this.arrivalLocation = arrivalLocation;
     }
 
-    public Date getDepartureTime() {
+    public int getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(Date departureTime) {
+    public void setDepartureTime(int departureTime) {
         this.departureTime = departureTime;
     }
 
-    public Date getArrivalTime() {
+    public int getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(Date arrivalTime) {
+    public void setArrivalTime(int arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
@@ -164,7 +159,7 @@ public class ServiceTransportation implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hp.pojo.ServiceTransportation[ id=" + id + " ]";
+        return "com.dht.test.ServiceTransportation[ id=" + id + " ]";
     }
     
 }

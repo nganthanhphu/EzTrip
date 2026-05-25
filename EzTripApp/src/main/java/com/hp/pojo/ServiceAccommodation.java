@@ -11,16 +11,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.NamedQueries;
 import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  *
@@ -31,8 +28,6 @@ import java.util.Date;
 @NamedQueries({
     @NamedQuery(name = "ServiceAccommodation.findAll", query = "SELECT s FROM ServiceAccommodation s"),
     @NamedQuery(name = "ServiceAccommodation.findById", query = "SELECT s FROM ServiceAccommodation s WHERE s.id = :id"),
-    @NamedQuery(name = "ServiceAccommodation.findByCheckInDate", query = "SELECT s FROM ServiceAccommodation s WHERE s.checkInDate = :checkInDate"),
-    @NamedQuery(name = "ServiceAccommodation.findByCheckOutDate", query = "SELECT s FROM ServiceAccommodation s WHERE s.checkOutDate = :checkOutDate"),
     @NamedQuery(name = "ServiceAccommodation.findByQuantityOfBed", query = "SELECT s FROM ServiceAccommodation s WHERE s.quantityOfBed = :quantityOfBed"),
     @NamedQuery(name = "ServiceAccommodation.findByArea", query = "SELECT s FROM ServiceAccommodation s WHERE s.area = :area"),
     @NamedQuery(name = "ServiceAccommodation.findByLocation", query = "SELECT s FROM ServiceAccommodation s WHERE s.location = :location")})
@@ -46,16 +41,6 @@ public class ServiceAccommodation implements Serializable {
     private Integer id;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "check_in_date")
-    @Temporal(TemporalType.DATE)
-    private Date checkInDate;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "check_out_date")
-    @Temporal(TemporalType.DATE)
-    private Date checkOutDate;
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "quantity_of_bed")
     private int quantityOfBed;
     @Basic(optional = false)
@@ -67,7 +52,7 @@ public class ServiceAccommodation implements Serializable {
     @Size(min = 1, max = 255)
     @Column(name = "location")
     private String location;
-    @JoinColumn(name = "service_id", referencedColumnName = "id", unique = true)
+    @JoinColumn(name = "service_id", referencedColumnName = "id")
     @OneToOne(optional = false)
     private Service serviceId;
 
@@ -78,10 +63,8 @@ public class ServiceAccommodation implements Serializable {
         this.id = id;
     }
 
-    public ServiceAccommodation(Integer id, Date checkInDate, Date checkOutDate, int quantityOfBed, float area, String location) {
+    public ServiceAccommodation(Integer id, int quantityOfBed, float area, String location) {
         this.id = id;
-        this.checkInDate = checkInDate;
-        this.checkOutDate = checkOutDate;
         this.quantityOfBed = quantityOfBed;
         this.area = area;
         this.location = location;
@@ -93,22 +76,6 @@ public class ServiceAccommodation implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Date getCheckInDate() {
-        return checkInDate;
-    }
-
-    public void setCheckInDate(Date checkInDate) {
-        this.checkInDate = checkInDate;
-    }
-
-    public Date getCheckOutDate() {
-        return checkOutDate;
-    }
-
-    public void setCheckOutDate(Date checkOutDate) {
-        this.checkOutDate = checkOutDate;
     }
 
     public int getQuantityOfBed() {
@@ -165,7 +132,7 @@ public class ServiceAccommodation implements Serializable {
 
     @Override
     public String toString() {
-        return "com.hp.pojo.ServiceAccommodation[ id=" + id + " ]";
+        return "com.dht.test.ServiceAccommodation[ id=" + id + " ]";
     }
     
 }
