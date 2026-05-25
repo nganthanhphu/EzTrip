@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.service.BaseServiceDetailDTO;
-import com.hp.dto.service.DetailTransportationSvcDTO;
+import com.hp.dto.service.TransportationSvcDetailDTO;
 import com.hp.dto.service.TransportationSvcListDTO;
 import com.hp.dto.user.UserProfileDTO;
 import com.hp.pojo.Image;
@@ -62,12 +62,12 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
     }
 
     @Override
-    public DetailTransportationSvcDTO getTransportationById(Integer id) {
+    public TransportationSvcDetailDTO getTransportationById(Integer id) {
         com.hp.pojo.Service svc = this.transportationSvcRepository.getTransportationById(id);
         return this.toDetailTransportationSvcDTO(svc);
     }
 
-    private DetailTransportationSvcDTO toDetailTransportationSvcDTO(com.hp.pojo.Service svc) {
+    private TransportationSvcDetailDTO toDetailTransportationSvcDTO(com.hp.pojo.Service svc) {
         if (svc == null)
             return null;
         BaseServiceDetailDTO baseInfo = new BaseServiceDetailDTO();
@@ -78,7 +78,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
         baseInfo.setQuantity(svc.getQuantity());
         Set<String> images = svc.getImageSet().stream().map(img -> img.getUrl()).collect(Collectors.toSet());
         baseInfo.setImages(images);
-        DetailTransportationSvcDTO detail = new DetailTransportationSvcDTO();
+        TransportationSvcDetailDTO detail = new TransportationSvcDetailDTO();
         detail.setBaseInfo(baseInfo);
         detail.setId(svc.getServiceTransportation().getId());
         detail.setArrivalLocation(svc.getServiceTransportation().getArrivalLocation());
@@ -90,7 +90,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
     }
 
     @Override
-    public DetailTransportationSvcDTO addTransportation(DetailTransportationSvcDTO transportation) throws Exception {
+    public TransportationSvcDetailDTO addTransportation(TransportationSvcDetailDTO transportation) throws Exception {
         TypeOfTransportation typeOfTransportation = this.typeOfTransportationRepository
                 .getTypeOfTransportationByName(transportation.getTypeOfTransportation());
         if (typeOfTransportation == null) {

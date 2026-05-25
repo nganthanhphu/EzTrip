@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author Joon
  */
-public class DetailTransportationSvcDTO {
+public class TransportationSvcDetailDTO {
 
     private BaseServiceDetailDTO baseInfo;
     private Integer id;
@@ -29,10 +29,10 @@ public class DetailTransportationSvcDTO {
     @JsonIgnore
     private String departureTm;
 
-    public DetailTransportationSvcDTO() {
+    public TransportationSvcDetailDTO() {
     }
 
-    public DetailTransportationSvcDTO(BaseServiceDetailDTO baseInfo, Integer id, String arrivalLocation, String departureLocation, Date arrivalTime, Date departureTime, String typeOfTransportation) {
+    public TransportationSvcDetailDTO(BaseServiceDetailDTO baseInfo, Integer id, String arrivalLocation, String departureLocation, Date arrivalTime, Date departureTime, String typeOfTransportation) {
         this.baseInfo = baseInfo;
         this.id = id;
         this.arrivalLocation = arrivalLocation;

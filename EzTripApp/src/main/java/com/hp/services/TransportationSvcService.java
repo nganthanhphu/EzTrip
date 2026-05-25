@@ -7,7 +7,7 @@ package com.hp.services;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.DetailTransportationSvcDTO;
+import com.hp.dto.service.TransportationSvcDetailDTO;
 import com.hp.dto.service.TransportationSvcListDTO;
 
 /**
@@ -17,7 +17,7 @@ import com.hp.dto.service.TransportationSvcListDTO;
 public interface TransportationSvcService {
     List<TransportationSvcListDTO> getTransportationServices(Map<String, String> params);
 
-    DetailTransportationSvcDTO getTransportationById(Integer id);
+    TransportationSvcDetailDTO getTransportationById(Integer id);
 
-    DetailTransportationSvcDTO addTransportation(DetailTransportationSvcDTO transportation) throws Exception;
+    TransportationSvcDetailDTO addTransportation(TransportationSvcDetailDTO transportation) throws Exception;
 }

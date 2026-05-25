@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hp.dto.service.DetailTransportationSvcDTO;
+import com.hp.dto.service.TransportationSvcDetailDTO;
 import com.hp.dto.service.TransportationSvcListDTO;
 import com.hp.services.TransportationSvcService;
 
@@ -43,8 +43,8 @@ public class ApiTransportationController {
     }
 
     @GetMapping("/transportations/{id}")
-    public ResponseEntity<DetailTransportationSvcDTO> getTransportationById(@PathVariable(value = "id") int id) {
-        DetailTransportationSvcDTO transportation = this.transportationService.getTransportationById(id);
+    public ResponseEntity<TransportationSvcDetailDTO> getTransportationById(@PathVariable(value = "id") int id) {
+        TransportationSvcDetailDTO transportation = this.transportationService.getTransportationById(id);
 
         if (transportation != null) {
             return new ResponseEntity<>(transportation, HttpStatus.OK);
@@ -54,9 +54,9 @@ public class ApiTransportationController {
     }
 
     @PostMapping(path = "/secure/transportations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DetailTransportationSvcDTO> addTransportation(
-            @ModelAttribute DetailTransportationSvcDTO transportation) throws Exception {
-        DetailTransportationSvcDTO addedTransportation = this.transportationService.addTransportation(transportation);
+    public ResponseEntity<TransportationSvcDetailDTO> addTransportation(
+            @ModelAttribute TransportationSvcDetailDTO transportation) throws Exception {
+        TransportationSvcDetailDTO addedTransportation = this.transportationService.addTransportation(transportation);
         return new ResponseEntity<>(addedTransportation, HttpStatus.CREATED);
     }
 }
