@@ -86,11 +86,10 @@ SELECT
 FROM tmp_numbers
 WHERE n <= 20;
 
-INSERT INTO service_tourism (service_id, start_date, end_date, location)
+INSERT INTO service_tourism (service_id, tour_duration, location)
 SELECT
   1000 + n,
-  DATE_ADD('2026-06-01', INTERVAL n DAY),
-  DATE_ADD('2026-06-03', INTERVAL n DAY),
+  1 + (n % 5),
   CONCAT('City ', n)
 FROM tmp_numbers
 WHERE n <= 20;
@@ -108,11 +107,9 @@ SELECT
 FROM tmp_numbers
 WHERE n <= 20;
 
-INSERT INTO service_accommodation (service_id, check_in_date, check_out_date, quantity_of_bed, area, location)
+INSERT INTO service_accommodation (service_id, quantity_of_bed, area, location)
 SELECT
   2000 + n,
-  DATE_ADD('2026-07-01', INTERVAL n DAY),
-  DATE_ADD('2026-07-02', INTERVAL n DAY),
   1 + (n % 3),
   20 + (n % 5) * 5,
   CONCAT('District ', n)
@@ -141,8 +138,8 @@ SELECT
   END,
   CONCAT('City ', (n % 10) + 1),
   CONCAT('City ', (n % 10) + 2),
-  DATE_ADD('2026-08-01 08:00:00', INTERVAL n DAY),
-  DATE_ADD('2026-08-01 12:00:00', INTERVAL n DAY)
+  6 + (n % 12),
+  8 + (n % 12)
 FROM tmp_numbers
 WHERE n <= 20;
 
@@ -160,14 +157,17 @@ FROM service s
 JOIN tmp_numbers i ON i.n <= (1 + (s.id % 5))
 WHERE s.id BETWEEN 1000 AND 3019;
 
-INSERT INTO booking (id, customer_id, service_id, booking_date, payment_method_id, status_id)
+INSERT INTO booking (id, customer_id, service_id, created_date, booking_day, payment_method_id, total_amount, status_id, note)
 SELECT
   (s.id * 10 + b.n),
   101 + ((s.id + b.n) % 20),
   s.id,
-  DATE_ADD('2026-05-01 09:00:00', INTERVAL ((s.id % 20) + b.n) DAY),
+  DATE_ADD('2026-05-01 09:00:00', INTERVAL ((s.id + (b.n * 7)) % 30) DAY),
+  DATE_ADD(DATE(DATE_ADD('2026-05-01 09:00:00', INTERVAL ((s.id + (b.n * 7)) % 30) DAY)), INTERVAL 3 DAY),
   1 + (b.n % 3),
-  1 + ((s.id + b.n) % 4)
+  s.price,
+  1 + ((s.id + b.n) % 4),
+  CONCAT('Note ', b.n)
 FROM service s
 JOIN tmp_numbers b ON b.n <= 10
 WHERE s.id BETWEEN 1000 AND 3019;
@@ -177,6 +177,6 @@ SELECT
   b.id,
   3 + (b.id % 3),
   CONCAT('Review for booking ', b.id),
-  DATE_ADD(b.booking_date, INTERVAL 1 DAY)
+  DATE_ADD(b.created_date, INTERVAL 1 DAY)
 FROM booking b
 WHERE b.status_id = 3 AND (b.id % 3) = 0;
