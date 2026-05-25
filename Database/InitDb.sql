@@ -111,8 +111,7 @@ CREATE TABLE image (
 CREATE TABLE service_tourism (
     id int PRIMARY KEY AUTO_INCREMENT,
     service_id int NOT NULL UNIQUE,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
+    tour_duration INT NOT NULL DEFAULT 1,
     location VARCHAR(255) NOT NULL,
 
     FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE CASCADE
@@ -121,8 +120,6 @@ CREATE TABLE service_tourism (
 CREATE TABLE service_accommodation (
     id int PRIMARY KEY AUTO_INCREMENT,
     service_id int NOT NULL UNIQUE,
-    check_in_date DATE NOT NULL,
-    check_out_date DATE NOT NULL,
     quantity_of_bed INT NOT NULL DEFAULT 1,
     area FLOAT NOT NULL,
     location VARCHAR(255) NOT NULL,
@@ -136,8 +133,8 @@ CREATE TABLE service_transportation (
     type_of_transportation_id int NULL,
     departure_location VARCHAR(255) NOT NULL,
     arrival_location VARCHAR(255) NOT NULL,
-    departure_time DATETIME NOT NULL,
-    arrival_time DATETIME NOT NULL, -- hay thêm này luôn ha
+    departure_time INT NOT NULL,
+    arrival_time INT NOT NULL, -- hay thêm này luôn ha
 
     FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE CASCADE,
     FOREIGN KEY (type_of_transportation_id) REFERENCES type_of_transportation(id)
@@ -147,9 +144,12 @@ CREATE TABLE booking (
     id int PRIMARY KEY AUTO_INCREMENT,
     customer_id int NOT NULL,
     service_id int NOT NULL,
-    booking_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    booking_day DATE NOT NULL, -- Thời gian mà khách muốn sử dụng dịch vụ, ví dụ: ngày checkin, ngày đi tour, ngày đi phương tiện,..., cái này sẽ do nhà cung cấp tự kiểm tra với các loại dịch vụ của họ, nếu trùng thì sẽ không cho đặt nữa
     payment_method_id int NULL,
+    total_amount INT DEFAULT 0,
     status_id int NOT NULL DEFAULT 1, -- Mặc định là PENDING, ê nhớ đổ dữ liệu ở trên trước á
+    note nvarchar(255) NULL, -- Ghi chú cho các loại dịch vụ (phòng thì là checin, checkout, vé thì lưu số ghế, tour thì lưu số lượng người,...), làm vậy thì nhà cung cấp phải thực hiện bằng tay chỗ kiểm tra này,
 
     FOREIGN KEY (customer_id) REFERENCES customer_profile(id) ON DELETE RESTRICT,
     FOREIGN KEY (service_id) REFERENCES service(id) ON DELETE RESTRICT,
