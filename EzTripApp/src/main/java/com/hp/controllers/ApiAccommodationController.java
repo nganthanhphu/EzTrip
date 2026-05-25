@@ -4,6 +4,7 @@
  */
 package com.hp.controllers;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class ApiAccommodationController {
     }
 
     @PostMapping(path = "/secure/accommodations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AccommodationSvcDetailDTO> addAccommodation(@ModelAttribute AccommodationSvcDetailDTO accommodation) throws Exception {
+    public ResponseEntity<AccommodationSvcDetailDTO> addAccommodation(@ModelAttribute AccommodationSvcDetailDTO accommodation) throws ParseException {
         AccommodationSvcDetailDTO addedAccommodation = this.accommodationService.addAccommodation(accommodation);
         return new ResponseEntity<>(addedAccommodation, HttpStatus.CREATED);
     }

@@ -6,11 +6,12 @@ package com.hp.services.handler.profile;
 
 import com.hp.dto.user.UserRegisterDTO;
 import com.hp.pojo.BaseUser;
+import java.text.ParseException;
 
 /**
  *
  * @author Joon
  */
 public interface UserProfileHandler {
-    void handleProfileInfo(BaseUser user, UserRegisterDTO u) throws Exception;
+    void handleProfileInfo(BaseUser user, UserRegisterDTO u) throws ParseException;
 }

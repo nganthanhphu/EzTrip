@@ -5,6 +5,7 @@
 package com.hp.services.impl;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -85,7 +86,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     }
 
     @Override
-    public TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws Exception {
+    public TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws ParseException {
         UserProfileDTO currentUser = this.userService.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(tourism.getBaseInfo().getName());

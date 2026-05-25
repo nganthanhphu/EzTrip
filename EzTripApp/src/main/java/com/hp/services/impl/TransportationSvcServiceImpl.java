@@ -5,6 +5,7 @@
 package com.hp.services.impl;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -90,7 +91,7 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
     }
 
     @Override
-    public TransportationSvcDetailDTO addTransportation(TransportationSvcDetailDTO transportation) throws Exception {
+    public TransportationSvcDetailDTO addTransportation(TransportationSvcDetailDTO transportation) throws ParseException {
         TypeOfTransportation typeOfTransportation = this.typeOfTransportationRepository
                 .getTypeOfTransportationByName(transportation.getTypeOfTransportation());
         if (typeOfTransportation == null) {

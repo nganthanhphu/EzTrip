@@ -4,6 +4,7 @@
  */
 package com.hp.services;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,5 +20,5 @@ public interface AccommodationSvcService {
 
     AccommodationSvcDetailDTO getAccommodationById(Integer id);
 
-    AccommodationSvcDetailDTO addAccommodation(AccommodationSvcDetailDTO accommodation) throws Exception;
+    AccommodationSvcDetailDTO addAccommodation(AccommodationSvcDetailDTO accommodation) throws ParseException;
 }

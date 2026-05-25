@@ -20,6 +20,7 @@ import com.hp.services.UserService;
 import com.hp.services.handler.profile.UserProfileHandler;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -76,7 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileDTO addUser(UserRegisterDTO u) throws Exception {
+    public UserProfileDTO addUser(UserRegisterDTO u) throws ParseException {
         BaseUser user = new BaseUser();
         user.setFullname(u.getFullname());
         user.setEmail(u.getEmail());
@@ -98,7 +99,7 @@ public class UserServiceImpl implements UserService {
         UserProfileHandler handler = this.profileHandlers.get(roleName);
 
         if (handler == null) {
-            throw new Exception("Vai trò không hợp lệ!");
+            throw new IllegalArgumentException("Vai trò không hợp lệ!");
         }
 
         handler.handleProfileInfo(user, u);

@@ -4,6 +4,7 @@
  */
 package com.hp.controllers;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,7 @@ public class ApiTransportationController {
 
     @PostMapping(path = "/secure/transportations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TransportationSvcDetailDTO> addTransportation(
-            @ModelAttribute TransportationSvcDetailDTO transportation) throws Exception {
+            @ModelAttribute TransportationSvcDetailDTO transportation) throws ParseException {
         TransportationSvcDetailDTO addedTransportation = this.transportationService.addTransportation(transportation);
         return new ResponseEntity<>(addedTransportation, HttpStatus.CREATED);
     }

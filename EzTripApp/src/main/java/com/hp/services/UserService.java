@@ -4,6 +4,8 @@
  */
 package com.hp.services;
 
+import java.text.ParseException;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.hp.dto.user.UserProfileDTO;
@@ -16,6 +18,6 @@ import com.hp.dto.user.UserRegisterDTO;
  */
 public interface UserService extends UserDetailsService {
     UserProfileDTO getUserByPhone(String phoneNumber);
-    UserProfileDTO addUser(UserRegisterDTO request) throws Exception;
+    UserProfileDTO addUser(UserRegisterDTO request) throws ParseException;
     BaseUser authenticate(String phoneNumber, String password);
 }

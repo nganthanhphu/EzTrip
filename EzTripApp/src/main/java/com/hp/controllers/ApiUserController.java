@@ -11,6 +11,7 @@ import com.hp.dto.user.UserRegisterDTO;
 import com.hp.services.UserService;
 import com.hp.utils.JwtUtils;
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class ApiUserController {
     private UserService userService;
 
     @PostMapping(path = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserProfileDTO> create(@ModelAttribute UserRegisterDTO user) throws Exception {
+    public ResponseEntity<UserProfileDTO> create(@ModelAttribute UserRegisterDTO user) throws ParseException {
         UserProfileDTO u = this.userService.addUser(user);
 
         return new ResponseEntity<>(u, HttpStatus.CREATED);

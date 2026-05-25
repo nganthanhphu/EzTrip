@@ -4,6 +4,7 @@
  */
 package com.hp.services;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,5 +20,5 @@ public interface TourismSvcService {
 
     TourismSvcDetailDTO getTourismById(Integer id);
     
-    TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws Exception;
+    TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws ParseException;
 }

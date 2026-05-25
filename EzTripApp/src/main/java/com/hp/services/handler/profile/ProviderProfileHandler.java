@@ -29,11 +29,11 @@ public class ProviderProfileHandler implements UserProfileHandler {
     private TypeOfProviderRepository typeOfProviderRepo;
 
     @Override
-    public void handleProfileInfo(BaseUser user, UserRegisterDTO u) throws Exception {
+    public void handleProfileInfo(BaseUser user, UserRegisterDTO u) {
         String roleName = u.getRole();
         Role role = roleRepo.getRoleByName(roleName);
         if (role == null || !role.getName().equals("PROVIDER")) {
-            throw new Exception("Vai trò không hợp lệ!");
+            throw new IllegalArgumentException("Vai trò không hợp lệ!");
         }
         user.setRoleId(role);
 
@@ -46,7 +46,7 @@ public class ProviderProfileHandler implements UserProfileHandler {
         String typeOfProviderName = u.getTypeOfProvider();
         TypeOfProvider typeOfProvider = typeOfProviderRepo.getTypeOfProviderByName(typeOfProviderName);
         if (typeOfProvider == null) {
-            throw new Exception("Loại nhà cung cấp không hợp lệ!");
+            throw new IllegalArgumentException("Loại nhà cung cấp không hợp lệ!");
         }
         profile.setTypeOfProviderId(typeOfProvider);
 

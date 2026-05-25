@@ -4,6 +4,7 @@
  */
 package com.hp.services.handler.profile;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
@@ -33,7 +34,7 @@ public class CustomProfileHandler implements UserProfileHandler {
     private GenderRepository genderRepo;
 
     @Override
-    public void handleProfileInfo(BaseUser user, UserRegisterDTO u) throws Exception {
+    public void handleProfileInfo(BaseUser user, UserRegisterDTO u) throws ParseException {
         String roleName = u.getRole();
         Role role = roleRepo.getRoleByName(roleName);
         if (role == null || !role.getName().equals("CUSTOMER")) {
@@ -47,7 +48,7 @@ public class CustomProfileHandler implements UserProfileHandler {
         String genderName = u.getGender();
         Gender gender = genderRepo.getGenderByName(genderName);
         if (gender == null) {
-            throw new Exception("Giới tính không hợp lệ!");
+            throw new IllegalArgumentException("Giới tính không hợp lệ!");
         }
         profile.setGenderId(gender);
 
@@ -58,6 +59,6 @@ public class CustomProfileHandler implements UserProfileHandler {
 
         user.setCustomerProfile(profile);
         user.setIsActive(true);
-        
+
     }
 }
