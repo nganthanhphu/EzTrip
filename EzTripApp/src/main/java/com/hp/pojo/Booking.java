@@ -30,9 +30,9 @@ import java.util.Date;
 @Entity
 @Table(name = "booking")
 @NamedQueries({
-    @NamedQuery(name = "Booking.findAll", query = "SELECT b FROM Booking b"),
-    @NamedQuery(name = "Booking.findById", query = "SELECT b FROM Booking b WHERE b.id = :id"),
-    @NamedQuery(name = "Booking.findByBookingDate", query = "SELECT b FROM Booking b WHERE b.bookingDate = :bookingDate")})
+        @NamedQuery(name = "Booking.findAll", query = "SELECT b FROM Booking b"),
+        @NamedQuery(name = "Booking.findById", query = "SELECT b FROM Booking b LEFT JOIN FETCH b.statusId LEFT JOIN FETCH b.customerId bu LEFT JOIN FETCH bu.userId LEFT JOIN FETCH b.paymentMethodId LEFT JOIN FETCH b.serviceId s LEFT JOIN FETCH s.serviceAccommodation LEFT JOIN FETCH s.serviceTourism LEFT JOIN FETCH s.serviceTransportation LEFT JOIN FETCH b.review WHERE b.id = :id"),
+        @NamedQuery(name = "Booking.findByBookingDate", query = "SELECT b FROM Booking b WHERE b.bookingDate = :bookingDate") })
 public class Booking implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -153,5 +153,5 @@ public class Booking implements Serializable {
     public String toString() {
         return "com.hp.pojo.Booking[ id=" + id + " ]";
     }
-    
+
 }
