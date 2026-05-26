@@ -53,7 +53,7 @@ public class CustomerProfile implements Serializable {
     @OneToOne(optional = false)
     private BaseUser userId;
     @JoinColumn(name = "gender_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Gender genderId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId")
     private Set<Booking> bookingSet;

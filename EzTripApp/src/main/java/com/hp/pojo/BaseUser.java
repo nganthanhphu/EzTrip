@@ -76,7 +76,7 @@ public class BaseUser implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
     private ProviderProfile providerProfile;
     @JoinColumn(name = "role_id", referencedColumnName = "id")
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Role roleId;
 
     public BaseUser() {

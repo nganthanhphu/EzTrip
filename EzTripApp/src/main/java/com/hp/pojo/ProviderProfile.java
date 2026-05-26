@@ -57,7 +57,7 @@ public class ProviderProfile implements Serializable {
     @OneToOne(optional = false)
     private BaseUser userId;
     @JoinColumn(name = "type_of_provider_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     private TypeOfProvider typeOfProviderId;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "providerId")
