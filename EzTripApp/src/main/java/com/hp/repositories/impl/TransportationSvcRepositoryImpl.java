@@ -184,14 +184,14 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
         Query<TransportationListViewDTO> query = s.createQuery(q);
 
-        if (params != null) {
-            int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
-            int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page - 1) * pageSize;
+        int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
+        int page = 1;
+        if (params != null)
+            page = Integer.parseInt(params.getOrDefault("page", "1"));
 
-            query.setMaxResults(pageSize);
-            query.setFirstResult(start);
-        }
+        int start = (page - 1) * pageSize;
+        query.setFirstResult(start);
+        query.setMaxResults(pageSize);
 
         return query.getResultList();
     }

@@ -76,26 +76,26 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
         Join<Booking, Review> review = booking.join("review", JoinType.LEFT);
 
         Expression<Integer> confirmedCount = b.sum(
-            b.<Integer>selectCase()
-                .when(b.equal(bookingStatus.get("name"), "CONFIRMED"), 1)
-                .otherwise(0));
+                b.<Integer>selectCase()
+                        .when(b.equal(bookingStatus.get("name"), "CONFIRMED"), 1)
+                        .otherwise(0));
 
         Expression<Integer> remainingQuantity = b.diff(
-            root.get("quantity"),
-            b.coalesce(confirmedCount, 0));
+                root.get("quantity"),
+                b.coalesce(confirmedCount, 0));
 
         q.select(b.construct(TourismListViewDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("price"),
                 imageUrl,
-            root.get("quantity"),
-            remainingQuantity,
-            b.coalesce(b.avg(review.get("rating")), 0.0),
-            b.coalesce(b.count(review.get("id")), 0),
-            b.coalesce(b.countDistinct(booking.get("id")), 0),
-            provider.get("companyName"),
-            tourism.get("tourDuration"),
+                root.get("quantity"),
+                remainingQuantity,
+                b.coalesce(b.avg(review.get("rating")), 0.0),
+                b.coalesce(b.count(review.get("id")), 0),
+                b.coalesce(b.countDistinct(booking.get("id")), 0),
+                provider.get("companyName"),
+                tourism.get("tourDuration"),
                 tourism.get("location")));
 
         q.orderBy(b.desc(root.get("id")));
@@ -154,13 +154,14 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
 
         Query<TourismListViewDTO> query = s.createQuery(q);
 
-        if (params != null) {
-            int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
-            int page = Integer.parseInt(params.getOrDefault("page", "1"));
-            int start = (page - 1) * pageSize;
-            query.setFirstResult(start);
-            query.setMaxResults(pageSize);
-        }
+        int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
+        int page = 1;
+        if (params != null)
+            page = Integer.parseInt(params.getOrDefault("page", "1"));
+
+        int start = (page - 1) * pageSize;
+        query.setFirstResult(start);
+        query.setMaxResults(pageSize);
 
         return query.getResultList();
     }
