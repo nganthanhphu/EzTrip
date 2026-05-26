@@ -187,7 +187,11 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
         int page = 1;
         if (params != null)
-            page = Integer.parseInt(params.getOrDefault("page", "1"));
+            try {
+                page = Integer.parseInt(params.getOrDefault("page", "1"));
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
 
         int start = (page - 1) * pageSize;
         query.setFirstResult(start);
