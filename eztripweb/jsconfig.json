@@ -1,0 +1,13 @@
+{
+"compilerOptions": {
+    "baseUrl": "src",
+    "ignoreDeprecations": "6.0",
+    "paths": {
+        "@components/*": ["components/*"],
+        "@layouts/*": ["layouts/*"],
+        "@screens/*": ["screens/*"],
+        "@utils/*": ["utils/*"]
+    }
+    },
+"include": ["src"]
+}

@@ -32,3 +32,6 @@ replay_pid*
 
 # VS Code files
 .vscode/settings.json
+
+# Environment variables
+.env
