@@ -5,60 +5,30 @@
 package com.hp.dto.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  *
  * @author Joon
  */
 public class AccommodationSvcListDTO {
+
     private BaseServiceListDTO baseInfo;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
-    private Date checkInDate;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
-    private Date checkOutDate;
+    private int quantityOfBed;
+    private float area;
     private String location;
 
     public AccommodationSvcListDTO() {
     }
 
-    public AccommodationSvcListDTO(Integer id, String name, BigDecimal price, String image,
-            Double avgRating, Long reviewCount, Long bookingCount, Date checkInDate, Date checkOutDate,
-            String location) {
-        this.baseInfo = new BaseServiceListDTO(id, name, price, image, avgRating, reviewCount, bookingCount);
-        this.checkInDate = checkInDate;
-        this.checkOutDate = checkOutDate;
+    public AccommodationSvcListDTO(Integer id, String name, BigDecimal price, String image, Integer quantity,
+            Integer remainingQuantity, Double avgRating, Long reviewCount, Long bookingCount, String companyName,
+            int quantityOfBed,
+            float area, String location) {
+        this.baseInfo = new BaseServiceListDTO(id, name, price, image, quantity, remainingQuantity, avgRating,
+                reviewCount, bookingCount, companyName);
+        this.quantityOfBed = quantityOfBed;
+        this.area = area;
         this.location = location;
-    }
-
-    /**
-     * @return the checkInDate
-     */
-    public Date getCheckInDate() {
-        return checkInDate;
-    }
-
-    /**
-     * @param checkInDate the checkInDate to set
-     */
-    public void setCheckInDate(Date checkInDate) {
-        this.checkInDate = checkInDate;
-    }
-
-    /**
-     * @return the checkOutDate
-     */
-    public Date getCheckOutDate() {
-        return checkOutDate;
-    }
-
-    /**
-     * @param checkOutDate the checkOutDate to set
-     */
-    public void setCheckOutDate(Date checkOutDate) {
-        this.checkOutDate = checkOutDate;
     }
 
     /**
@@ -87,5 +57,33 @@ public class AccommodationSvcListDTO {
      */
     public void setBaseInfo(BaseServiceListDTO baseInfo) {
         this.baseInfo = baseInfo;
+    }
+
+    /**
+     * @return the quantityOfBed
+     */
+    public int getQuantityOfBed() {
+        return quantityOfBed;
+    }
+
+    /**
+     * @param quantityOfBed the quantityOfBed to set
+     */
+    public void setQuantityOfBed(int quantityOfBed) {
+        this.quantityOfBed = quantityOfBed;
+    }
+
+    /**
+     * @return the area
+     */
+    public float getArea() {
+        return area;
+    }
+
+    /**
+     * @param area the area to set
+     */
+    public void setArea(float area) {
+        this.area = area;
     }
 }

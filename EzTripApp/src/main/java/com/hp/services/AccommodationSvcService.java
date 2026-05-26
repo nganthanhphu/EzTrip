@@ -20,5 +20,5 @@ public interface AccommodationSvcService {
 
     AccommodationSvcDetailDTO getAccommodationById(Integer id);
 
-    AccommodationSvcDetailDTO addAccommodation(AccommodationSvcDetailDTO accommodation) throws ParseException;
+    void addAccommodation(AccommodationSvcDetailDTO accommodation) throws ParseException;
 }

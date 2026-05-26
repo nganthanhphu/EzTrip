@@ -5,10 +5,6 @@
 package com.hp.dto.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 /**
  *
  * @author Joon
@@ -17,21 +13,24 @@ public class TransportationSvcListDTO {
     private BaseServiceListDTO baseInfo;
     private String arrivalLocation;
     private String departureLocation;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm")
-    private Date arrivalTime;
+    private int arrivalTime;
+    private int departureTime;
     private String typeOfTransportation;
 
     public TransportationSvcListDTO() {
     }
 
-    public TransportationSvcListDTO(Integer id, String name, BigDecimal price, String image,
-            Double avgRating, Long reviewCount, Long bookingCount, String arrivalLocation, String departureLocation,
-            Date arrivalTime, String typeOfTransportation) {
-        this.baseInfo = new BaseServiceListDTO(id, name, price, image, avgRating, reviewCount,
-                bookingCount);
+    public TransportationSvcListDTO(Integer id, String name, BigDecimal price, String image, Integer quantity,
+            Integer remainingQuantity,
+            Double avgRating, Long reviewCount, Long bookingCount, String companyName, String arrivalLocation,
+            String departureLocation,
+            int arrivalTime, int departureTime, String typeOfTransportation) {
+        this.baseInfo = new BaseServiceListDTO(id, name, price, image, quantity, remainingQuantity, avgRating,
+                reviewCount, bookingCount, companyName);
         this.arrivalLocation = arrivalLocation;
         this.departureLocation = departureLocation;
         this.arrivalTime = arrivalTime;
+        this.departureTime = departureTime;
         this.typeOfTransportation = typeOfTransportation;
     }
 
@@ -80,15 +79,29 @@ public class TransportationSvcListDTO {
     /**
      * @return the arrivalTime
      */
-    public Date getArrivalTime() {
+    public int getArrivalTime() {
         return arrivalTime;
     }
 
     /**
      * @param arrivalTime the arrivalTime to set
      */
-    public void setArrivalTime(Date arrivalTime) {
+    public void setArrivalTime(int arrivalTime) {
         this.arrivalTime = arrivalTime;
+    }
+
+    /**
+     * @return the departureTime
+     */
+    public int getDepartureTime() {
+        return departureTime;
+    }
+
+    /**
+     * @param departureTime the departureTime to set
+     */
+    public void setDepartureTime(int departureTime) {
+        this.departureTime = departureTime;
     }
 
     /**

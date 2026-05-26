@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.hp.dto.service.TransportationSvcDetailDTO;
 import com.hp.dto.service.TransportationSvcListDTO;
@@ -55,9 +56,8 @@ public class ApiTransportationController {
     }
 
     @PostMapping(path = "/secure/transportations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TransportationSvcDetailDTO> addTransportation(
-            @ModelAttribute TransportationSvcDetailDTO transportation) throws ParseException {
-        TransportationSvcDetailDTO addedTransportation = this.transportationService.addTransportation(transportation);
-        return new ResponseEntity<>(addedTransportation, HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addTransportation(@ModelAttribute TransportationSvcDetailDTO transportation) throws ParseException {
+        this.transportationService.addTransportation(transportation);
     }
 }

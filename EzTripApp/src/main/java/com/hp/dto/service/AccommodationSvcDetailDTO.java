@@ -4,10 +4,7 @@
  */
 package com.hp.dto.service;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.math.BigDecimal;
 
 /**
  *
@@ -17,27 +14,31 @@ public class AccommodationSvcDetailDTO {
 
     private BaseServiceDetailDTO baseInfo;
     private Integer id;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
-    private Date checkInDate;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
-    private Date checkOutDate;
     private int quantityOfBed;
     private float area;
     private String location;
-    @JsonIgnore
-    private String checkInDt;
-    @JsonIgnore
-    private String checkOutDt;
 
     public AccommodationSvcDetailDTO() {
     }
 
-    public AccommodationSvcDetailDTO(BaseServiceDetailDTO baseInfo, Integer id, Date checkInDate, Date checkOutDate,
-            int quantityOfBed, float area, String location) {
+    public AccommodationSvcDetailDTO(BaseServiceDetailDTO baseInfo, Integer id, int quantityOfBed, float area,
+            String location) {
         this.baseInfo = baseInfo;
         this.id = id;
-        this.checkInDate = checkInDate;
-        this.checkOutDate = checkOutDate;
+        this.quantityOfBed = quantityOfBed;
+        this.area = area;
+        this.location = location;
+    }
+
+    public AccommodationSvcDetailDTO(Integer baseId, String name, String description, BigDecimal price,
+            Integer quantity,
+            Integer remainingQuantity, Double avgRating, Long reviewCount, Long bookingCount, String companyName,
+            String companyAddress,
+            String companyPhone, String companyEmail, Integer id, int quantityOfBed, float area,
+            String location) {
+        this.baseInfo = new BaseServiceDetailDTO(baseId, name, description, price, quantity, remainingQuantity,
+                avgRating, reviewCount, bookingCount, companyName, companyAddress, companyPhone, companyEmail);
+        this.id = id;
         this.quantityOfBed = quantityOfBed;
         this.area = area;
         this.location = location;
@@ -69,34 +70,6 @@ public class AccommodationSvcDetailDTO {
      */
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    /**
-     * @return the checkInDate
-     */
-    public Date getCheckInDate() {
-        return checkInDate;
-    }
-
-    /**
-     * @param checkInDate the checkInDate to set
-     */
-    public void setCheckInDate(Date checkInDate) {
-        this.checkInDate = checkInDate;
-    }
-
-    /**
-     * @return the checkOutDate
-     */
-    public Date getCheckOutDate() {
-        return checkOutDate;
-    }
-
-    /**
-     * @param checkOutDate the checkOutDate to set
-     */
-    public void setCheckOutDate(Date checkOutDate) {
-        this.checkOutDate = checkOutDate;
     }
 
     /**
@@ -139,34 +112,6 @@ public class AccommodationSvcDetailDTO {
      */
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    /**
-     * @return the checkInDt
-     */
-    public String getCheckInDt() {
-        return checkInDt;
-    }
-
-    /**
-     * @param checkInDt the checkInDt to set
-     */
-    public void setCheckInDt(String checkInDt) {
-        this.checkInDt = checkInDt;
-    }
-
-    /**
-     * @return the checkOutDt
-     */
-    public String getCheckOutDt() {
-        return checkOutDt;
-    }
-
-    /**
-     * @param checkOutDt the checkOutDt to set
-     */
-    public void setCheckOutDt(String checkOutDt) {
-        this.checkOutDt = checkOutDt;
     }
 
 }

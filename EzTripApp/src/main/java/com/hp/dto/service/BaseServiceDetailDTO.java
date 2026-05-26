@@ -23,22 +23,39 @@ public class BaseServiceDetailDTO {
     private String description;
     private BigDecimal price;
     private Integer quantity;
+    private Integer remainingQuantity;
     private Set<String> images;
+    private Double avgRating;
+    private Long reviewCount;
+    private Long bookingCount;
     @JsonIgnore
     private List<MultipartFile> imgFiles;
+    private String companyName;
+    private String companyAddress;
+    private String companyPhone;
+    private String companyEmail;
 
     public BaseServiceDetailDTO() {
     }
 
-    public BaseServiceDetailDTO(Integer id, String name, String description, BigDecimal price, Integer quantity, Set<String> images) {
+    public BaseServiceDetailDTO(Integer id, String name, String description, BigDecimal price, Integer quantity,
+            Integer remainingQuantity, Double avgRating, Long reviewCount, Long bookingCount, String companyName,
+            String companyAddress,
+            String companyPhone, String companyEmail) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.quantity = quantity;
-        this.images = images;
+        this.remainingQuantity = remainingQuantity;
+        this.avgRating = avgRating;
+        this.reviewCount = reviewCount;
+        this.bookingCount = bookingCount;
+        this.companyName = companyName;
+        this.companyAddress = companyAddress;
+        this.companyPhone = companyPhone;
+        this.companyEmail = companyEmail;
     }
-    
 
     /**
      * @return the id
@@ -138,4 +155,115 @@ public class BaseServiceDetailDTO {
         this.imgFiles = imgFiles;
     }
 
+    /**
+     * @return the remainingQuantity
+     */
+    public Integer getRemainingQuantity() {
+        return remainingQuantity;
+    }
+
+    /**
+     * @param remainingQuantity the remainingQuantity to set
+     */
+    public void setRemainingQuantity(Integer remainingQuantity) {
+        this.remainingQuantity = remainingQuantity;
+    }
+
+    /**
+     * @return the companyName
+     */
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    /**
+     * @param companyName the companyName to set
+     */
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    /**
+     * @return the companyAddress
+     */
+    public String getCompanyAddress() {
+        return companyAddress;
+    }
+
+    /**
+     * @param companyAddress the companyAddress to set
+     */
+    public void setCompanyAddress(String companyAddress) {
+        this.companyAddress = companyAddress;
+    }
+
+    /**
+     * @return the companyPhone
+     */
+    public String getCompanyPhone() {
+        return companyPhone;
+    }
+
+    /**
+     * @param companyPhone the companyPhone to set
+     */
+    public void setCompanyPhone(String companyPhone) {
+        this.companyPhone = companyPhone;
+    }
+
+    /**
+     * @return the companyEmail
+     */
+    public String getCompanyEmail() {
+        return companyEmail;
+    }
+
+    /**
+     * @param companyEmail the companyEmail to set
+     */
+    public void setCompanyEmail(String companyEmail) {
+        this.companyEmail = companyEmail;
+    }
+
+    /**
+     * @return the avgRating
+     */
+    public Double getAvgRating() {
+        return avgRating;
+    }
+
+    /**
+     * @param avgRating the avgRating to set
+     */
+    public void setAvgRating(Double avgRating) {
+        this.avgRating = avgRating;
+    }
+
+    /**
+     * @return the reviewCount
+     */
+    public Long getReviewCount() {
+        return reviewCount;
+    }
+
+    /**
+     * @param reviewCount the reviewCount to set
+     */
+    public void setReviewCount(Long reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
+    /**
+     * @return the bookingCount
+     */
+    public Long getBookingCount() {
+        return bookingCount;
+    }
+
+    /**
+     * @param bookingCount the bookingCount to set
+     */
+    public void setBookingCount(Long bookingCount) {
+        this.bookingCount = bookingCount;
+    }
 }

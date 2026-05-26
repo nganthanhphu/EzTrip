@@ -5,9 +5,6 @@
 package com.hp.dto.service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  *
@@ -15,21 +12,19 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 public class TourismSvcListDTO {
     private BaseServiceListDTO baseInfo;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
-    private Date startDate;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy")
-    private Date endDate;
+    private int tourDuration;
     private String location;
 
     public TourismSvcListDTO() {
     }
 
-    public TourismSvcListDTO(Integer id, String name, BigDecimal price,String image,
-            Double avgRating, Long reviewCount, Long bookingCount, Date startDate, Date endDate,
+    public TourismSvcListDTO(Integer id, String name, BigDecimal price, String image, Integer quantity,
+            Integer remainingQuantity, Double avgRating, Long reviewCount, Long bookingCount, String companyName,
+            int tourDuration,
             String location) {
-        this.baseInfo = new BaseServiceListDTO(id, name, price, image, avgRating, reviewCount, bookingCount);
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.baseInfo = new BaseServiceListDTO(id, name, price, image, quantity, remainingQuantity, avgRating,
+                reviewCount, bookingCount, companyName);
+        this.tourDuration = tourDuration;
         this.location = location;
     }
 
@@ -48,34 +43,6 @@ public class TourismSvcListDTO {
     }
 
     /**
-     * @return the start_date
-     */
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    /**
-     * @param start_date the start_date to set
-     */
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    /**
-     * @return the end_date
-     */
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    /**
-     * @param end_date the end_date to set
-     */
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    /**
      * @return the location
      */
     public String getLocation() {
@@ -87,5 +54,19 @@ public class TourismSvcListDTO {
      */
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    /**
+     * @return the tourDuration
+     */
+    public int getTourDuration() {
+        return tourDuration;
+    }
+
+    /**
+     * @param tourDuration the tourDuration to set
+     */
+    public void setTourDuration(int tourDuration) {
+        this.tourDuration = tourDuration;
     }
 }

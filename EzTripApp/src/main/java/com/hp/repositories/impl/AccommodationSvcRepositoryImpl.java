@@ -5,12 +5,11 @@
 package com.hp.repositories.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -21,16 +20,21 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hp.dto.service.AccommodationSvcDetailDTO;
 import com.hp.dto.service.AccommodationSvcListDTO;
 import com.hp.repositories.AccommodationSvcRepository;
+import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
 import com.hp.pojo.Image;
+import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.Review;
 import com.hp.pojo.Service;
 import com.hp.pojo.ServiceAccommodation;
+import com.hp.pojo.BookingStatus;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
@@ -64,20 +68,34 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
         imageUrl.select(b.least(image.<String>get("url")));
         imageUrl.where(b.equal(image.get("serviceId").as(Integer.class), root.get("id")));
 
+        Join<Service, ProviderProfile> provider = root.join("providerId", JoinType.INNER);
         Join<Service, ServiceAccommodation> accommodation = root.join("serviceAccommodation", JoinType.INNER);
         Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
+        Join<Booking, BookingStatus> bookingStatus = booking.join("statusId", JoinType.LEFT);
         Join<Booking, Review> review = booking.join("review", JoinType.LEFT);
+
+        Expression<Integer> confirmedCount = b.sum(
+                b.<Integer>selectCase()
+                        .when(b.equal(bookingStatus.get("name"), "CONFIRMED"), 1)
+                        .otherwise(0));
+
+        Expression<Integer> remainingQuantity = b.diff(
+                root.get("quantity"),
+                b.coalesce(confirmedCount, 0));
 
         q.select(b.construct(AccommodationSvcListDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("price"),
                 imageUrl,
+                root.get("quantity"),
+                remainingQuantity,
                 b.coalesce(b.avg(review.get("rating")), 0.0),
-                b.count(review.get("id")),
-                b.countDistinct(booking.get("id")),
-                accommodation.get("checkInDate"),
-                accommodation.get("checkOutDate"),
+                b.coalesce(b.count(review.get("id")), 0),
+                b.coalesce(b.countDistinct(booking.get("id")), 0),
+                provider.get("companyName"),
+                accommodation.get("quantityOfBed"),
+                accommodation.get("area"),
                 accommodation.get("location")));
 
         q.orderBy(b.desc(root.get("id")));
@@ -86,7 +104,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
         List<Predicate> havingPredicates = new ArrayList<>();
 
         predicates.add(b.equal(root.get("isActive"), true));
-        predicates.add(b.greaterThan(root.get("quantity"), 0));
+        havingPredicates.add(b.greaterThan(remainingQuantity, 0));
 
         if (params != null) {
 
@@ -109,29 +127,6 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
                 try {
                     predicates.add(b.lessThanOrEqualTo(root.get("price"), new BigDecimal(toPrice)));
                 } catch (NumberFormatException e) {
-
-                }
-            }
-
-            DateTimeFormatter dateFormat = DateTimeFormatter.ISO_LOCAL_DATE;
-
-            String startDate = params.get("fromDate");
-            if (startDate != null && !startDate.isEmpty()) {
-                try {
-                    LocalDate startDateObj = LocalDate.parse(startDate, dateFormat);
-                    predicates
-                            .add(b.greaterThanOrEqualTo(accommodation.get("checkInDate"), startDateObj));
-                } catch (DateTimeParseException e) {
-
-                }
-            }
-
-            String endDate = params.get("toDate");
-            if (endDate != null && !endDate.isEmpty()) {
-                try {
-                    LocalDate endDateObj = LocalDate.parse(endDate, dateFormat);
-                    predicates.add(b.lessThanOrEqualTo(accommodation.get("checkOutDate"), endDateObj));
-                } catch (DateTimeParseException e) {
 
                 }
             }
@@ -176,22 +171,69 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
     }
 
     @Override
-    public Service getAccommodationById(Integer id) {
+    public AccommodationSvcDetailDTO getAccommodationById(Integer id) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query<Service> q = s.createNamedQuery("Service.findById", Service.class);
-        q.setParameter("id", id);
-        return q.uniqueResult();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<AccommodationSvcDetailDTO> q = b.createQuery(AccommodationSvcDetailDTO.class);
+        Root<Service> root = q.from(Service.class);
+
+        Join<Service, ProviderProfile> providerProfile = root.join("providerId", JoinType.INNER);
+        Join<ProviderProfile, BaseUser> providerUser = providerProfile.join("userId", JoinType.INNER);
+        Join<Service, ServiceAccommodation> accommodation = root.join("serviceAccommodation", JoinType.INNER);
+        Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
+        Join<Booking, BookingStatus> bookingStatus = booking.join("statusId", JoinType.LEFT);
+        Join<Booking, Review> review = booking.join("review", JoinType.LEFT);
+
+        Expression<Integer> confirmedCount = b.sum(
+                b.<Integer>selectCase().when(b.equal(bookingStatus.get("name"), "CONFIRMED"), 1).otherwise(0));
+
+        Expression<Integer> remainingQuantity = b.diff(root.get("quantity"), b.coalesce(confirmedCount, 0));
+
+        q.select(b.construct(AccommodationSvcDetailDTO.class,
+                root.get("id"),
+                root.get("name"),
+                root.get("description"),
+                root.get("price"),
+                root.get("quantity"),
+                remainingQuantity,
+                b.coalesce(b.avg(review.get("rating")), 0.0),
+                b.coalesce(b.count(review.get("id")), 0),
+                b.coalesce(b.countDistinct(booking.get("id")), 0),
+                providerProfile.get("companyName"),
+                providerProfile.get("companyAddress"),
+                providerUser.get("phoneNumber"),
+                providerUser.get("email"),
+                accommodation.get("id"),
+                accommodation.get("quantityOfBed"),
+                accommodation.get("area"),
+                accommodation.get("location")));
+
+        q.where(b.and(
+                b.equal(root.get("id"), id),
+                b.equal(root.get("isActive"), true)));
+
+        q.groupBy(root.get("id"));
+
+        Query<AccommodationSvcDetailDTO> query = s.createQuery(q);
+        AccommodationSvcDetailDTO result = query.uniqueResult();
+        if (result != null) {
+            Query<String> imageQuery = s.createQuery("SELECT i.url FROM Image i WHERE i.serviceId.id = :serviceId",
+                    String.class);
+            imageQuery.setParameter("serviceId", id);
+            Set<String> imageUrls = new HashSet<>(imageQuery.getResultList());
+            result.getBaseInfo().setImages(imageUrls);
+        }
+
+        return result;
     }
 
     @Override
-    public Service addOrUpdateAccommodation(Service svc) {
+    public void addOrUpdateAccommodation(Service svc) {
         Session s = this.factory.getObject().getCurrentSession();
         if (svc.getId() != null)
             s.merge(svc);
         else
             s.persist(svc);
-
-        return svc;
     }
 
 }

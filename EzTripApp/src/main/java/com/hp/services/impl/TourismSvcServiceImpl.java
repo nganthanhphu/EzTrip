@@ -6,15 +6,12 @@ package com.hp.services.impl;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hp.dto.service.BaseServiceDetailDTO;
 import com.hp.dto.service.TourismSvcDetailDTO;
 import com.hp.dto.service.TourismSvcListDTO;
 import com.hp.pojo.BaseUser;
@@ -60,33 +56,11 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Override
     public TourismSvcDetailDTO getTourismById(Integer id) {
-        com.hp.pojo.Service svc = this.tourismSvcRepository.getTourismById(id);
-        return this.toDetailTourismSvcDTO(svc);
-    }
-
-    private TourismSvcDetailDTO toDetailTourismSvcDTO(com.hp.pojo.Service svc) {
-        if (svc == null)
-            return null;
-
-        BaseServiceDetailDTO baseInfo = new BaseServiceDetailDTO();
-        baseInfo.setId(svc.getId());
-        baseInfo.setName(svc.getName());
-        baseInfo.setDescription(svc.getDescription());
-        baseInfo.setPrice(svc.getPrice());
-        baseInfo.setQuantity(svc.getQuantity());
-        Set<String> images = svc.getImageSet().stream().map(img -> img.getUrl()).collect(Collectors.toSet());
-        baseInfo.setImages(images);
-        TourismSvcDetailDTO detail = new TourismSvcDetailDTO();
-        detail.setBaseInfo(baseInfo);
-        detail.setId(svc.getServiceTourism().getId());
-        detail.setStartDate(svc.getServiceTourism().getStartDate());
-        detail.setEndDate(svc.getServiceTourism().getEndDate());
-        detail.setLocation(svc.getServiceTourism().getLocation());
-        return detail;
+        return this.tourismSvcRepository.getTourismById(id);
     }
 
     @Override
-    public TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws ParseException {
+    public void addTourism(TourismSvcDetailDTO tourism) throws ParseException {
         BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(tourism.getBaseInfo().getName());
@@ -115,21 +89,12 @@ public class TourismSvcServiceImpl implements TourismSvcService {
         svc.setTypeOfServiceId(new TypeOfService(1));
 
         ServiceTourism additionalInfo = new ServiceTourism();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String startDt = tourism.getStartDt();
-        String endDt = tourism.getEndDt();
-        Date startDate = sdf.parse(startDt);
-        Date endDate = sdf.parse(endDt);
-        additionalInfo.setStartDate(startDate);
-        additionalInfo.setEndDate(endDate);
+        additionalInfo.setTourDuration(tourism.getTourDuration());
         additionalInfo.setLocation(tourism.getLocation());
 
         additionalInfo.setServiceId(svc);
         svc.setServiceTourism(additionalInfo);
 
-        com.hp.pojo.Service addedSvc = this.tourismSvcRepository.addOrUpdateTourism(svc);
-
-        return this.toDetailTourismSvcDTO(addedSvc);
+        this.tourismSvcRepository.addOrUpdateTourism(svc);
     }
 }

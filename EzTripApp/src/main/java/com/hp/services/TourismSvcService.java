@@ -20,5 +20,5 @@ public interface TourismSvcService {
 
     TourismSvcDetailDTO getTourismById(Integer id);
     
-    TourismSvcDetailDTO addTourism(TourismSvcDetailDTO tourism) throws ParseException;
+    void addTourism(TourismSvcDetailDTO tourism) throws ParseException;
 }

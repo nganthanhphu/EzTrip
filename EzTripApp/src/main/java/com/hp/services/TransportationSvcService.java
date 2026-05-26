@@ -20,5 +20,5 @@ public interface TransportationSvcService {
 
     TransportationSvcDetailDTO getTransportationById(Integer id);
 
-    TransportationSvcDetailDTO addTransportation(TransportationSvcDetailDTO transportation) throws ParseException;
+    void addTransportation(TransportationSvcDetailDTO transportation) throws ParseException;
 }

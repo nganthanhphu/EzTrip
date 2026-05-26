@@ -7,6 +7,7 @@ package com.hp.repositories;
 import java.util.List;
 import java.util.Map;
 
+import com.hp.dto.service.TransportationSvcDetailDTO;
 import com.hp.dto.service.TransportationSvcListDTO;
 import com.hp.pojo.Service;
 
@@ -18,7 +19,7 @@ public interface TransportationSvcRepository {
 
     List<TransportationSvcListDTO> getTransportationServices(Map<String, String> params);
 
-    Service getTransportationById(Integer id);
+    TransportationSvcDetailDTO getTransportationById(Integer id);
 
-    Service addOrUpdateTransportation(Service svc);
+    void addOrUpdateTransportation(Service svc);
 }

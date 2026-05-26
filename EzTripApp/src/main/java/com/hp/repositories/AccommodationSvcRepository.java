@@ -7,6 +7,7 @@ package com.hp.repositories;
 import java.util.List;
 import java.util.Map;
 
+import com.hp.dto.service.AccommodationSvcDetailDTO;
 import com.hp.dto.service.AccommodationSvcListDTO;
 import com.hp.pojo.Service;
 
@@ -18,8 +19,8 @@ public interface AccommodationSvcRepository {
 
     List<AccommodationSvcListDTO> getAccommodationServices(Map<String, String> params);
 
-    Service getAccommodationById(Integer id);
+    AccommodationSvcDetailDTO getAccommodationById(Integer id);
 
-    Service addOrUpdateAccommodation(Service svc);
+    void addOrUpdateAccommodation(Service svc);
 
 }

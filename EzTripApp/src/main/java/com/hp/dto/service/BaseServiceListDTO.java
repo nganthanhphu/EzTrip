@@ -16,22 +16,29 @@ public class BaseServiceListDTO {
     private String name;
     private BigDecimal price;
     private String image;
+    private Integer quantity;
+    private Integer remainingQuantity;
     private Double avgRating;
     private Long reviewCount;
     private Long bookingCount;
+    private String companyName;
 
     public BaseServiceListDTO() {
     }
 
-    public BaseServiceListDTO(Integer id, String name, BigDecimal price, String image, Double avgRating,
-            Long reviewCount, Long bookingCount) {
+    public BaseServiceListDTO(Integer id, String name, BigDecimal price, String image, Integer quantity,
+            Integer remainingQuantity, Double avgRating,
+            Long reviewCount, Long bookingCount, String companyName) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.image = image;
+        this.quantity = quantity;
+        this.remainingQuantity = remainingQuantity;
         this.avgRating = avgRating;
         this.reviewCount = reviewCount;
         this.bookingCount = bookingCount;
+        this.companyName = companyName;
     }
 
     /**
@@ -130,6 +137,48 @@ public class BaseServiceListDTO {
      */
     public void setBookingCount(Long bookingCount) {
         this.bookingCount = bookingCount;
+    }
+
+    /**
+     * @return the quantity
+     */
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    /**
+     * @param quantity the quantity to set
+     */
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    /**
+     * @return the remainingQuantity
+     */
+    public Integer getRemainingQuantity() {
+        return remainingQuantity;
+    }
+
+    /**
+     * @param remainingQuantity the remainingQuantity to set
+     */
+    public void setRemainingQuantity(Integer remainingQuantity) {
+        this.remainingQuantity = remainingQuantity;
+    }
+
+    /**
+     * @return the companyName
+     */
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    /**
+     * @param companyName the companyName to set
+     */
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
 }

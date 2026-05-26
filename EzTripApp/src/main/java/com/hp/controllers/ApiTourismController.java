@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.hp.dto.service.TourismSvcDetailDTO;
 import com.hp.dto.service.TourismSvcListDTO;
@@ -44,7 +45,7 @@ public class ApiTourismController {
     @GetMapping("/tourisms/{id}")
     public ResponseEntity<TourismSvcDetailDTO> getTourismById(@PathVariable(value = "id") int id) {
         TourismSvcDetailDTO tourism = this.tourismService.getTourismById(id);
-        
+
         if (tourism != null) {
             return new ResponseEntity<>(tourism, HttpStatus.OK);
         } else {
@@ -53,8 +54,8 @@ public class ApiTourismController {
     }
 
     @PostMapping(path = "/secure/tourisms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TourismSvcDetailDTO> addTourism(@ModelAttribute TourismSvcDetailDTO tourism) throws ParseException {
-        TourismSvcDetailDTO addedTourism = this.tourismService.addTourism(tourism);
-        return new ResponseEntity<>(addedTourism, HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addTourism(@ModelAttribute TourismSvcDetailDTO tourism) throws ParseException {
+        this.tourismService.addTourism(tourism);
     }
 }

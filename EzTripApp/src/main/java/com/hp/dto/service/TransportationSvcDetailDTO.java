@@ -4,10 +4,7 @@
  */
 package com.hp.dto.service;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.math.BigDecimal;
 
 /**
  *
@@ -19,21 +16,30 @@ public class TransportationSvcDetailDTO {
     private Integer id;
     private String arrivalLocation;
     private String departureLocation;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm")
-    private Date arrivalTime;
-    @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm")
-    private Date departureTime;
+    private int arrivalTime;
+    private int departureTime;
     private String typeOfTransportation;
-    @JsonIgnore
-    private String arrivalTm;
-    @JsonIgnore
-    private String departureTm;
 
     public TransportationSvcDetailDTO() {
     }
 
-    public TransportationSvcDetailDTO(BaseServiceDetailDTO baseInfo, Integer id, String arrivalLocation, String departureLocation, Date arrivalTime, Date departureTime, String typeOfTransportation) {
+    public TransportationSvcDetailDTO(BaseServiceDetailDTO baseInfo, Integer id, String arrivalLocation, String departureLocation, int arrivalTime, int departureTime, String typeOfTransportation) {
         this.baseInfo = baseInfo;
+        this.id = id;
+        this.arrivalLocation = arrivalLocation;
+        this.departureLocation = departureLocation;
+        this.arrivalTime = arrivalTime;
+        this.departureTime = departureTime;
+        this.typeOfTransportation = typeOfTransportation;
+    }
+
+    public TransportationSvcDetailDTO(Integer baseId, String name, String description, BigDecimal price,
+            Integer quantity, Integer remainingQuantity, Double avgRating, Long reviewCount, Long bookingCount,
+            String companyName, String companyAddress, String companyPhone, String companyEmail, Integer id,
+            String arrivalLocation, String departureLocation, int arrivalTime, int departureTime,
+            String typeOfTransportation) {
+        this.baseInfo = new BaseServiceDetailDTO(baseId, name, description, price, quantity, remainingQuantity,
+                avgRating, reviewCount, bookingCount, companyName, companyAddress, companyPhone, companyEmail);
         this.id = id;
         this.arrivalLocation = arrivalLocation;
         this.departureLocation = departureLocation;
@@ -101,28 +107,28 @@ public class TransportationSvcDetailDTO {
     /**
      * @return the arrivalTime
      */
-    public Date getArrivalTime() {
+    public int getArrivalTime() {
         return arrivalTime;
     }
 
     /**
      * @param arrivalTime the arrivalTime to set
      */
-    public void setArrivalTime(Date arrivalTime) {
+    public void setArrivalTime(int arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
     /**
      * @return the departureTime
      */
-    public Date getDepartureTime() {
+    public int getDepartureTime() {
         return departureTime;
     }
 
     /**
      * @param departureTime the departureTime to set
      */
-    public void setDepartureTime(Date departureTime) {
+    public void setDepartureTime(int departureTime) {
         this.departureTime = departureTime;
     }
 
@@ -138,34 +144,6 @@ public class TransportationSvcDetailDTO {
      */
     public void setTypeOfTransportation(String typeOfTransportation) {
         this.typeOfTransportation = typeOfTransportation;
-    }
-
-    /**
-     * @return the arrivalTm
-     */
-    public String getArrivalTm() {
-        return arrivalTm;
-    }
-
-    /**
-     * @param arrivalTm the arrivalTm to set
-     */
-    public void setArrivalTm(String arrivalTm) {
-        this.arrivalTm = arrivalTm;
-    }
-
-    /**
-     * @return the departureTm
-     */
-    public String getDepartureTm() {
-        return departureTm;
-    }
-
-    /**
-     * @param departureTm the departureTm to set
-     */
-    public void setDepartureTm(String departureTm) {
-        this.departureTm = departureTm;
     }
 
 }

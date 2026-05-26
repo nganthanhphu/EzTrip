@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.hp.dto.service.AccommodationSvcDetailDTO;
 import com.hp.dto.service.AccommodationSvcListDTO;
@@ -54,8 +55,8 @@ public class ApiAccommodationController {
     }
 
     @PostMapping(path = "/secure/accommodations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AccommodationSvcDetailDTO> addAccommodation(@ModelAttribute AccommodationSvcDetailDTO accommodation) throws ParseException {
-        AccommodationSvcDetailDTO addedAccommodation = this.accommodationService.addAccommodation(accommodation);
-        return new ResponseEntity<>(addedAccommodation, HttpStatus.CREATED);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addAccommodation(@ModelAttribute AccommodationSvcDetailDTO accommodation) throws ParseException {
+        this.accommodationService.addAccommodation(accommodation);
     }
 }
