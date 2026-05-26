@@ -6,7 +6,6 @@ package com.hp.services.impl;
 
 import com.hp.dto.booking.BookingCreateDTO;
 import com.hp.dto.booking.BookingViewDTO;
-import com.hp.dto.review.ReviewViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
 import com.hp.pojo.BookingStatus;
@@ -19,6 +18,8 @@ import com.hp.utils.UserUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class BookingServiceImpl implements BookingService {
         if (quantity > (int) service[3]) {
             throw new IllegalArgumentException("Số lượng vượt quá số lượng có sẵn!");
         }
-        
+
         Date bookingDay;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -82,33 +83,24 @@ public class BookingServiceImpl implements BookingService {
         this.bookingRepository.addOrUpdateBooking(booking);
     }
 
-    public BookingViewDTO toBookingDetailDTO(Booking booking) {
-        if (booking == null) {
-            return null;
-        }
-        ReviewViewDTO review = null;
-        if (booking.getReview() != null) {
-            review = new ReviewViewDTO(
-                    booking.getReview().getId(),
-                    booking.getReview().getRating(),
-                    booking.getReview().getComment(),
-                    booking.getReview().getReviewDate());
+    @Override
+    public BookingViewDTO getBookingById(int id) {
+        return this.bookingRepository.getBookingById(id);
+    }
+
+    @Override
+    public List<BookingViewDTO> getBookings(Map<String, String> params) {
+        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+
+        int customerId = 0, providerId = 0;
+
+        if (currentUser.getRoleId().getName().equals("CUSTOMER")) {
+            customerId = currentUser.getCustomerProfile().getId();
+        } else if (currentUser.getRoleId().getName().equals("PROVIDER")) {
+            providerId = currentUser.getProviderProfile().getId();
         }
 
-        return new BookingViewDTO(
-                booking.getId(),
-                booking.getServiceId().getName(),
-                booking.getCreatedDate(),
-                booking.getBookingDay(),
-                booking.getQuantity(),
-                booking.getTotalAmount(),
-                booking.getNote(),
-                booking.getStatusId().getName(),
-                booking.getCustomerId().getUserId().getFullname(),
-                booking.getCustomerId().getUserId().getPhoneNumber(),
-                booking.getCustomerId().getUserId().getAvatar(),
-                booking.getPaymentMethodId().getName(),
-                review);
+        return this.bookingRepository.getBookings(params, customerId, providerId);
     }
 
 }

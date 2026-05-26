@@ -32,7 +32,7 @@ import java.util.Date;
 @Table(name = "booking")
 @NamedQueries({
     @NamedQuery(name = "Booking.findAll", query = "SELECT b FROM Booking b"),
-    @NamedQuery(name = "Booking.findById", query = "SELECT b FROM Booking b LEFT JOIN FETCH b.statusId LEFT JOIN FETCH b.customerId bu LEFT JOIN FETCH bu.userId LEFT JOIN FETCH b.paymentMethodId LEFT JOIN FETCH b.serviceId s LEFT JOIN FETCH s.serviceAccommodation LEFT JOIN FETCH s.serviceTourism LEFT JOIN FETCH s.serviceTransportation LEFT JOIN FETCH b.review WHERE b.id = :id"),
+    @NamedQuery(name = "Booking.findById", query = "SELECT b FROM Booking b WHERE b.id = :id"),
     @NamedQuery(name = "Booking.findByCreatedDate", query = "SELECT b FROM Booking b WHERE b.createdDate = :createdDate"),
     @NamedQuery(name = "Booking.findByBookingDay", query = "SELECT b FROM Booking b WHERE b.bookingDay = :bookingDay"),
     @NamedQuery(name = "Booking.findByTotalAmount", query = "SELECT b FROM Booking b WHERE b.totalAmount = :totalAmount"),

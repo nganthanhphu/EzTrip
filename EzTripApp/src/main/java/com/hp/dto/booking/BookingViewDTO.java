@@ -14,18 +14,26 @@ import com.hp.dto.review.ReviewViewDTO;
  * @author Joon
  */
 public record BookingViewDTO(
-        Integer id,
-        String serviceName,
-        @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm") Date createdDate,
-        @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy") Date bookingDay,
-        int quantity,
-        int totalAmount,
-        String note,
-        String status,
-        String customerName,
-        String customerPhone,
-        String customerAvatar,
-        String paymentMethod,
-        ReviewViewDTO review
-) {
+                Integer id,
+                String serviceName,
+                @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm") Date createdDate,
+                @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy") Date bookingDay,
+                int quantity,
+                int totalAmount,
+                String note,
+                String status,
+                String customerName,
+                String customerPhone,
+                String customerAvatar,
+                String paymentMethod,
+                ReviewViewDTO review) {
+        public BookingViewDTO(Integer id, String serviceName, Date createdDate, Date bookingDay, int quantity,
+                        int totalAmount, String note, String status, String customerName, String customerPhone,
+                        String customerAvatar, String paymentMethod, Integer reviewId, Integer reviewRating,
+                        String reviewComment, Date reviewDate) {
+                this(id, serviceName, createdDate, bookingDay, quantity, totalAmount, note, status, customerName,
+                                customerPhone, customerAvatar, paymentMethod,
+                                reviewId != null ? new ReviewViewDTO(reviewId, reviewRating, reviewComment, reviewDate)
+                                                : null);
+        }
 }
