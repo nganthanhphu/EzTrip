@@ -157,7 +157,7 @@ FROM service s
 JOIN tmp_numbers i ON i.n <= (1 + (s.id % 5))
 WHERE s.id BETWEEN 1000 AND 3019;
 
-INSERT INTO booking (id, customer_id, service_id, created_date, booking_day, payment_method_id, total_amount, status_id, note)
+INSERT INTO booking (id, customer_id, service_id, created_date, booking_day, payment_method_id, quantity, total_amount, status_id, note)
 SELECT
   (s.id * 10 + b.n),
   101 + ((s.id + b.n) % 20),
@@ -165,7 +165,8 @@ SELECT
   DATE_ADD('2026-05-01 09:00:00', INTERVAL ((s.id + (b.n * 7)) % 30) DAY),
   DATE_ADD(DATE(DATE_ADD('2026-05-01 09:00:00', INTERVAL ((s.id + (b.n * 7)) % 30) DAY)), INTERVAL 3 DAY),
   1 + (b.n % 3),
-  s.price,
+  1 + (b.n % 3),
+  s.price * (1 + (b.n % 3)),
   1 + ((s.id + b.n) % 4),
   CONCAT('Note ', b.n)
 FROM service s

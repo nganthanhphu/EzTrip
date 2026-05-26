@@ -147,6 +147,7 @@ CREATE TABLE booking (
     created_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     booking_day DATE NOT NULL, -- Thời gian mà khách muốn sử dụng dịch vụ, ví dụ: ngày checkin, ngày đi tour, ngày đi phương tiện,..., cái này sẽ do nhà cung cấp tự kiểm tra với các loại dịch vụ của họ, nếu trùng thì sẽ không cho đặt nữa
     payment_method_id int NULL,
+    quantity INT NOT NULL DEFAULT 1,
     total_amount INT DEFAULT 0,
     status_id int NOT NULL DEFAULT 1, -- Mặc định là PENDING, ê nhớ đổ dữ liệu ở trên trước á
     note nvarchar(255) NULL, -- Ghi chú cho các loại dịch vụ (phòng thì là checin, checkout, vé thì lưu số ghế, tour thì lưu số lượng người,...), làm vậy thì nhà cung cấp phải thực hiện bằng tay chỗ kiểm tra này,

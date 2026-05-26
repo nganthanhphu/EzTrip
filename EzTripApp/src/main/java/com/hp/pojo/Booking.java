@@ -55,6 +55,10 @@ public class Booking implements Serializable {
     @Column(name = "booking_day")
     @Temporal(TemporalType.DATE)
     private Date bookingDay;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "quantity")
+    private Integer quantity;
     @Column(name = "total_amount")
     private Integer totalAmount;
     @Size(max = 255)
@@ -82,10 +86,11 @@ public class Booking implements Serializable {
         this.id = id;
     }
 
-    public Booking(Integer id, Date createdDate, Date bookingDay) {
+    public Booking(Integer id, Date createdDate, Date bookingDay, Integer quantity) {
         this.id = id;
         this.createdDate = createdDate;
         this.bookingDay = bookingDay;
+        this.quantity = quantity;
     }
 
     public Integer getId() {
@@ -110,6 +115,14 @@ public class Booking implements Serializable {
 
     public void setBookingDay(Date bookingDay) {
         this.bookingDay = bookingDay;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public Integer getTotalAmount() {
