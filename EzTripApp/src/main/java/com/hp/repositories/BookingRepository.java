@@ -11,6 +11,6 @@ import com.hp.pojo.Booking;
  * @author Joon
  */
 public interface BookingRepository {
-    Booking addOrUpdateBooking(Booking booking);
+    void addOrUpdateBooking(Booking booking);
     Booking getBookingById(int id);
 }

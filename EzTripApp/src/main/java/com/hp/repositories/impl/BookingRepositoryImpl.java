@@ -33,17 +33,13 @@ public class BookingRepositoryImpl implements BookingRepository {
     }
 
     @Override
-    public Booking addOrUpdateBooking(Booking booking) {
+    public void addOrUpdateBooking(Booking booking) {
         Session s = this.factory.getObject().getCurrentSession();
         if (booking.getId() != null) {
             s.merge(booking);
         } else {
             s.persist(booking);
         }
-        s.flush();
-        int id = booking.getId();
-        s.detach(booking);
-        return this.getBookingById(id);
     }
 
 }

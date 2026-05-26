@@ -1,0 +1,64 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.hp.repositories.impl;
+
+import com.hp.pojo.Booking;
+import com.hp.pojo.BookingStatus;
+import com.hp.pojo.Service;
+import com.hp.repositories.BaseServiceRepository;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ *
+ * @author Joon
+ */
+@Repository
+@Transactional
+public class BaseServiceRepositoryImpl implements BaseServiceRepository {
+
+    @Autowired
+    private LocalSessionFactoryBean factory;
+
+    @Override
+    public Object[] getServiceById(int id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        Root<Service> root = q.from(Service.class);
+        Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
+        Join<Booking, BookingStatus> bookingStatus = booking.join("statusId", JoinType.LEFT);
+
+        Expression<Integer> confirmedCount = b.sum(
+                b.<Integer>selectCase()
+                        .when(b.equal(bookingStatus.get("name"), "CONFIRMED"), 1)
+                        .otherwise(0));
+
+        Expression<Integer> remainingQuantity = b.diff(
+                root.get("quantity"),
+                b.coalesce(confirmedCount, 0));
+
+        q.multiselect(root.get("id"), root.get("isActive"), root.get("price").as(Integer.class), remainingQuantity);
+        q.where(b.equal(root.get("id"), id));
+        q.groupBy(root.get("id"));
+        
+        Query<Object[]> query = s.createQuery(q);
+
+        return query.uniqueResult();
+    }
+
+}

@@ -12,6 +12,9 @@ public class BookingCreateDTO {
 
    private Integer serviceId;
    private Integer paymentMethodId;
+   private String bookingDay;
+   private int quantity;
+   private String note;
 
     /**
      * @return the serviceId
@@ -39,6 +42,48 @@ public class BookingCreateDTO {
      */
     public void setPaymentMethodId(Integer paymentMethodId) {
         this.paymentMethodId = paymentMethodId;
+    }
+
+    /**
+     * @return the bookingDay
+     */
+    public String getBookingDay() {
+        return bookingDay;
+    }
+
+    /**
+     * @param bookingDay the bookingDay to set
+     */
+    public void setBookingDay(String bookingDay) {
+        this.bookingDay = bookingDay;
+    }
+
+    /**
+     * @return the quantity
+     */
+    public int getQuantity() {
+        return quantity;
+    }
+
+    /**
+     * @param quantity the quantity to set
+     */
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    /**
+     * @return the note
+     */
+    public String getNote() {
+        return note;
+    }
+
+    /**
+     * @param note the note to set
+     */
+    public void setNote(String note) {
+        this.note = note;
     }
     
 }

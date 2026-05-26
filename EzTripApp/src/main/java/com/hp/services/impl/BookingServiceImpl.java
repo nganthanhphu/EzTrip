@@ -11,11 +11,13 @@ import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
 import com.hp.pojo.BookingStatus;
 import com.hp.pojo.PaymentMethod;
+import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.BookingRepository;
 import com.hp.repositories.UserRepository;
 import com.hp.services.BookingService;
 import com.hp.utils.UserUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,19 +38,48 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BaseServiceRepository serviceRepository;
+
     @Override
-    public BookingDetailDTO addBooking(BookingCreateDTO bk) {
-        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+    public void addBooking(BookingCreateDTO bk) {
+        Object[] service = this.serviceRepository.getServiceById(bk.getServiceId());
+        if (service == null) {
+            throw new IllegalArgumentException("Dịch vụ không tồn tại!");
+        }
+
+        if (!(boolean) service[1]) {
+            throw new IllegalArgumentException("Dịch vụ không khả dụng!");
+        }
+
+        int quantity = bk.getQuantity();
+
+        if (quantity > (int) service[3]) {
+            throw new IllegalArgumentException("Số lượng vượt quá số lượng có sẵn!");
+        }
         
+        Date bookingDay;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            bookingDay = sdf.parse(bk.getBookingDay());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Ngày bắt đầu dịch vụ không hợp lệ!");
+        }
+
+        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+
         Booking booking = new Booking();
-        booking.setBookingDate(new Date());
+        booking.setCreatedDate(new Date());
+        booking.setBookingDay(bookingDay);
+        booking.setQuantity(quantity);
+        booking.setTotalAmount(((Number) service[2]).intValue() * quantity);
+        booking.setNote(bk.getNote());
         booking.setStatusId(new BookingStatus(1));
         booking.setCustomerId(currentUser.getCustomerProfile());
         booking.setPaymentMethodId(new PaymentMethod(bk.getPaymentMethodId()));
         booking.setServiceId(new com.hp.pojo.Service(bk.getServiceId()));
 
-        Booking savedBooking = this.bookingRepository.addOrUpdateBooking(booking);
-        return this.toBookingDetailDTO(savedBooking);
+        this.bookingRepository.addOrUpdateBooking(booking);
     }
 
     public BookingDetailDTO toBookingDetailDTO(Booking booking) {
