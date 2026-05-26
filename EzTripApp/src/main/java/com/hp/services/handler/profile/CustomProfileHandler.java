@@ -11,7 +11,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hp.dto.user.UserRegisterDTO;
+import com.hp.dto.user.UserCreateDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
 import com.hp.pojo.Gender;
@@ -33,8 +33,8 @@ public class CustomProfileHandler implements UserProfileHandler {
     private GenderRepository genderRepo;
 
     @Override
-    public void handleProfileInfo(BaseUser user, UserRegisterDTO u) throws ParseException {
-        String roleName = u.getRole();
+    public void handleProfileInfo(BaseUser user, UserCreateDTO u) throws ParseException {
+        String roleName = u.role();
         Role role = roleRepo.getRoleByName(roleName);
         if (role == null || !role.getName().equals("CUSTOMER")) {
             throw new IllegalArgumentException("Vai trò không hợp lệ!");
@@ -44,14 +44,14 @@ public class CustomProfileHandler implements UserProfileHandler {
         CustomerProfile profile = new CustomerProfile();
         profile.setUserId(user);
 
-        String genderName = u.getGender();
+        String genderName = u.gender();
         Gender gender = genderRepo.getGenderByName(genderName);
         if (gender == null) {
             throw new IllegalArgumentException("Giới tính không hợp lệ!");
         }
         profile.setGenderId(gender);
 
-        String dobString = u.getDob();
+        String dobString = u.dob();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Date dob = sdf.parse(dobString);
         profile.setDob(dob);

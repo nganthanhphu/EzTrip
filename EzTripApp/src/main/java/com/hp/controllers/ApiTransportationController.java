@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.hp.dto.service.TransportationSvcDetailDTO;
-import com.hp.dto.service.TransportationSvcListDTO;
+import com.hp.dto.service.TransportationCreateDTO;
+import com.hp.dto.service.TransportationListViewDTO;
+import com.hp.dto.service.TransportationViewDTO;
 import com.hp.services.TransportationSvcService;
 
 /**
@@ -37,16 +38,16 @@ public class ApiTransportationController {
     private TransportationSvcService transportationService;
 
     @GetMapping("/transportations")
-    public ResponseEntity<List<TransportationSvcListDTO>> getTransportations(
+    public ResponseEntity<List<TransportationListViewDTO>> getTransportations(
             @RequestParam Map<String, String> params) {
-        List<TransportationSvcListDTO> transportations = this.transportationService
+        List<TransportationListViewDTO> transportations = this.transportationService
                 .getTransportationServices(params);
         return new ResponseEntity<>(transportations, HttpStatus.OK);
     }
 
     @GetMapping("/transportations/{id}")
-    public ResponseEntity<TransportationSvcDetailDTO> getTransportationById(@PathVariable(value = "id") int id) {
-        TransportationSvcDetailDTO transportation = this.transportationService.getTransportationById(id);
+    public ResponseEntity<TransportationViewDTO> getTransportationById(@PathVariable(value = "id") int id) {
+        TransportationViewDTO transportation = this.transportationService.getTransportationById(id);
 
         if (transportation != null) {
             return new ResponseEntity<>(transportation, HttpStatus.OK);
@@ -57,7 +58,7 @@ public class ApiTransportationController {
 
     @PostMapping(path = "/secure/transportations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void addTransportation(@ModelAttribute TransportationSvcDetailDTO transportation) throws ParseException {
+    public void addTransportation(@ModelAttribute TransportationCreateDTO transportation) throws ParseException {
         this.transportationService.addTransportation(transportation);
     }
 }

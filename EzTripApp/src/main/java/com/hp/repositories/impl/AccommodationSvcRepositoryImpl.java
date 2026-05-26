@@ -20,8 +20,9 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.dto.service.AccommodationSvcDetailDTO;
-import com.hp.dto.service.AccommodationSvcListDTO;
+import com.hp.dto.service.AccommodationListViewDTO;
+import com.hp.dto.service.AccommodationViewDTO;
+import com.hp.dto.service.BaseServiceViewDTO;
 import com.hp.repositories.AccommodationSvcRepository;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
@@ -57,10 +58,10 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
     private Environment env;
 
     @Override
-    public List<AccommodationSvcListDTO> getAccommodationServices(Map<String, String> params) {
+    public List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<AccommodationSvcListDTO> q = b.createQuery(AccommodationSvcListDTO.class);
+        CriteriaQuery<AccommodationListViewDTO> q = b.createQuery(AccommodationListViewDTO.class);
         Root<Service> root = q.from(Service.class);
 
         Subquery<String> imageUrl = q.subquery(String.class);
@@ -83,7 +84,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
                 root.get("quantity"),
                 b.coalesce(confirmedCount, 0));
 
-        q.select(b.construct(AccommodationSvcListDTO.class,
+        q.select(b.construct(AccommodationListViewDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("price"),
@@ -156,7 +157,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
 
         q.groupBy(root.get("id"));
 
-        Query<AccommodationSvcListDTO> query = s.createQuery(q);
+        Query<AccommodationListViewDTO> query = s.createQuery(q);
 
         if (params != null) {
             int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
@@ -171,10 +172,10 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
     }
 
     @Override
-    public AccommodationSvcDetailDTO getAccommodationById(Integer id) {
+    public AccommodationViewDTO getAccommodationById(Integer id) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<AccommodationSvcDetailDTO> q = b.createQuery(AccommodationSvcDetailDTO.class);
+        CriteriaQuery<AccommodationViewDTO> q = b.createQuery(AccommodationViewDTO.class);
         Root<Service> root = q.from(Service.class);
 
         Join<Service, ProviderProfile> providerProfile = root.join("providerId", JoinType.INNER);
@@ -189,7 +190,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
 
         Expression<Integer> remainingQuantity = b.diff(root.get("quantity"), b.coalesce(confirmedCount, 0));
 
-        q.select(b.construct(AccommodationSvcDetailDTO.class,
+        q.select(b.construct(AccommodationViewDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("description"),
@@ -214,14 +215,16 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
 
         q.groupBy(root.get("id"));
 
-        Query<AccommodationSvcDetailDTO> query = s.createQuery(q);
-        AccommodationSvcDetailDTO result = query.uniqueResult();
+        Query<AccommodationViewDTO> query = s.createQuery(q);
+        AccommodationViewDTO result = query.uniqueResult();
         if (result != null) {
             Query<String> imageQuery = s.createQuery("SELECT i.url FROM Image i WHERE i.serviceId.id = :serviceId",
                     String.class);
             imageQuery.setParameter("serviceId", id);
             Set<String> imageUrls = new HashSet<>(imageQuery.getResultList());
-            result.getBaseInfo().setImages(imageUrls);
+            BaseServiceViewDTO baseInfo = result.baseInfo().setImages(imageUrls);
+            result = new AccommodationViewDTO(baseInfo, result.id(), result.quantityOfBed(), result.area(),
+                result.location());
         }
 
         return result;

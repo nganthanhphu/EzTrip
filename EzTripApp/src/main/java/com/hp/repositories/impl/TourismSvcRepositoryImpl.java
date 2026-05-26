@@ -20,8 +20,9 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.hp.dto.service.TourismSvcDetailDTO;
-import com.hp.dto.service.TourismSvcListDTO;
+import com.hp.dto.service.BaseServiceViewDTO;
+import com.hp.dto.service.TourismListViewDTO;
+import com.hp.dto.service.TourismViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
 import com.hp.pojo.BookingStatus;
@@ -57,10 +58,10 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
     private Environment env;
 
     @Override
-    public List<TourismSvcListDTO> getTourismServices(Map<String, String> params) {
+    public List<TourismListViewDTO> getTourismServices(Map<String, String> params) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<TourismSvcListDTO> q = b.createQuery(TourismSvcListDTO.class);
+        CriteriaQuery<TourismListViewDTO> q = b.createQuery(TourismListViewDTO.class);
         Root<Service> root = q.from(Service.class);
 
         Subquery<String> imageUrl = q.subquery(String.class);
@@ -83,7 +84,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
             root.get("quantity"),
             b.coalesce(confirmedCount, 0));
 
-        q.select(b.construct(TourismSvcListDTO.class,
+        q.select(b.construct(TourismListViewDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("price"),
@@ -151,7 +152,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
 
         q.groupBy(root.get("id"));
 
-        Query<TourismSvcListDTO> query = s.createQuery(q);
+        Query<TourismListViewDTO> query = s.createQuery(q);
 
         if (params != null) {
             int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
@@ -165,10 +166,10 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
     }
 
     @Override
-    public TourismSvcDetailDTO getTourismById(Integer id) {
+    public TourismViewDTO getTourismById(Integer id) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<TourismSvcDetailDTO> q = b.createQuery(TourismSvcDetailDTO.class);
+        CriteriaQuery<TourismViewDTO> q = b.createQuery(TourismViewDTO.class);
         Root<Service> root = q.from(Service.class);
 
         Join<Service, ProviderProfile> providerProfile = root.join("providerId", JoinType.INNER);
@@ -183,7 +184,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
 
         Expression<Integer> remainingQuantity = b.diff(root.get("quantity"), b.coalesce(confirmedCount, 0));
 
-        q.select(b.construct(TourismSvcDetailDTO.class,
+        q.select(b.construct(TourismViewDTO.class,
                 root.get("id"),
                 root.get("name"),
                 root.get("description"),
@@ -207,14 +208,15 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
 
         q.groupBy(root.get("id"));
 
-        Query<TourismSvcDetailDTO> query = s.createQuery(q);
-        TourismSvcDetailDTO result = query.uniqueResult();
+        Query<TourismViewDTO> query = s.createQuery(q);
+        TourismViewDTO result = query.uniqueResult();
         if (result != null) {
             Query<String> imageQuery = s.createQuery("SELECT i.url FROM Image i WHERE i.serviceId.id = :serviceId",
                     String.class);
             imageQuery.setParameter("serviceId", id);
             Set<String> imageUrls = new HashSet<>(imageQuery.getResultList());
-            result.getBaseInfo().setImages(imageUrls);
+            BaseServiceViewDTO baseInfo = result.baseInfo().setImages(imageUrls);
+            result = new TourismViewDTO(baseInfo, result.id(), result.tourDuration(), result.location());
         }
 
         return result;

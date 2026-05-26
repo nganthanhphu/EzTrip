@@ -19,8 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hp.dto.service.AccommodationSvcDetailDTO;
-import com.hp.dto.service.AccommodationSvcListDTO;
+import com.hp.dto.service.AccommodationCreateDTO;
+import com.hp.dto.service.AccommodationListViewDTO;
+import com.hp.dto.service.AccommodationViewDTO;
+import com.hp.dto.service.BaseServiceCreateDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
@@ -49,37 +51,40 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
     private Cloudinary cloudinary;
 
     @Override
-    public List<AccommodationSvcListDTO> getAccommodationServices(Map<String, String> params) {
+    public List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params) {
         return this.accommodationSvcRepository.getAccommodationServices(params);
     }
 
     @Override
-    public AccommodationSvcDetailDTO getAccommodationById(Integer id) {
+    public AccommodationViewDTO getAccommodationById(Integer id) {
         return this.accommodationSvcRepository.getAccommodationById(id);
     }
 
     @Override
-    public void addAccommodation(AccommodationSvcDetailDTO accommodation) throws ParseException {
+    public void addAccommodation(AccommodationCreateDTO accommodation) throws ParseException {
+        BaseServiceCreateDTO baseInfo = accommodation.baseInfo();
         BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
-        svc.setName(accommodation.getBaseInfo().getName());
-        svc.setDescription(accommodation.getBaseInfo().getDescription());
-        svc.setPrice(accommodation.getBaseInfo().getPrice());
-        svc.setQuantity(accommodation.getBaseInfo().getQuantity());
+        svc.setName(baseInfo.name());
+        svc.setDescription(baseInfo.description());
+        svc.setPrice(baseInfo.price());
+        svc.setQuantity(baseInfo.quantity());
         svc.setIsActive(true);
         Set<Image> images = new HashSet<>();
-        for (MultipartFile img : accommodation.getBaseInfo().getImgFiles()) {
-            if (img.isEmpty())
-                continue;
-            try {
-                Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
-                        ObjectUtils.asMap("resource_type", "auto"));
-                Image image = new Image();
-                image.setUrl(res.get("secure_url").toString());
-                image.setServiceId(svc);
-                images.add(image);
-            } catch (IOException ex) {
-                Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        if (baseInfo.imgFiles() != null) {
+            for (MultipartFile img : baseInfo.imgFiles()) {
+                if (img.isEmpty())
+                    continue;
+                try {
+                    Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
+                            ObjectUtils.asMap("resource_type", "auto"));
+                    Image image = new Image();
+                    image.setUrl(res.get("secure_url").toString());
+                    image.setServiceId(svc);
+                    images.add(image);
+                } catch (IOException ex) {
+                    Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         svc.setImageSet(images);
@@ -89,9 +94,9 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
         ServiceAccommodation additionalInfo = new ServiceAccommodation();
 
-        additionalInfo.setQuantityOfBed(accommodation.getQuantityOfBed());
-        additionalInfo.setArea(accommodation.getArea());
-        additionalInfo.setLocation(accommodation.getLocation());
+        additionalInfo.setQuantityOfBed(accommodation.quantityOfBed());
+        additionalInfo.setArea(accommodation.area());
+        additionalInfo.setLocation(accommodation.location());
 
         additionalInfo.setServiceId(svc);
         svc.setServiceAccommodation(additionalInfo);

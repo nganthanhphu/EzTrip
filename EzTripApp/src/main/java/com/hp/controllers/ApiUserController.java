@@ -4,10 +4,10 @@
  */
 package com.hp.controllers;
 
+import com.hp.dto.user.UserCreateDTO;
 import com.hp.dto.user.UserLoginDTO;
-import com.hp.dto.user.UserProfileDTO;
+import com.hp.dto.user.UserViewDTO;
 import com.hp.pojo.BaseUser;
-import com.hp.dto.user.UserRegisterDTO;
 import com.hp.services.UserService;
 import com.hp.utils.JwtUtils;
 import java.security.Principal;
@@ -38,15 +38,15 @@ public class ApiUserController {
     private UserService userService;
 
     @PostMapping(path = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserProfileDTO> create(@ModelAttribute UserRegisterDTO user) throws ParseException {
-        UserProfileDTO u = this.userService.addUser(user);
+    public ResponseEntity<UserViewDTO> create(@ModelAttribute UserCreateDTO user) throws ParseException {
+        UserViewDTO u = this.userService.addUser(user);
 
         return new ResponseEntity<>(u, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginDTO u) {
-        BaseUser user = this.userService.authenticate(u.getPhoneNumber(), u.getPassword());
+        BaseUser user = this.userService.authenticate(u.phoneNumber(), u.password());
         if (user != null) {
             try {
                 String token = this.jwtUtils.generateToken(user.getId(), user.getPhoneNumber(), user.getRoleId().getName());
@@ -59,9 +59,9 @@ public class ApiUserController {
     }
 
     @RequestMapping("/secure/profile")
-    public ResponseEntity<UserProfileDTO> getProfile(Principal principal) {
+    public ResponseEntity<UserViewDTO> getProfile(Principal principal) {
         String phoneNumber = principal.getName();
-        UserProfileDTO user = this.userService.getUserByPhone(phoneNumber);
+        UserViewDTO user = this.userService.getUserByPhone(phoneNumber);
 
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);

@@ -7,7 +7,7 @@ package com.hp.services.handler.profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hp.dto.user.UserRegisterDTO;
+import com.hp.dto.user.UserCreateDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.Role;
@@ -29,8 +29,8 @@ public class ProviderProfileHandler implements UserProfileHandler {
     private TypeOfProviderRepository typeOfProviderRepo;
 
     @Override
-    public void handleProfileInfo(BaseUser user, UserRegisterDTO u) {
-        String roleName = u.getRole();
+    public void handleProfileInfo(BaseUser user, UserCreateDTO u) {
+        String roleName = u.role();
         Role role = roleRepo.getRoleByName(roleName);
         if (role == null || !role.getName().equals("PROVIDER")) {
             throw new IllegalArgumentException("Vai trò không hợp lệ!");
@@ -40,10 +40,10 @@ public class ProviderProfileHandler implements UserProfileHandler {
         ProviderProfile profile = new ProviderProfile();
         profile.setUserId(user);
 
-        profile.setCompanyName(u.getCompanyName());
-        profile.setCompanyAddress(u.getCompanyAddress());
+        profile.setCompanyName(u.companyName());
+        profile.setCompanyAddress(u.companyAddress());
 
-        String typeOfProviderName = u.getTypeOfProvider();
+        String typeOfProviderName = u.typeOfProvider();
         TypeOfProvider typeOfProvider = typeOfProviderRepo.getTypeOfProviderByName(typeOfProviderName);
         if (typeOfProvider == null) {
             throw new IllegalArgumentException("Loại nhà cung cấp không hợp lệ!");

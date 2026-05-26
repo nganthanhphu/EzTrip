@@ -5,8 +5,8 @@
 package com.hp.services.impl;
 
 import com.hp.dto.booking.BookingCreateDTO;
-import com.hp.dto.booking.BookingDetailDTO;
-import com.hp.dto.review.ReviewDetailDTO;
+import com.hp.dto.booking.BookingViewDTO;
+import com.hp.dto.review.ReviewViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
 import com.hp.pojo.BookingStatus;
@@ -43,7 +43,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void addBooking(BookingCreateDTO bk) {
-        Object[] service = this.serviceRepository.getServiceById(bk.getServiceId());
+        Object[] service = this.serviceRepository.getServiceById(bk.serviceId());
         if (service == null) {
             throw new IllegalArgumentException("Dịch vụ không tồn tại!");
         }
@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Dịch vụ không khả dụng!");
         }
 
-        int quantity = bk.getQuantity();
+        int quantity = bk.quantity();
 
         if (quantity > (int) service[3]) {
             throw new IllegalArgumentException("Số lượng vượt quá số lượng có sẵn!");
@@ -61,7 +61,7 @@ public class BookingServiceImpl implements BookingService {
         Date bookingDay;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            bookingDay = sdf.parse(bk.getBookingDay());
+            bookingDay = sdf.parse(bk.bookingDay());
         } catch (Exception e) {
             throw new IllegalArgumentException("Ngày bắt đầu dịch vụ không hợp lệ!");
         }
@@ -73,40 +73,42 @@ public class BookingServiceImpl implements BookingService {
         booking.setBookingDay(bookingDay);
         booking.setQuantity(quantity);
         booking.setTotalAmount(((Number) service[2]).intValue() * quantity);
-        booking.setNote(bk.getNote());
+        booking.setNote(bk.note());
         booking.setStatusId(new BookingStatus(1));
         booking.setCustomerId(currentUser.getCustomerProfile());
-        booking.setPaymentMethodId(new PaymentMethod(bk.getPaymentMethodId()));
-        booking.setServiceId(new com.hp.pojo.Service(bk.getServiceId()));
+        booking.setPaymentMethodId(new PaymentMethod(bk.paymentMethodId()));
+        booking.setServiceId(new com.hp.pojo.Service(bk.serviceId()));
 
         this.bookingRepository.addOrUpdateBooking(booking);
     }
 
-    public BookingDetailDTO toBookingDetailDTO(Booking booking) {
+    public BookingViewDTO toBookingDetailDTO(Booking booking) {
         if (booking == null) {
             return null;
         }
-
-        BookingDetailDTO bookingDTO = new BookingDetailDTO();
-        bookingDTO.setId(booking.getId());
-        bookingDTO.setServiceName(booking.getServiceId().getName());
-        bookingDTO.setBookingDate(booking.getBookingDate());
-        bookingDTO.setStatus(booking.getStatusId().getName());
-        bookingDTO.setCustomerName(booking.getCustomerId().getUserId().getFullname());
-        bookingDTO.setCustomerPhone(booking.getCustomerId().getUserId().getPhoneNumber());
-        bookingDTO.setCustomerAvatar(booking.getCustomerId().getUserId().getAvatar());
-        bookingDTO.setPaymentMethod(booking.getPaymentMethodId().getName());
-
+        ReviewViewDTO review = null;
         if (booking.getReview() != null) {
-            ReviewDetailDTO reviewDTO = new ReviewDetailDTO();
-            reviewDTO.setId(booking.getReview().getId());
-            reviewDTO.setRating(booking.getReview().getRating());
-            reviewDTO.setComment(booking.getReview().getComment());
-            reviewDTO.setReviewDate(booking.getReview().getReviewDate());
-            bookingDTO.setReview(reviewDTO);
+            review = new ReviewViewDTO(
+                    booking.getReview().getId(),
+                    booking.getReview().getRating(),
+                    booking.getReview().getComment(),
+                    booking.getReview().getReviewDate());
         }
 
-        return bookingDTO;
+        return new BookingViewDTO(
+                booking.getId(),
+                booking.getServiceId().getName(),
+                booking.getCreatedDate(),
+                booking.getBookingDay(),
+                booking.getQuantity(),
+                booking.getTotalAmount(),
+                booking.getNote(),
+                booking.getStatusId().getName(),
+                booking.getCustomerId().getUserId().getFullname(),
+                booking.getCustomerId().getUserId().getPhoneNumber(),
+                booking.getCustomerId().getUserId().getAvatar(),
+                booking.getPaymentMethodId().getName(),
+                review);
     }
 
 }

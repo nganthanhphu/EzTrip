@@ -8,8 +8,15 @@ package com.hp.dto.user;
  *
  * @author Joon
  */
-public record UserLoginDTO(
+public record UserViewDTO(
+        Integer id,
+        String fullname,
+        String email,
         String phoneNumber,
-        String password
+        String avatar,
+        Boolean isActive,
+        String role,
+        CustomerViewDTO customerProfile,
+        ProviderViewDTO providerProfile
 ) {
 }

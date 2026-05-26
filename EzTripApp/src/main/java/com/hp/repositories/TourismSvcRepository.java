@@ -7,8 +7,8 @@ package com.hp.repositories;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.TourismSvcDetailDTO;
-import com.hp.dto.service.TourismSvcListDTO;
+import com.hp.dto.service.TourismListViewDTO;
+import com.hp.dto.service.TourismViewDTO;
 import com.hp.pojo.Service;
 
 /**
@@ -17,9 +17,9 @@ import com.hp.pojo.Service;
  */
 public interface TourismSvcRepository {
 
-    List<TourismSvcListDTO> getTourismServices(Map<String, String> params);
+    List<TourismListViewDTO> getTourismServices(Map<String, String> params);
 
-    TourismSvcDetailDTO getTourismById(Integer id);
+    TourismViewDTO getTourismById(Integer id);
 
     void addOrUpdateTourism(Service svc);
 }

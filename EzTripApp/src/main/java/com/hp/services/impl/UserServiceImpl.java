@@ -6,10 +6,10 @@ package com.hp.services.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hp.dto.user.CustomerProfileDTO;
-import com.hp.dto.user.ProviderProfileDTO;
-import com.hp.dto.user.UserProfileDTO;
-import com.hp.dto.user.UserRegisterDTO;
+import com.hp.dto.user.CustomerViewDTO;
+import com.hp.dto.user.ProviderViewDTO;
+import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
 import com.hp.pojo.ProviderProfile;
@@ -71,20 +71,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfileDTO getUserByPhone(String phoneNumber) {
+    public UserViewDTO getUserByPhone(String phoneNumber) {
         BaseUser user = this.userRepository.getUserByPhone(phoneNumber);
         return toUserProfileDTO(user);
     }
 
     @Override
-    public UserProfileDTO addUser(UserRegisterDTO u) throws ParseException {
+    public UserViewDTO addUser(UserCreateDTO u) throws ParseException {
         BaseUser user = new BaseUser();
-        user.setFullname(u.getFullname());
-        user.setEmail(u.getEmail());
-        user.setPhoneNumber(u.getPhoneNumber());
-        user.setPassword(this.passwordEncoder.encode(u.getPassword()));
+        user.setFullname(u.fullname());
+        user.setEmail(u.email());
+        user.setPhoneNumber(u.phoneNumber());
+        user.setPassword(this.passwordEncoder.encode(u.password()));
 
-        MultipartFile avatar = u.getAvatar();
+        MultipartFile avatar = u.avatar();
         if (avatar != null && !avatar.isEmpty()) {
             try {
                 Map<?, ?> res = this.cloudinary.uploader().upload(avatar.getBytes(),
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        String roleName = u.getRole();
+        String roleName = u.role();
         UserProfileHandler handler = this.profileHandlers.get(roleName);
 
         if (handler == null) {
@@ -112,51 +112,45 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.authenticate(phoneNumber, password);
     }
 
-    private UserProfileDTO toUserProfileDTO(BaseUser user) {
+    private UserViewDTO toUserProfileDTO(BaseUser user) {
         if (user == null) {
             return null;
         }
 
-        UserProfileDTO userDTO = new UserProfileDTO();
-        userDTO.setId(user.getId());
-        userDTO.setFullname(user.getFullname());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setPhoneNumber(user.getPhoneNumber());
-        userDTO.setAvatar(user.getAvatar());
-        userDTO.setIsActive(user.getIsActive());
-        userDTO.setRole(user.getRoleId().getName());
-
+        CustomerViewDTO customerProfileDto = null;
         CustomerProfile customerProfile = user.getCustomerProfile();
-        if (customerProfile == null) {
-            userDTO.setCustomerProfile(null);
-        } else {
-            CustomerProfileDTO customerProfileDto = new CustomerProfileDTO();
-            customerProfileDto.setId(customerProfile.getId());
-            customerProfileDto.setDob(customerProfile.getDob());
-
+        if (customerProfile != null) {
             Gender gender = customerProfile.getGenderId();
-            if (gender == null) {
-                customerProfileDto.setGender(null);
-            } else {
-                customerProfileDto.setGender(gender.getName());
+            String genderName = null;
+            if (gender != null) {
+                genderName = gender.getName();
             }
-
-            userDTO.setCustomerProfile(customerProfileDto);
+            customerProfileDto = new CustomerViewDTO(
+                    customerProfile.getId(),
+                    customerProfile.getDob(),
+                    genderName);
         }
 
+        ProviderViewDTO providerProfileDto = null;
         ProviderProfile providerProfile = user.getProviderProfile();
-        if (providerProfile == null) {
-            userDTO.setProviderProfile(null);
-        } else {
-            ProviderProfileDTO providerProfileDto = new ProviderProfileDTO();
-            providerProfileDto.setId(providerProfile.getId());
-            providerProfileDto.setCompanyName(providerProfile.getCompanyName());
-            providerProfileDto.setCompanyAddress(providerProfile.getCompanyAddress());
-
-            providerProfileDto.setTypeOfProvider(providerProfile.getTypeOfProviderId().getName());
-            userDTO.setProviderProfile(providerProfileDto);
+        if (providerProfile != null) {
+            providerProfileDto = new ProviderViewDTO(
+                    providerProfile.getId(),
+                    providerProfile.getCompanyName(),
+                    providerProfile.getCompanyAddress(),
+                    providerProfile.getTypeOfProviderId().getName());
         }
-        return userDTO;
+
+        return new UserViewDTO(
+                user.getId(),
+                user.getFullname(),
+                user.getEmail(),
+                user.getPhoneNumber(),
+                user.getAvatar(),
+                user.getIsActive(),
+                user.getRoleId().getName(),
+                customerProfileDto,
+                providerProfileDto);
     }
 
 }

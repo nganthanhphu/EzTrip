@@ -8,17 +8,18 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.TransportationSvcDetailDTO;
-import com.hp.dto.service.TransportationSvcListDTO;
+import com.hp.dto.service.TransportationCreateDTO;
+import com.hp.dto.service.TransportationListViewDTO;
+import com.hp.dto.service.TransportationViewDTO;
 
 /**
  *
  * @author Joon
  */
 public interface TransportationSvcService {
-    List<TransportationSvcListDTO> getTransportationServices(Map<String, String> params);
+    List<TransportationListViewDTO> getTransportationServices(Map<String, String> params);
 
-    TransportationSvcDetailDTO getTransportationById(Integer id);
+    TransportationViewDTO getTransportationById(Integer id);
 
-    void addTransportation(TransportationSvcDetailDTO transportation) throws ParseException;
+    void addTransportation(TransportationCreateDTO transportation) throws ParseException;
 }

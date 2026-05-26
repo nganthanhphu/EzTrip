@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.hp.dto.service.AccommodationSvcDetailDTO;
-import com.hp.dto.service.AccommodationSvcListDTO;
+import com.hp.dto.service.AccommodationCreateDTO;
+import com.hp.dto.service.AccommodationListViewDTO;
+import com.hp.dto.service.AccommodationViewDTO;
 import com.hp.services.AccommodationSvcService;
 
 /**
@@ -37,15 +38,15 @@ public class ApiAccommodationController {
     private AccommodationSvcService accommodationService;
 
     @GetMapping("/accommodations")
-    public ResponseEntity<List<AccommodationSvcListDTO>> getAccommodations(
+    public ResponseEntity<List<AccommodationListViewDTO>> getAccommodations(
             @RequestParam Map<String, String> params) {
-        List<AccommodationSvcListDTO> accommodations = this.accommodationService.getAccommodationServices(params);
+        List<AccommodationListViewDTO> accommodations = this.accommodationService.getAccommodationServices(params);
         return new ResponseEntity<>(accommodations, HttpStatus.OK);
     }
 
     @GetMapping("/accommodations/{id}")
-    public ResponseEntity<AccommodationSvcDetailDTO> getAccommodationById(@PathVariable(value = "id") int id) {
-        AccommodationSvcDetailDTO accommodation = this.accommodationService.getAccommodationById(id);
+    public ResponseEntity<AccommodationViewDTO> getAccommodationById(@PathVariable(value = "id") int id) {
+        AccommodationViewDTO accommodation = this.accommodationService.getAccommodationById(id);
         
         if (accommodation != null) {
             return new ResponseEntity<>(accommodation, HttpStatus.OK);
@@ -56,7 +57,7 @@ public class ApiAccommodationController {
 
     @PostMapping(path = "/secure/accommodations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void addAccommodation(@ModelAttribute AccommodationSvcDetailDTO accommodation) throws ParseException {
+    public void addAccommodation(@ModelAttribute AccommodationCreateDTO accommodation) throws ParseException {
         this.accommodationService.addAccommodation(accommodation);
     }
 }

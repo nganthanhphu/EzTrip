@@ -8,17 +8,18 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.AccommodationSvcDetailDTO;
-import com.hp.dto.service.AccommodationSvcListDTO;
+import com.hp.dto.service.AccommodationCreateDTO;
+import com.hp.dto.service.AccommodationListViewDTO;
+import com.hp.dto.service.AccommodationViewDTO;
 
 /**
  *
  * @author Joon
  */
 public interface AccommodationSvcService {
-    List<AccommodationSvcListDTO> getAccommodationServices(Map<String, String> params);
+    List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params);
 
-    AccommodationSvcDetailDTO getAccommodationById(Integer id);
+    AccommodationViewDTO getAccommodationById(Integer id);
 
-    void addAccommodation(AccommodationSvcDetailDTO accommodation) throws ParseException;
+    void addAccommodation(AccommodationCreateDTO accommodation) throws ParseException;
 }

@@ -4,12 +4,17 @@
  */
 package com.hp.dto.user;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 /**
  *
  * @author Joon
  */
-public record UserLoginDTO(
-        String phoneNumber,
-        String password
+public record CustomerViewDTO(
+        Integer id,
+        @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd-MM-yyyy") Date dob,
+        String gender
 ) {
 }

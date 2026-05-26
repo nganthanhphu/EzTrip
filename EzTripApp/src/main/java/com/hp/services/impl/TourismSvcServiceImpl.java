@@ -20,8 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hp.dto.service.TourismSvcDetailDTO;
-import com.hp.dto.service.TourismSvcListDTO;
+import com.hp.dto.service.BaseServiceCreateDTO;
+import com.hp.dto.service.TourismCreateDTO;
+import com.hp.dto.service.TourismListViewDTO;
+import com.hp.dto.service.TourismViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
@@ -50,37 +52,40 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     private Cloudinary cloudinary;
 
     @Override
-    public List<TourismSvcListDTO> getTourismServices(Map<String, String> params) {
+    public List<TourismListViewDTO> getTourismServices(Map<String, String> params) {
         return this.tourismSvcRepository.getTourismServices(params);
     }
 
     @Override
-    public TourismSvcDetailDTO getTourismById(Integer id) {
+    public TourismViewDTO getTourismById(Integer id) {
         return this.tourismSvcRepository.getTourismById(id);
     }
 
     @Override
-    public void addTourism(TourismSvcDetailDTO tourism) throws ParseException {
+    public void addTourism(TourismCreateDTO tourism) throws ParseException {
+        BaseServiceCreateDTO baseInfo = tourism.baseInfo();
         BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
-        svc.setName(tourism.getBaseInfo().getName());
-        svc.setDescription(tourism.getBaseInfo().getDescription());
-        svc.setPrice(tourism.getBaseInfo().getPrice());
-        svc.setQuantity(tourism.getBaseInfo().getQuantity());
+        svc.setName(baseInfo.name());
+        svc.setDescription(baseInfo.description());
+        svc.setPrice(baseInfo.price());
+        svc.setQuantity(baseInfo.quantity());
         svc.setIsActive(true);
         Set<Image> images = new HashSet<>();
-        for (MultipartFile img : tourism.getBaseInfo().getImgFiles()) {
-            if (img.isEmpty())
-                continue;
-            try {
-                Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
-                        ObjectUtils.asMap("resource_type", "auto"));
-                Image image = new Image();
-                image.setUrl(res.get("secure_url").toString());
-                image.setServiceId(svc);
-                images.add(image);
-            } catch (IOException ex) {
-                Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        if (baseInfo.imgFiles() != null) {
+            for (MultipartFile img : baseInfo.imgFiles()) {
+                if (img.isEmpty())
+                    continue;
+                try {
+                    Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
+                            ObjectUtils.asMap("resource_type", "auto"));
+                    Image image = new Image();
+                    image.setUrl(res.get("secure_url").toString());
+                    image.setServiceId(svc);
+                    images.add(image);
+                } catch (IOException ex) {
+                    Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         svc.setImageSet(images);
@@ -89,8 +94,8 @@ public class TourismSvcServiceImpl implements TourismSvcService {
         svc.setTypeOfServiceId(new TypeOfService(1));
 
         ServiceTourism additionalInfo = new ServiceTourism();
-        additionalInfo.setTourDuration(tourism.getTourDuration());
-        additionalInfo.setLocation(tourism.getLocation());
+        additionalInfo.setTourDuration(tourism.tourDuration());
+        additionalInfo.setLocation(tourism.location());
 
         additionalInfo.setServiceId(svc);
         svc.setServiceTourism(additionalInfo);

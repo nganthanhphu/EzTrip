@@ -8,17 +8,18 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.service.TourismSvcDetailDTO;
-import com.hp.dto.service.TourismSvcListDTO;
+import com.hp.dto.service.TourismCreateDTO;
+import com.hp.dto.service.TourismListViewDTO;
+import com.hp.dto.service.TourismViewDTO;
 
 /**
  *
  * @author Joon
  */
 public interface TourismSvcService {
-    List<TourismSvcListDTO> getTourismServices(Map<String, String> params);
+    List<TourismListViewDTO> getTourismServices(Map<String, String> params);
 
-    TourismSvcDetailDTO getTourismById(Integer id);
+    TourismViewDTO getTourismById(Integer id);
     
-    void addTourism(TourismSvcDetailDTO tourism) throws ParseException;
+    void addTourism(TourismCreateDTO tourism) throws ParseException;
 }

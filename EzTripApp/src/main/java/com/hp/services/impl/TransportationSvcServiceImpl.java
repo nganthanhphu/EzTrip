@@ -20,8 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.hp.dto.service.TransportationSvcDetailDTO;
-import com.hp.dto.service.TransportationSvcListDTO;
+import com.hp.dto.service.BaseServiceCreateDTO;
+import com.hp.dto.service.TransportationCreateDTO;
+import com.hp.dto.service.TransportationListViewDTO;
+import com.hp.dto.service.TransportationViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
@@ -54,43 +56,46 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
     @Autowired
     private TypeOfTransportationRepository typeOfTransportationRepository;
 
-    public List<TransportationSvcListDTO> getTransportationServices(Map<String, String> params) {
+    public List<TransportationListViewDTO> getTransportationServices(Map<String, String> params) {
         return this.transportationSvcRepository.getTransportationServices(params);
     }
 
     @Override
-    public TransportationSvcDetailDTO getTransportationById(Integer id) {
+    public TransportationViewDTO getTransportationById(Integer id) {
         return this.transportationSvcRepository.getTransportationById(id);
     }
 
     @Override
-    public void addTransportation(TransportationSvcDetailDTO transportation) throws ParseException {
+    public void addTransportation(TransportationCreateDTO transportation) throws ParseException {
         TypeOfTransportation typeOfTransportation = this.typeOfTransportationRepository
-                .getTypeOfTransportationByName(transportation.getTypeOfTransportation());
+                .getTypeOfTransportationByName(transportation.typeOfTransportation());
         if (typeOfTransportation == null) {
             throw new IllegalArgumentException("Loại phương tiện không hợp lệ!");
         }
 
+        BaseServiceCreateDTO baseInfo = transportation.baseInfo();
         BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
-        svc.setName(transportation.getBaseInfo().getName());
-        svc.setDescription(transportation.getBaseInfo().getDescription());
-        svc.setPrice(transportation.getBaseInfo().getPrice());
-        svc.setQuantity(transportation.getBaseInfo().getQuantity());
+        svc.setName(baseInfo.name());
+        svc.setDescription(baseInfo.description());
+        svc.setPrice(baseInfo.price());
+        svc.setQuantity(baseInfo.quantity());
         svc.setIsActive(true);
         Set<Image> images = new HashSet<>();
-        for (MultipartFile img : transportation.getBaseInfo().getImgFiles()) {
-            if (img.isEmpty())
-                continue;
-            try {
-                Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
-                        ObjectUtils.asMap("resource_type", "auto"));
-                Image image = new Image();
-                image.setUrl(res.get("secure_url").toString());
-                image.setServiceId(svc);
-                images.add(image);
-            } catch (IOException ex) {
-                Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        if (baseInfo.imgFiles() != null) {
+            for (MultipartFile img : baseInfo.imgFiles()) {
+                if (img.isEmpty())
+                    continue;
+                try {
+                    Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
+                            ObjectUtils.asMap("resource_type", "auto"));
+                    Image image = new Image();
+                    image.setUrl(res.get("secure_url").toString());
+                    image.setServiceId(svc);
+                    images.add(image);
+                } catch (IOException ex) {
+                    Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         svc.setImageSet(images);
@@ -99,10 +104,10 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
         svc.setTypeOfServiceId(new TypeOfService(3));
 
         ServiceTransportation additionalInfo = new ServiceTransportation();
-        additionalInfo.setArrivalLocation(transportation.getArrivalLocation());
-        additionalInfo.setDepartureLocation(transportation.getDepartureLocation());
-        additionalInfo.setArrivalTime(transportation.getArrivalTime());
-        additionalInfo.setDepartureTime(transportation.getDepartureTime());
+        additionalInfo.setArrivalLocation(transportation.arrivalLocation());
+        additionalInfo.setDepartureLocation(transportation.departureLocation());
+        additionalInfo.setArrivalTime(transportation.arrivalTime());
+        additionalInfo.setDepartureTime(transportation.departureTime());
         additionalInfo.setTypeOfTransportationId(typeOfTransportation);
 
         additionalInfo.setServiceId(svc);

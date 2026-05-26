@@ -8,16 +8,16 @@ import java.text.ParseException;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import com.hp.dto.user.UserProfileDTO;
+import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserViewDTO;
 import com.hp.pojo.BaseUser;
-import com.hp.dto.user.UserRegisterDTO;
 
 /**
  *
  * @author Joon
  */
 public interface UserService extends UserDetailsService {
-    UserProfileDTO getUserByPhone(String phoneNumber);
-    UserProfileDTO addUser(UserRegisterDTO request) throws ParseException;
+    UserViewDTO getUserByPhone(String phoneNumber);
+    UserViewDTO addUser(UserCreateDTO request) throws ParseException;
     BaseUser authenticate(String phoneNumber, String password);
 }
