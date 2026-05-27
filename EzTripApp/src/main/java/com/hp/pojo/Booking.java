@@ -60,6 +60,8 @@ public class Booking implements Serializable {
     @NotNull
     @Column(name = "quantity")
     private Integer quantity;
+    @Basic(optional = false)
+    @NotNull
     @Column(name = "total_amount")
     private Integer totalAmount;
     @Size(max = 255)
@@ -72,7 +74,7 @@ public class Booking implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private CustomerProfile customerId;
     @JoinColumn(name = "payment_method_id", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PaymentMethod paymentMethodId;
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
