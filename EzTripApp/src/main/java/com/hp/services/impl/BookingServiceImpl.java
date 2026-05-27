@@ -44,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void addBooking(BookingCreateDTO bk) {
-        Object[] service = this.serviceRepository.getServiceById(bk.serviceId());
+        Object[] service = this.serviceRepository.getServiceForBookingValidation(bk.serviceId());
         if (service == null) {
             throw new IllegalArgumentException("Dịch vụ không tồn tại!");
         }

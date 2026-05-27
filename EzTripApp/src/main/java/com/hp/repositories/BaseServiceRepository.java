@@ -9,5 +9,5 @@ package com.hp.repositories;
  * @author Joon
  */
 public interface BaseServiceRepository {
-    Object[] getServiceById(int id);
+    Object[] getServiceForBookingValidation(int id);
 }

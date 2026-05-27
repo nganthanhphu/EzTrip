@@ -35,7 +35,7 @@ public class BaseServiceRepositoryImpl implements BaseServiceRepository {
     private LocalSessionFactoryBean factory;
 
     @Override
-    public Object[] getServiceById(int id) {
+    public Object[] getServiceForBookingValidation(int id) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
