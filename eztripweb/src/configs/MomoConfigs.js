@@ -1,9 +1,3 @@
-// Momo payment configuration for client usage.
-// Set these with REACT_APP_ environment variables in your .env file.
-// Example:
-// REACT_APP_MOMO_PARTNER_CODE=your_partner_code
-// REACT_APP_MOMO_ACCESS_KEY=your_access_key
-
 export const MomoConfigs = {
 	partnerCode: process.env.REACT_APP_MOMO_PARTNER_CODE || "",
 	accessKey: process.env.REACT_APP_MOMO_ACCESS_KEY || "",

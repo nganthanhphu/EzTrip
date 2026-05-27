@@ -12,22 +12,35 @@ import Dashboard from '@screens/provider/Dashboard';
 import ServiceList from '@screens/provider/ServiceList';
 import BookingList from '@screens/provider/BookingList';
 import Chat from '@screens/common/Chat';
+import Login from '@screens/auth/Login';
+import Logout from '@screens/auth/Logout';
+import PrivateRoute from '@routes/PrivateRoute';
+import RoleRoute from '@routes/RoleRoute';
 
 const AppRoutes = () => {
 	return (
 		<Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/logout" element={<Logout />} />
+            <Route path="/provider/logout" element={<Logout />} />
+
             <Route path="/" element={<Home />} />
             <Route path="/accommodation" element={<AccommodationList />} />
             <Route path="/accommodation/:id" element={<AccommodationDetail />} />
             <Route path="/transportation" element={<TransportationList />} />
             <Route path="/tours" element={<TourList />} />
             <Route path="/tours/:id" element={<TourDetail />} />
-            <Route path="/history" element={<HistoryBookingList />} />
 
-            <Route path="/provider/dashboard" element={<Dashboard />} />
-            <Route path="/provider/services" element={<ServiceList />} />
-            <Route path="/provider/services/:id/BookingList" element={<BookingList />} />
-            <Route path="/chat/:fromId/:toId" element={<Chat />} />
+            <Route element={<PrivateRoute />}>
+                  <Route path="/history" element={<HistoryBookingList />} />
+                  <Route path="/chat/:fromId/:toId" element={<Chat />} />
+            </Route>
+
+            <Route element={<RoleRoute role="PROVIDER" />}>
+                  <Route path="/provider/dashboard" element={<Dashboard />} />
+                  <Route path="/provider/services" element={<ServiceList />} />
+                  <Route path="/provider/services/:id/BookingList" element={<BookingList />} />
+            </Route>
 
 		</Routes>
 	);

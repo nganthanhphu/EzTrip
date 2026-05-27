@@ -1,7 +1,10 @@
 import { Container, Navbar, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useAuth } from "@hooks/useAuth";
 
 function Header() {
+	const { currentUser } = useAuth();
+
     return (
         <Navbar expand="lg" className="bg-body-tertiary">
             <Container>
@@ -19,8 +22,17 @@ function Header() {
 
             <Container className="d-flex justify-content-end">
                 <Nav>
-                    <Link className="nav-link" to="/profile">Hồ sơ</Link>
-                    <Link className="nav-link" to="/logout">Đăng xuất</Link>
+                    {currentUser ? (
+                        <>
+                            <Link className="nav-link" to="/profile">{currentUser.name}</Link>
+                            <Link className="nav-link" to="/logout">Đăng xuất</Link>
+                        </>
+                    ) : (
+                        <>
+                            <Link className="nav-link" to="/login">Đăng nhập</Link>
+                            <Link className="nav-link" to="/register">Đăng ký</Link>
+                        </>
+                    )}
                 </Nav>
             </Container>
         </Navbar>

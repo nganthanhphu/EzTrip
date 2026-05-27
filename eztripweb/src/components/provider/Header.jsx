@@ -1,7 +1,10 @@
 import { Container, Navbar, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useAuth } from "@hooks/useAuth";
 
 function Header() {
+    const { currentUser } = useAuth();
+
     return (
         <Navbar expand="lg" className="bg-body-tertiary">
             <Container>
@@ -17,7 +20,11 @@ function Header() {
 
             <Container className="d-flex justify-content-end">
                 <Nav>
-                    <Link className="nav-link" to="/provider/profile">Hồ sơ</Link>
+                    {currentUser && (
+                        <Link className="nav-link" to="/provider/profile">
+                            {currentUser.name || currentUser.fullname || "Hồ sơ"}
+                        </Link>
+                    )}
                     <Link className="nav-link" to="/provider/logout">Đăng xuất</Link>
                 </Nav>
             </Container>
