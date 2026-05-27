@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.hp.dto.booking.BookingCreateDTO;
+import com.hp.dto.booking.BookingUpdateDTO;
 import com.hp.dto.booking.BookingViewDTO;
 
 /**
@@ -18,4 +19,5 @@ public interface BookingService {
     void addBooking(BookingCreateDTO bk);
     BookingViewDTO getBookingById(int id);
     List<BookingViewDTO> getBookings(Map<String, String> params);
+    void updateBooking(int bookingId, BookingUpdateDTO bk);
 }

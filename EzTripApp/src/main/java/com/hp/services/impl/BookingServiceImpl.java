@@ -5,6 +5,7 @@
 package com.hp.services.impl;
 
 import com.hp.dto.booking.BookingCreateDTO;
+import com.hp.dto.booking.BookingUpdateDTO;
 import com.hp.dto.booking.BookingViewDTO;
 import com.hp.dto.review.ReviewViewDTO;
 import com.hp.pojo.BaseUser;
@@ -14,6 +15,7 @@ import com.hp.pojo.PaymentMethod;
 import com.hp.pojo.Review;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.BookingRepository;
+import com.hp.repositories.BookingStatusRepository;
 import com.hp.repositories.UserRepository;
 import com.hp.services.BookingService;
 import com.hp.utils.UserUtils;
@@ -43,6 +45,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private BaseServiceRepository serviceRepository;
+
+    @Autowired
+    private BookingStatusRepository bookingStatusRepository;
 
     @Override
     public void addBooking(BookingCreateDTO bk) {
@@ -138,6 +143,35 @@ public class BookingServiceImpl implements BookingService {
                 booking.getCustomerId().getUserId().getAvatar(),
                 booking.getPaymentMethodId().getName(),
                 reviewDTO);
+    }
+
+    @Override
+    public void updateBooking(int bookingId, BookingUpdateDTO bk) {
+        Booking booking = this.bookingRepository.getBookingById(bookingId);
+        if (booking == null) {
+            throw new IllegalArgumentException("Booking không tồn tại!");
+        }
+
+        String statusName = booking.getStatusId().getName();
+        if (statusName.equals("COMPLETED") || statusName.equals("CANCELLED")) {
+            throw new IllegalStateException("Không thể cập nhật booking đã hoàn thành hoặc đã hủy!");
+        }
+
+        String newStatusString = bk.status();
+        if (statusName.equals("PENDING")){
+            if (!newStatusString.equals("CONFIRMED") && !newStatusString.equals("CANCELLED")) {
+                throw new IllegalArgumentException("Trạng thái mới không hợp lệ!");
+            }
+        } else if (statusName.equals("CONFIRMED")) {
+            if (!newStatusString.equals("COMPLETED")) {
+                throw new IllegalArgumentException("Trạng thái mới không hợp lệ!");
+            }
+        }
+
+        BookingStatus newStatus = this.bookingStatusRepository.getBookingStatusByName(newStatusString);
+        booking.setStatusId(newStatus);
+        this.bookingRepository.addOrUpdateBooking(booking);
+
     }
 
 }
