@@ -2,17 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.hp.repositories;
+package com.hp.services;
 
+import com.hp.pojo.Gender;
 import java.util.List;
-
-import com.hp.pojo.TypeOfTransportation;
 
 /**
  *
  * @author Joon
  */
-public interface TypeOfTransportationRepository {
-    TypeOfTransportation getTypeOfTransportationByName(String name);
-    List<TypeOfTransportation> getTypeOfTransportations();
+public interface GenderService {
+    List<Gender> getGenders();
 }

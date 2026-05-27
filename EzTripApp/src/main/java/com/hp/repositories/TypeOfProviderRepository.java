@@ -4,6 +4,8 @@
  */
 package com.hp.repositories;
 
+import java.util.List;
+
 import com.hp.pojo.TypeOfProvider;
 
 /**
@@ -12,4 +14,5 @@ import com.hp.pojo.TypeOfProvider;
  */
 public interface TypeOfProviderRepository {
     TypeOfProvider getTypeOfProviderByName(String name);
+    List<TypeOfProvider> getTypeOfProviders();
 }

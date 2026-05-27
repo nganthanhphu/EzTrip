@@ -227,12 +227,4 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
         return result;
     }
 
-    @Override
-    public void addOrUpdateTourism(Service svc) {
-        Session s = this.factory.getObject().getCurrentSession();
-        if (svc.getId() != null)
-            s.merge(svc);
-        else
-            s.persist(svc);
-    }
 }

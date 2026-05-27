@@ -4,15 +4,14 @@
  */
 package com.hp.repositories;
 
+import com.hp.pojo.Review;
 import java.util.List;
-
-import com.hp.pojo.TypeOfTransportation;
 
 /**
  *
  * @author Joon
  */
-public interface TypeOfTransportationRepository {
-    TypeOfTransportation getTypeOfTransportationByName(String name);
-    List<TypeOfTransportation> getTypeOfTransportations();
+public interface ReviewRepository {
+    List<Review> getReviewsByServiceId(int serviceId, int page);
+    void addReview(Review review);
 }

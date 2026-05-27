@@ -7,7 +7,6 @@ package com.hp.repositories;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.dto.booking.BookingViewDTO;
 import com.hp.pojo.Booking;
 
 /**
@@ -16,6 +15,6 @@ import com.hp.pojo.Booking;
  */
 public interface BookingRepository {
     void addOrUpdateBooking(Booking booking);
-    BookingViewDTO getBookingById(int id);
-    List<BookingViewDTO> getBookings(Map<String, String> params, int customerId, int providerId);
+    Booking getBookingById(int id);
+    List<Booking> getBookings(Map<String, String> params, int customerId, int providerId);
 }

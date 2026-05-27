@@ -4,6 +4,8 @@
  */
 package com.hp.repositories.impl;
 
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +29,15 @@ public class RoleRepositoryImpl implements RoleRepository{
     @Override
     public Role getRoleByName(String name) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query q = s.createNamedQuery("Role.findByName", Role.class);
+        Query<Role> q = s.createNamedQuery("Role.findByName", Role.class);
         q.setParameter("name", name);
-        return (Role) q.uniqueResult();
+        return q.uniqueResult();
+    }
+
+    @Override
+    public List<Role> getRoles() {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query<Role> q = s.createQuery("SELECT r FROM Role r ORDER BY r.id", Role.class);
+        return q.getResultList();
     }
 }

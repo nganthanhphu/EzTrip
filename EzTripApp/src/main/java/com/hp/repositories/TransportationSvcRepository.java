@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.hp.dto.service.TransportationListViewDTO;
 import com.hp.dto.service.TransportationViewDTO;
-import com.hp.pojo.Service;
 
 /**
  *
@@ -21,5 +20,4 @@ public interface TransportationSvcRepository {
 
     TransportationViewDTO getTransportationById(Integer id);
 
-    void addOrUpdateTransportation(Service svc);
 }

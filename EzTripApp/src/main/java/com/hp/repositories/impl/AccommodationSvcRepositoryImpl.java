@@ -228,19 +228,10 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
             Set<String> imageUrls = new HashSet<>(imageQuery.getResultList());
             BaseServiceViewDTO baseInfo = result.baseInfo().setImages(imageUrls);
             result = new AccommodationViewDTO(baseInfo, result.id(), result.quantityOfBed(), result.area(),
-                result.location());
+                    result.location());
         }
 
         return result;
-    }
-
-    @Override
-    public void addOrUpdateAccommodation(Service svc) {
-        Session s = this.factory.getObject().getCurrentSession();
-        if (svc.getId() != null)
-            s.merge(svc);
-        else
-            s.persist(svc);
     }
 
 }

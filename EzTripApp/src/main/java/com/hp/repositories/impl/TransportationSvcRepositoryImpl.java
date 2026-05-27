@@ -264,12 +264,4 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         return result;
     }
 
-    @Override
-    public void addOrUpdateTransportation(Service svc) {
-        Session s = this.factory.getObject().getCurrentSession();
-        if (svc.getId() != null)
-            s.merge(svc);
-        else
-            s.persist(svc);
-    }
 }

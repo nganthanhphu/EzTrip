@@ -4,6 +4,8 @@
  */
 package com.hp.repositories.impl;
 
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +28,15 @@ public class TypeOfProviderRepositoryImpl implements TypeOfProviderRepository {
     @Override
     public TypeOfProvider getTypeOfProviderByName(String name) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query q = s.createNamedQuery("TypeOfProvider.findByName", TypeOfProvider.class);
+        Query<TypeOfProvider> q = s.createNamedQuery("TypeOfProvider.findByName", TypeOfProvider.class);
         q.setParameter("name", name);
-        return (TypeOfProvider) q.uniqueResult();
+        return q.uniqueResult();
+    }
+
+    @Override
+    public List<TypeOfProvider> getTypeOfProviders() {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query<TypeOfProvider> q = s.createQuery("SELECT t FROM TypeOfProvider t ORDER BY t.id", TypeOfProvider.class);
+        return q.getResultList();
     }
 }

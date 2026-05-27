@@ -54,7 +54,7 @@ public class ProviderProfile implements Serializable {
     @Column(name = "company_address")
     private String companyAddress;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     private BaseUser userId;
     @JoinColumn(name = "type_of_provider_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)

@@ -35,7 +35,7 @@ public class BaseServiceRepositoryImpl implements BaseServiceRepository {
     private LocalSessionFactoryBean factory;
 
     @Override
-    public Object[] getServiceById(int id) {
+    public Object[] getServiceForBookingValidation(int id) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
@@ -55,10 +55,19 @@ public class BaseServiceRepositoryImpl implements BaseServiceRepository {
         q.multiselect(root.get("id"), root.get("isActive"), root.get("price").as(Integer.class), remainingQuantity);
         q.where(b.equal(root.get("id"), id));
         q.groupBy(root.get("id"));
-        
+
         Query<Object[]> query = s.createQuery(q);
 
         return query.uniqueResult();
+    }
+
+    @Override
+    public void addOrUpdateService(Service svc) {
+        Session s = this.factory.getObject().getCurrentSession();
+        if (svc.getId() != null)
+            s.merge(svc);
+        else
+            s.persist(svc);
     }
 
 }

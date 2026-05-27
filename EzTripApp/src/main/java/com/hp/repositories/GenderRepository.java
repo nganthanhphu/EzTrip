@@ -4,6 +4,8 @@
  */
 package com.hp.repositories;
 
+import java.util.List;
+
 import com.hp.pojo.Gender;
 
 /**
@@ -12,4 +14,5 @@ import com.hp.pojo.Gender;
  */
 public interface GenderRepository {
     Gender getGenderByName(String name);
+    List<Gender> getGenders();
 }
