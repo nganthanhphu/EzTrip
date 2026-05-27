@@ -97,6 +97,16 @@ public class BookingRepositoryImpl implements BookingRepository {
             if (status != null && !status.isEmpty()) {
                 predicates.add(b.equal(root.get("statusId").get("name"), status));
             }
+
+            String serviceId = params.get("serviceId");
+            if (serviceId != null && !serviceId.isEmpty()) {
+                try {
+                    int serviceIdInt = Integer.parseInt(serviceId);
+                    predicates.add(b.equal(root.get("serviceId").get("id"), serviceIdInt));
+                } catch (NumberFormatException e) {
+                    
+                }
+            }
         }
 
         q.where(predicates.toArray(Predicate[]::new));
