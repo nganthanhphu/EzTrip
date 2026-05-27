@@ -17,6 +17,7 @@
                 <CLOUDINARY_CLOUD_NAME>dkzzyue98</CLOUDINARY_CLOUD_NAME>
                 <CLOUDINARY_API_KEY>379276738137352</CLOUDINARY_API_KEY>
                 <CLOUDINARY_API_SECRET>npwNXV6bQEsxMwj_iZLFBkvOODU</CLOUDINARY_API_SECRET>
+                <netbeans.deploy.clientUrlPart>/EzTripApp</netbeans.deploy.clientUrlPart>
             </properties>
         </action>
     </actions>

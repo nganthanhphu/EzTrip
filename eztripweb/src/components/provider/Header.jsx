@@ -9,16 +9,16 @@ function Header() {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Link className="nav-link" to="/dashboard">Dashboard</Link>
-                        <Link className="nav-link" to="/services">Quản lý Dịch vụ</Link>
+                        <Link className="nav-link" to="/provider/dashboard">Dashboard</Link>
+                        <Link className="nav-link" to="/provider/services">Quản lý Dịch vụ</Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
 
             <Container className="d-flex justify-content-end">
                 <Nav>
-                    <Link className="nav-link" to="/profile">Hồ sơ</Link>
-                    <Link className="nav-link" to="/logout">Đăng xuất</Link>
+                    <Link className="nav-link" to="/provider/profile">Hồ sơ</Link>
+                    <Link className="nav-link" to="/provider/logout">Đăng xuất</Link>
                 </Nav>
             </Container>
         </Navbar>
