@@ -75,9 +75,9 @@ function Login() {
     return (
         <CustomerLayout>
             <div className="mx-auto" style={{ maxWidth: 420 }}>
-                <h1 className="text-center text-success mt-1 mb-4">
+                <h2 className="text-center text-success mt-1 mb-4">
                     ĐĂNG NHẬP NGƯỜI DÙNG
-                </h1>
+                </h2>
 
                 {err && <Alert variant="danger">{err}</Alert>}
 

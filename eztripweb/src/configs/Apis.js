@@ -5,7 +5,7 @@ export const SERVER_URL = "http://localhost:8080/EzTripApp";
 
 export const endpoints = {
     login: "/api/login",
-    register: "/api/register",
+    register: "/api/users",
     profile: "/api/secure/profile",
 };
 

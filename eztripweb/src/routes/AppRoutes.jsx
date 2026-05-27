@@ -13,6 +13,8 @@ import ServiceList from '@screens/provider/ServiceList';
 import BookingList from '@screens/provider/BookingList';
 import Chat from '@screens/common/Chat';
 import Login from '@screens/auth/Login';
+import RegisterCustomer from '@screens/auth/RegisterCustomer';
+import RegisterProvider from '@screens/auth/RegisterProvider';
 import Logout from '@screens/auth/Logout';
 import PrivateRoute from '@routes/PrivateRoute';
 import RoleRoute from '@routes/RoleRoute';
@@ -21,6 +23,9 @@ const AppRoutes = () => {
 	return (
 		<Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<RegisterCustomer />} />
+            <Route path="/register/provider" element={<RegisterProvider />} />
+            <Route path="/provider/register" element={<RegisterProvider />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/provider/logout" element={<Logout />} />
 
