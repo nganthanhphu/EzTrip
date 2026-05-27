@@ -4,7 +4,6 @@
  */
 package com.hp.services.impl;
 
-import com.hp.dto.booking.BookingViewDTO;
 import com.hp.dto.review.ReviewCreateDTO;
 import com.hp.dto.review.ReviewViewDTO;
 import com.hp.pojo.Booking;
@@ -50,16 +49,16 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addReview(ReviewCreateDTO review, int bookingId) {
-        BookingViewDTO booking = this.bookingRepository.getBookingById(bookingId);
+        Booking booking = this.bookingRepository.getBookingById(bookingId);
         if (booking == null) {
             throw new IllegalArgumentException("Booking không tồn tại!");
         }
 
-        if (!booking.status().equals("COMPLETED")) {
+        if (!"COMPLETED".equals(booking.getStatusId().getName())) {
             throw new IllegalArgumentException("Chỉ có thể đánh giá sau khi dịch vụ đã hoàn thành!");
         }
 
-        if (booking.review() != null) {
+        if (booking.getReview() != null) {
             throw new IllegalArgumentException("Bạn chỉ có thể đánh giá một lần!");
         }
 

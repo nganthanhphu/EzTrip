@@ -6,10 +6,12 @@ package com.hp.services.impl;
 
 import com.hp.dto.booking.BookingCreateDTO;
 import com.hp.dto.booking.BookingViewDTO;
+import com.hp.dto.review.ReviewViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
 import com.hp.pojo.BookingStatus;
 import com.hp.pojo.PaymentMethod;
+import com.hp.pojo.Review;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.BookingRepository;
 import com.hp.repositories.UserRepository;
@@ -85,7 +87,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingViewDTO getBookingById(int id) {
-        return this.bookingRepository.getBookingById(id);
+        Booking booking = this.bookingRepository.getBookingById(id);
+        return this.toBookingViewDTO(booking);
     }
 
     @Override
@@ -100,7 +103,41 @@ public class BookingServiceImpl implements BookingService {
             providerId = currentUser.getProviderProfile().getId();
         }
 
-        return this.bookingRepository.getBookings(params, customerId, providerId);
+        return this.bookingRepository.getBookings(params, customerId, providerId).stream()
+                .map(this::toBookingViewDTO)
+                .toList();
+    }
+
+    private BookingViewDTO toBookingViewDTO(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
+
+        Review review = booking.getReview();
+        ReviewViewDTO reviewDTO = null;
+
+        if (review != null) {
+            reviewDTO = new ReviewViewDTO(
+                    review.getId(),
+                    review.getRating(),
+                    review.getComment(),
+                    review.getReviewDate());
+        }
+
+        return new BookingViewDTO(
+                booking.getId(),
+                booking.getServiceId().getName(),
+                booking.getCreatedDate(),
+                booking.getBookingDay(),
+                booking.getQuantity(),
+                booking.getTotalAmount(),
+                booking.getNote(),
+                booking.getStatusId().getName(),
+                booking.getCustomerId().getUserId().getFullname(),
+                booking.getCustomerId().getUserId().getPhoneNumber(),
+                booking.getCustomerId().getUserId().getAvatar(),
+                booking.getPaymentMethodId().getName(),
+                reviewDTO);
     }
 
 }

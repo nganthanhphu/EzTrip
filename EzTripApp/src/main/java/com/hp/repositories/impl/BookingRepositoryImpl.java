@@ -4,19 +4,11 @@
  */
 package com.hp.repositories.impl;
 
-import com.hp.dto.booking.BookingViewDTO;
-import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
-import com.hp.pojo.BookingStatus;
-import com.hp.pojo.CustomerProfile;
-import com.hp.pojo.PaymentMethod;
-import com.hp.pojo.Review;
-import com.hp.pojo.Service;
 import com.hp.repositories.BookingRepository;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -50,40 +42,20 @@ public class BookingRepositoryImpl implements BookingRepository {
     private Environment env;
 
     @Override
-    public BookingViewDTO getBookingById(int id) {
+    public Booking getBookingById(int id) {
         Session s = this.factory.getObject().getCurrentSession();
-        CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<BookingViewDTO> q = b.createQuery(BookingViewDTO.class);
-        Root<Booking> root = q.from(Booking.class);
-
-        Join<Booking, Service> service = root.join("serviceId", JoinType.LEFT);
-        Join<Booking, BookingStatus> status = root.join("statusId", JoinType.LEFT);
-        Join<Booking, PaymentMethod> payment = root.join("paymentMethodId", JoinType.LEFT);
-        Join<Booking, Review> review = root.join("review", JoinType.LEFT);
-        Join<Booking, CustomerProfile> customer = root.join("customerId", JoinType.LEFT);
-        Join<CustomerProfile, BaseUser> user = customer.join("userId", JoinType.LEFT);
-
-        q.select(b.construct(BookingViewDTO.class,
-                root.get("id"),
-                service.get("name"),
-                root.get("createdDate"),
-                root.get("bookingDay"),
-                root.get("quantity"),
-                root.get("totalAmount"),
-                root.get("note"),
-                status.get("name"),
-                user.get("fullname"),
-                user.get("phoneNumber"),
-                user.get("avatar"),
-                payment.get("name"),
-                review.get("id"),
-                review.get("rating"),
-                review.get("comment"),
-                review.get("reviewDate")));
-
-        q.where(b.equal(root.get("id"), id));
-
-        Query<BookingViewDTO> query = s.createQuery(q);
+        Query<Booking> query = s.createQuery("""
+                SELECT b
+                FROM Booking b
+                LEFT JOIN FETCH b.serviceId
+                LEFT JOIN FETCH b.statusId
+                LEFT JOIN FETCH b.paymentMethodId
+                LEFT JOIN FETCH b.review
+                LEFT JOIN FETCH b.customerId c
+                LEFT JOIN FETCH c.userId
+                WHERE b.id = :id
+                """, Booking.class);
+        query.setParameter("id", id);
         return query.uniqueResult();
     }
 
@@ -98,36 +70,19 @@ public class BookingRepositoryImpl implements BookingRepository {
     }
 
     @Override
-    public List<BookingViewDTO> getBookings(Map<String, String> params, int customerId, int providerId) {
+    public List<Booking> getBookings(Map<String, String> params, int customerId, int providerId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
-        CriteriaQuery<BookingViewDTO> q = b.createQuery(BookingViewDTO.class);
+        CriteriaQuery<Booking> q = b.createQuery(Booking.class);
         Root<Booking> root = q.from(Booking.class);
 
-        Join<Booking, Service> service = root.join("serviceId", JoinType.LEFT);
-        Join<Booking, BookingStatus> bookingStatus = root.join("statusId", JoinType.LEFT);
-        Join<Booking, PaymentMethod> payment = root.join("paymentMethodId", JoinType.LEFT);
-        Join<Booking, Review> review = root.join("review", JoinType.LEFT);
-        Join<Booking, CustomerProfile> customer = root.join("customerId", JoinType.LEFT);
-        Join<CustomerProfile, BaseUser> user = customer.join("userId", JoinType.LEFT);
+        root.fetch("serviceId", JoinType.LEFT);
+        root.fetch("statusId", JoinType.LEFT);
+        root.fetch("paymentMethodId", JoinType.LEFT);
+        root.fetch("review", JoinType.LEFT);
+        root.fetch("customerId", JoinType.LEFT).fetch("userId", JoinType.LEFT);
 
-        q.select(b.construct(BookingViewDTO.class,
-                root.get("id"),
-                service.get("name"),
-                root.get("createdDate"),
-                root.get("bookingDay"),
-                root.get("quantity"),
-                root.get("totalAmount"),
-                root.get("note"),
-                bookingStatus.get("name"),
-                user.get("fullname"),
-                user.get("phoneNumber"),
-                user.get("avatar"),
-                payment.get("name"),
-                review.get("id"),
-                review.get("rating"),
-                review.get("comment"),
-                review.get("reviewDate")));
+        q.select(root);
 
         List<Predicate> predicates = new ArrayList<>();
 
@@ -146,7 +101,7 @@ public class BookingRepositoryImpl implements BookingRepository {
 
         q.where(predicates.toArray(Predicate[]::new));
 
-        Query<BookingViewDTO> query = s.createQuery(q);
+        Query<Booking> query = s.createQuery(q);
 
         int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
         int page = 1;
