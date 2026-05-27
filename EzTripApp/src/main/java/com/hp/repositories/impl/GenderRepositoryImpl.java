@@ -28,9 +28,9 @@ public class GenderRepositoryImpl implements GenderRepository{
     @Override
     public Gender getGenderByName(String name) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query q = s.createNamedQuery("Gender.findByName", Gender.class);
+        Query<Gender> q = s.createNamedQuery("Gender.findByName", Gender.class);
         q.setParameter("name", name);
-        return (Gender) q.uniqueResult();
+        return q.uniqueResult();
     }
 
     @Override

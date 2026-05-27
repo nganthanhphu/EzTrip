@@ -28,9 +28,9 @@ public class TypeOfTransportationRepositoryImpl implements TypeOfTransportationR
     @Override
     public TypeOfTransportation getTypeOfTransportationByName(String name) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query q = s.createNamedQuery("TypeOfTransportation.findByName", TypeOfTransportation.class);
+        Query<TypeOfTransportation> q = s.createNamedQuery("TypeOfTransportation.findByName", TypeOfTransportation.class);
         q.setParameter("name", name);
-        return (TypeOfTransportation) q.uniqueResult();
+        return q.uniqueResult();
     }
 
     @Override

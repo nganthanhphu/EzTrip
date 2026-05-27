@@ -31,9 +31,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public BaseUser getUserByPhone(String phoneNumber) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query q = s.createNamedQuery("BaseUser.findByPhoneNumber", BaseUser.class);
+        Query<BaseUser> q = s.createNamedQuery("BaseUser.findByPhoneNumber", BaseUser.class);
         q.setParameter("phoneNumber", phoneNumber);
-        return (BaseUser) q.uniqueResult();
+        return q.uniqueResult();
     }
 
     @Override

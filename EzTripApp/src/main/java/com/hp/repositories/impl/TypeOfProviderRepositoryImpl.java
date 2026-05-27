@@ -28,9 +28,9 @@ public class TypeOfProviderRepositoryImpl implements TypeOfProviderRepository {
     @Override
     public TypeOfProvider getTypeOfProviderByName(String name) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query q = s.createNamedQuery("TypeOfProvider.findByName", TypeOfProvider.class);
+        Query<TypeOfProvider> q = s.createNamedQuery("TypeOfProvider.findByName", TypeOfProvider.class);
         q.setParameter("name", name);
-        return (TypeOfProvider) q.uniqueResult();
+        return q.uniqueResult();
     }
 
     @Override
