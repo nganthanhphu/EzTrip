@@ -19,6 +19,8 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  *
  * @author Joon
@@ -29,6 +31,7 @@ import java.util.Set;
     @NamedQuery(name = "TypeOfTransportation.findAll", query = "SELECT t FROM TypeOfTransportation t"),
     @NamedQuery(name = "TypeOfTransportation.findById", query = "SELECT t FROM TypeOfTransportation t WHERE t.id = :id"),
     @NamedQuery(name = "TypeOfTransportation.findByName", query = "SELECT t FROM TypeOfTransportation t WHERE t.name = :name")})
+@JsonIgnoreProperties({"serviceTransportationSet"})
 public class TypeOfTransportation implements Serializable {
 
     private static final long serialVersionUID = 1L;

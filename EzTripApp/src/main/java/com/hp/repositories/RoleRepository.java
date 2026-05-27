@@ -4,6 +4,8 @@
  */
 package com.hp.repositories;
 
+import java.util.List;
+
 import com.hp.pojo.Role;
 
 /**
@@ -12,4 +14,5 @@ import com.hp.pojo.Role;
  */
 public interface RoleRepository {
     Role getRoleByName(String name);
+    List<Role> getRoles();
 }

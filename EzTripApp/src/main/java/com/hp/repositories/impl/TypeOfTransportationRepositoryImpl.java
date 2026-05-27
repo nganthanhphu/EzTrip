@@ -6,6 +6,9 @@ package com.hp.repositories.impl;
 
 import com.hp.pojo.TypeOfTransportation;
 import com.hp.repositories.TypeOfTransportationRepository;
+
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +31,13 @@ public class TypeOfTransportationRepositoryImpl implements TypeOfTransportationR
         Query q = s.createNamedQuery("TypeOfTransportation.findByName", TypeOfTransportation.class);
         q.setParameter("name", name);
         return (TypeOfTransportation) q.uniqueResult();
+    }
+
+    @Override
+    public List<TypeOfTransportation> getTypeOfTransportations() {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query<TypeOfTransportation> q = s.createQuery("SELECT t FROM TypeOfTransportation t ORDER BY t.id", TypeOfTransportation.class);
+        return q.getResultList();
     }
     
 }

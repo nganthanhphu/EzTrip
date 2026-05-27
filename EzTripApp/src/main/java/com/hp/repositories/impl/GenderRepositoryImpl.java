@@ -4,6 +4,8 @@
  */
 package com.hp.repositories.impl;
 
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,5 +31,12 @@ public class GenderRepositoryImpl implements GenderRepository{
         Query q = s.createNamedQuery("Gender.findByName", Gender.class);
         q.setParameter("name", name);
         return (Gender) q.uniqueResult();
+    }
+
+    @Override
+    public List<Gender> getGenders() {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query<Gender> q = s.createQuery("SELECT g FROM Gender g ORDER BY g.id", Gender.class);
+        return q.getResultList();
     }
 }
