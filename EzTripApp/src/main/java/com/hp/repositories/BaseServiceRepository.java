@@ -4,10 +4,13 @@
  */
 package com.hp.repositories;
 
+import com.hp.pojo.Service;
+
 /**
  *
  * @author Joon
  */
 public interface BaseServiceRepository {
     Object[] getServiceForBookingValidation(int id);
+    void addOrUpdateService(Service svc);
 }

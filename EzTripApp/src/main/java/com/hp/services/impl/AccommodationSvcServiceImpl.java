@@ -29,6 +29,7 @@ import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceAccommodation;
 import com.hp.pojo.TypeOfService;
 import com.hp.repositories.AccommodationSvcRepository;
+import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.UserRepository;
 import com.hp.services.AccommodationSvcService;
 import com.hp.utils.UserUtils;
@@ -43,6 +44,9 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Autowired
     private AccommodationSvcRepository accommodationSvcRepository;
+
+    @Autowired
+    private BaseServiceRepository baseServiceRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -100,7 +104,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
         additionalInfo.setServiceId(svc);
         svc.setServiceAccommodation(additionalInfo);
-        
-        this.accommodationSvcRepository.addOrUpdateAccommodation(svc);
+
+        this.baseServiceRepository.addOrUpdateService(svc);
     }
 }

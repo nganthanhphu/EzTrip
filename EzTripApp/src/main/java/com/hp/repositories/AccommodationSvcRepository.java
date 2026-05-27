@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.hp.dto.service.AccommodationListViewDTO;
 import com.hp.dto.service.AccommodationViewDTO;
-import com.hp.pojo.Service;
 
 /**
  *
@@ -20,7 +19,5 @@ public interface AccommodationSvcRepository {
     List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params);
 
     AccommodationViewDTO getAccommodationById(Integer id);
-
-    void addOrUpdateAccommodation(Service svc);
 
 }

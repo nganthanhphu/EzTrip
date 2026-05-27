@@ -29,6 +29,7 @@ import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceTourism;
 import com.hp.pojo.TypeOfService;
+import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.TourismSvcRepository;
 import com.hp.repositories.UserRepository;
 import com.hp.services.TourismSvcService;
@@ -44,6 +45,9 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Autowired
     private TourismSvcRepository tourismSvcRepository;
+
+    @Autowired
+    private BaseServiceRepository baseServiceRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -100,6 +104,6 @@ public class TourismSvcServiceImpl implements TourismSvcService {
         additionalInfo.setServiceId(svc);
         svc.setServiceTourism(additionalInfo);
 
-        this.tourismSvcRepository.addOrUpdateTourism(svc);
+        this.baseServiceRepository.addOrUpdateService(svc);
     }
 }

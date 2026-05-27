@@ -30,6 +30,7 @@ import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceTransportation;
 import com.hp.pojo.TypeOfService;
 import com.hp.pojo.TypeOfTransportation;
+import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.TransportationSvcRepository;
 import com.hp.repositories.TypeOfTransportationRepository;
 import com.hp.repositories.UserRepository;
@@ -46,6 +47,9 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
 
     @Autowired
     private TransportationSvcRepository transportationSvcRepository;
+
+    @Autowired
+    private BaseServiceRepository baseServiceRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -113,6 +117,6 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
         additionalInfo.setServiceId(svc);
         svc.setServiceTransportation(additionalInfo);
 
-        this.transportationSvcRepository.addOrUpdateTransportation(svc);
+        this.baseServiceRepository.addOrUpdateService(svc);
     }
 }

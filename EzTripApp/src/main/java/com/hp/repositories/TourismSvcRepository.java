@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.hp.dto.service.TourismListViewDTO;
 import com.hp.dto.service.TourismViewDTO;
-import com.hp.pojo.Service;
 
 /**
  *
@@ -21,5 +20,4 @@ public interface TourismSvcRepository {
 
     TourismViewDTO getTourismById(Integer id);
 
-    void addOrUpdateTourism(Service svc);
 }
