@@ -10,27 +10,48 @@ export function MessageBubble({ message, isOwn }) {
         padding: '6px 0',
     };
 
+    const avatarUrl = message.senderAvatar || message.avatar || message.senderPhoto || message.photo;
+
+    const AvatarImage = ({ url, alt, style }) => (
+        <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', display: 'inline-block', ...style }}>
+            <img src={url} alt={alt} style={{ width: '36px', height: '36px', objectFit: 'cover', display: 'block' }} />
+        </div>
+    );
+
+    const InitialsBubble = ({ name, fallback='U', style }) => (
+        <div style={{ width: 36, height: 36, borderRadius: 18, background: '#ddd', display: 'inline-block', marginRight: 8, textAlign: 'center', lineHeight: '36px', fontWeight: 600, ...style }}>
+            {name ? String(name).slice(0, 2).toUpperCase() : fallback}
+        </div>
+    );
+
     return (
         <div style={wrapperStyle} className={alignClass}>
             {!isOwn && (
-                <div style={{ width: 36, height: 36, borderRadius: 18, background: '#ddd', display: 'inline-block', marginRight: 8, textAlign: 'center', lineHeight: '36px', fontWeight: 600 }}>
-                    {message.from ? String(message.from).slice(0,2).toUpperCase() : 'U'}
-                </div>
+                avatarUrl ? (
+                    <AvatarImage url={avatarUrl} alt={message.senderName || 'avatar'} style={{ marginRight: 8 }} />
+                ) : (
+                    <InitialsBubble name={message.senderName || message.from} style={{ marginRight: 8 }} />
+                )
             )}
 
             <div style={{ maxWidth: '70%' }}>
                 <div className={`p-2 rounded ${bubbleBg}`}>
+                    <div className="fw-semibold small mb-1">{message.senderName || (isOwn ? 'Me' : 'User')}</div>
                     <div>{message.text}</div>
                 </div>
                 <div className="text-muted small mt-1" style={{ fontSize: 11 }}>
-                    {new Date(message.createdAt).toLocaleString()}
+                    {new Date(message.timestamp || message.createdAt || Date.now()).toLocaleString()}
                 </div>
             </div>
 
             {isOwn && (
-                <div style={{ width: 36, height: 36, borderRadius: 18, background: '#0d6efd', display: 'inline-block', marginLeft: 8, textAlign: 'center', lineHeight: '36px', color: '#fff', fontWeight: 600 }}>
-                    Me
-                </div>
+                avatarUrl ? (
+                    <AvatarImage url={avatarUrl} alt={message.senderName || 'me'} style={{ marginLeft: 8 }} />
+                ) : (
+                    <div style={{ width: 36, height: 36, borderRadius: 18, background: '#0d6efd', display: 'inline-block', marginLeft: 8, textAlign: 'center', lineHeight: '36px', color: '#fff', fontWeight: 600 }}>
+                        {message.senderName ? String(message.senderName).slice(0, 2).toUpperCase() : 'ME'}
+                    </div>
+                )
             )}
         </div>
     );
@@ -55,7 +76,9 @@ export function ChatInput({ placeholder = 'Viết tin nhắn...', onSend }) {
     );
 }
 
-export default {
+const ChatComponents = {
     MessageBubble,
     ChatInput,
 };
+
+export default ChatComponents;
