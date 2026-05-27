@@ -61,7 +61,7 @@ public class ServiceTransportation implements Serializable {
     @Column(name = "arrival_time")
     private int arrivalTime;
     @JoinColumn(name = "service_id", referencedColumnName = "id")
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Service serviceId;
     @JoinColumn(name = "type_of_transportation_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)

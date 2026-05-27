@@ -34,7 +34,7 @@ import java.util.Set;
 @Table(name = "service")
 @NamedQueries({
         @NamedQuery(name = "Service.findAll", query = "SELECT s FROM Service s"),
-        @NamedQuery(name = "Service.findById", query = "SELECT s FROM Service s LEFT JOIN FETCH s.serviceAccommodation LEFT JOIN FETCH s.serviceTourism LEFT JOIN FETCH s.serviceTransportation LEFT JOIN FETCH s.serviceTransportation.typeOfTransportationId WHERE s.id = :id"),
+        @NamedQuery(name = "Service.findById", query = "SELECT s FROM Service s WHERE s.id = :id"),
         @NamedQuery(name = "Service.findByName", query = "SELECT s FROM Service s WHERE s.name = :name"),
         @NamedQuery(name = "Service.findByPrice", query = "SELECT s FROM Service s WHERE s.price = :price"),
         @NamedQuery(name = "Service.findByQuantity", query = "SELECT s FROM Service s WHERE s.quantity = :quantity"),
@@ -68,13 +68,13 @@ public class Service implements Serializable {
     private int quantity;
     @Column(name = "is_active")
     private Boolean isActive = true;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId", fetch = FetchType.LAZY)
     private Set<Image> imageSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId", fetch = FetchType.LAZY)
     private Set<Booking> bookingSet;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId", fetch = FetchType.LAZY)
     private ServiceAccommodation serviceAccommodation;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId", fetch = FetchType.LAZY)
     private ServiceTourism serviceTourism;
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -82,7 +82,7 @@ public class Service implements Serializable {
     @JoinColumn(name = "type_of_service_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
     private TypeOfService typeOfServiceId;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "serviceId", fetch = FetchType.LAZY)
     private ServiceTransportation serviceTransportation;
 
     public Service() {

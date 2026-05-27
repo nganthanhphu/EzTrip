@@ -7,6 +7,7 @@ package com.hp.pojo;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,7 +54,7 @@ public class ServiceAccommodation implements Serializable {
     @Column(name = "location")
     private String location;
     @JoinColumn(name = "service_id", referencedColumnName = "id")
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Service serviceId;
 
     public ServiceAccommodation() {

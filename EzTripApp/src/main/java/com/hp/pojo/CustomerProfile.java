@@ -50,12 +50,12 @@ public class CustomerProfile implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date dob;
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     private BaseUser userId;
     @JoinColumn(name = "gender_id", referencedColumnName = "id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Gender genderId;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customerId", fetch = FetchType.LAZY)
     private Set<Booking> bookingSet;
 
     public CustomerProfile() {

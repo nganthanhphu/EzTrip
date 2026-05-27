@@ -71,9 +71,9 @@ public class BaseUser implements Serializable {
     private String phoneNumber;
     @Column(name = "is_active")
     private Boolean isActive = true;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.LAZY)
     private CustomerProfile customerProfile;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "userId", fetch = FetchType.LAZY)
     private ProviderProfile providerProfile;
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
