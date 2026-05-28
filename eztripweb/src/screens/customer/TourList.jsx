@@ -1,36 +1,50 @@
-import React, { useState } from "react";
-import { Container, Stack, Row, Col, Form, Button } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TourItem from "@components/customer/CardTourItem";
-import defaultImage from "../../assets/images/default_tour_item.jpg";
-
-const tours = [
-    {
-        id: 1,
-        name: "Tour Hà Nội - Hạ Long",
-        providerName: "Công ty du lịch ABC",
-        location: "Hà Nội - Hạ Long",
-        price: "1.000.000 VNĐ",
-        rating: 9.0,
-        avaibility_count: 10,
-        tour_duration: "2 ngày 1 đêm",
-        image: defaultImage
-    }
-]
+import MySpinner from "@components/common/MySpinner";
+import { getTourisms } from "@services/customerService";
 
 function TourList() {
+    const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [tourDuration, setTourDuration] = useState("");
+    const [tourList, setTourList] = useState([]);
+
+    const loadTours = async () => {
+        try {
+            setLoading(true);
+            const response = await getTourisms({
+                searchText,
+                tourDuration,
+            });
+
+            setTourList(Array.isArray(response) ? response : []);
+        } catch (error) {
+            console.error("Error fetching tours:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadTours();
+    }, []);
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        loadTours();
+    };
 
     return (
         <CustomerLayout>
-            <Container className="p-4">
-                <Form className="mb-3">
+            <Container className="py-4">
+                <Form className="mb-3" onSubmit={handleSearch}>
                     <Row className="g-2 align-items-center">
                         <Col md={5}>
                             <Form.Control
                                 type="text"
-                                placeholder="Tìm kiếm (tên tour, địa điểm)"
+                                placeholder="Tìm kiếm (tên tour, địa điểm, nhà cung cấp)..."
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
                             />
@@ -41,32 +55,31 @@ function TourList() {
                                 type="number"
                                 placeholder="Thời lượng (ngày)"
                                 value={tourDuration}
-                                onChange={(e) => setTourDuration(e.target.value)}
+                                onChange={(e) =>
+                                    setTourDuration(e.target.value)
+                                }
                             />
                         </Col>
 
                         <Col md={2} className="d-grid">
-                            <Button variant="primary">
+                            <Button
+                                variant="primary"
+                                type="submit"
+                                disabled={loading}
+                            >
                                 Tìm kiếm
                             </Button>
                         </Col>
                     </Row>
                 </Form>
-                
 
-                {tours.map((tour) => (
-                    <TourItem
-                        key={tour.id}
-                        name={tour.name}
-                        providerName={tour.providerName}
-                        location={tour.location}
-                        price={tour.price}
-                        rating={tour.rating}
-                        avaibility_count={tour.avaibility_count}
-                        tour_duration={tour.tour_duration}
-                        imageUrl={tour.image}
-                    />
-                ))}
+                <div className="d-flex flex-column gap-3">
+                    {tourList.map((tour) => (
+                        <TourItem key={tour.id} {...tour} />
+                    ))}
+                </div>
+
+                {loading && <MySpinner />}
             </Container>
         </CustomerLayout>
     );

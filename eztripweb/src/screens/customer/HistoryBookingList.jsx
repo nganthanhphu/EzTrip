@@ -49,7 +49,6 @@ const handlePrimary = (item) => {
 };
 
 function HistoryBookingList() {
-    const [searchText, setSearchText] = useState("");
     const [serviceType, setServiceType] = useState("");
     const [status, setStatus] = useState("");
     const { lookupTables } = useLookupTables();
@@ -59,15 +58,6 @@ function HistoryBookingList() {
             <Container className="p-4">
                 <Form className="mb-3">
                     <Row className="g-2 align-items-center">
-                        <Col md={5}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Tìm kiếm (tên dịch vụ, nhà cung cấp)"
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
-                            />
-                        </Col>
-
                         <Col md={2}>
                             <Form.Control
                                 as="select"

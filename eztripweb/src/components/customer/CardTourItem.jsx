@@ -1,68 +1,71 @@
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 import defaultImage from "../../assets/images/default_tour_item.jpg";
+import { formatCurrency } from "@utils/formatters";
 
-function CardTourItem({
-    name = "Tour mẫu",
-    providerName = "Nhà cung cấp",
-    location = "Địa điểm",
-    price = "0 VNĐ",
-    rating = 0,
-    avaibility_count = 0,
-    tour_duration = "1 ngày",
-    onSelect,
-}) {
+function CardTourItem(props) {
+    const { id, name, price, image, quantity, remainingQuantity, avgRating, reviewCount, bookingCount, companyName } = props.baseInfo;
+    const { location, tourDuration } = props;
+    const nav = useNavigate();
+
     return (
-        <Card className="w-100 border-dark-subtle rounded-0">
+        <Card className="w-100 border border-dark-subtle rounded-0 shadow-none mb-3 overflow-hidden" onClick={() => nav(`/tours/${id}`)} style={{ cursor: "pointer" }}>
             <Card.Body className="p-0">
                 <Row className="g-0 align-items-stretch">
                     <Col
                         xs={12}
-                        md={3}
-                        className="border-end border-dark-subtle d-flex align-items-stretch bg-light p-0"
+                        md={4}
+                        className="border-end border-dark-subtle bg-light d-flex align-items-stretch"
                     >
-                        <div className="w-100 h-100">
+                        <div className="w-100" style={{ minHeight: 170 }}>
                             <Image
-                                src={defaultImage}
-                                alt="Tour"
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                }}
+                                src={image || defaultImage}
+                                alt={name}
+                                className="w-100 h-100"
+                                style={{ objectFit: "cover" }}
                             />
                         </div>
                     </Col>
 
                     <Col
                         xs={12}
-                        md={6}
-                        className="border-end border-dark-subtle p-3 p-md-4 d-flex flex-column justify-content-between"
+                        md={5}
+                        className="border-end border-dark-subtle p-2 p-md-3 d-flex flex-column justify-content-between"
                     >
-                        <div>
-                            <h2 className="mb-2 fw-semibold">{name}</h2>
-                            <div className="fs-6 mb-2">{providerName}</div>
-                            <div className="mb-2">📍 {location}</div>
+                        <div className="d-flex flex-column gap-1">
+                            <div className="d-flex align-items-start justify-content-between gap-2">
+                                <div className="min-w-0">
+                                    <h5 className="mb-1 fw-bold text-truncate">{name}</h5>
+                                    <div className="text-muted small text-truncate">{companyName}</div>
+                                </div>
 
-                            <div className="d-flex flex-wrap gap-3 mb-2">
-                                <span>Thời lượng: {tour_duration}</span>
-                                <span>{avaibility_count} chỗ</span>
+                                <Badge bg="warning" text="dark" className="rounded-0 align-self-start">
+                                    {Number(avgRating || 0).toFixed(1)} / 10
+                                </Badge>
                             </div>
 
-                            <div className="d-flex justify-content-md-end justify-content-start mb-3">
-                                <Badge className="success">{rating} / 10</Badge>
+                            <div className="text-muted">📍 {location}</div>
+
+                            <div className="d-flex flex-column gap-2 pt-2 border-top border-dark-subtle">
+                                <div className="small text-muted">🧭 {tourDuration} ngày</div>
+                                <div className="small text-muted">📝 {reviewCount} nhận xét</div>
+                                <div className="small text-muted">📅 {bookingCount} lượt đặt</div>
+                                <div className="small text-muted">⏳ {remainingQuantity}/{quantity} chỗ còn lại</div>
                             </div>
                         </div>
                     </Col>
+
                     <Col
                         xs={12}
                         md={3}
-                        className="p-3 p-md-4 d-flex flex-column justify-content-between"
+                        className="p-2 p-md-3 d-flex flex-column justify-content-between"
                     >
-                        <div className="d-flex flex-column align-items-md-end align-items-start gap-3">
-                            <div className="fs-3 fw-semibold text-nowrap">
-                                {price}
+                        <div className="d-flex flex-column align-items-md-end align-items-start gap-2">
+                            <div className="fs-5 fw-semibold text-nowrap text-primary">
+                                {formatCurrency(Number(price || 0))}
                             </div>
-                            <Button variant="primary" onClick={onSelect}>
+
+                            <Button variant="primary" size="sm" onClick={() => nav(`/tours/${id}?action=book`)} className="rounded-0 w-100">
                                 Đặt tour
                             </Button>
                         </div>

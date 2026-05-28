@@ -1,77 +1,111 @@
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
 import defaultImage from "../../assets/images/default_transportation_item.jpg";
+import { formatCurrency, formatHour } from "@utils/formatters";
 
-function CardTransportationItem({
-	imageUrl = defaultImage,
-    name = "Tên hành trình",
-    providerName = "Xe khách Phương Trang",
-	type_of_transportation = "Loại phương tiện",
-	departure_location = "Điểm đi",
-	arrival_location = "Điểm đến",
-	departure_time = "--:--",
-	arrival_time = "--:--",
-	avaibility_count = 0,
-	price = "0 VNĐ",
-	rating = 0,
-	onSelect,
-}) {
-	return (
-        <Card className="w-100 border-dark-subtle rounded-0">
+function CardTransportationItem(props) {
+    const {
+        price,
+        image,
+        quantity,
+        remainingQuantity,
+        avgRating,
+        reviewCount,
+        bookingCount,
+        companyName,
+    } = props.baseInfo;
+    const {
+        typeOfTransportation,
+        departureLocation,
+        arrivalLocation,
+        departureTime,
+        arrivalTime,
+    } = props;
+    const { onSelect } = props;
+
+    return (
+        <Card className="w-100 border border-dark-subtle rounded-0 shadow-none mb-3 overflow-hidden">
             <Card.Body className="p-0">
                 <Row className="g-0 align-items-stretch">
                     <Col
                         xs={12}
-                        md={3}
-                        className="border-end border-dark-subtle d-flex align-items-stretch bg-light p-0"
+                        md={4}
+                        className="border-end border-dark-subtle bg-light d-flex align-items-stretch"
                     >
-                        <div className="w-100 h-100">
+                        <div className="w-100" style={{ minHeight: 170 }}>
                             <Image
-                                src={defaultImage}
-                                alt="Transportation"
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "cover",
-                                }}
+                                src={image || defaultImage}
+                                alt={departureLocation}
+                                className="w-100 h-100"
+                                style={{ objectFit: "cover" }}
                             />
                         </div>
                     </Col>
 
                     <Col
                         xs={12}
-                        md={6}
-                        className="border-end border-dark-subtle p-3 p-md-4 d-flex flex-column justify-content-between"
+                        md={5}
+                        className="border-end border-dark-subtle p-2 p-md-3 d-flex flex-column justify-content-between"
                     >
-                        <div>
-                            <h2 className="mb-2 fw-semibold">
-                                {departure_location} → {arrival_location}
-                            </h2>
-                            <div className="fs-6 mb-2">
-                                {" "}
-                                Loại phương tiện: {type_of_transportation}
-                            </div>
-                            <div className="fs-6 mb-3">{providerName}</div>
-                            <div className="d-flex flex-wrap gap-3">
-                                <span>{departure_time}</span>
-                                <span>{arrival_time}</span>
-                            </div>
-                            <div>Số ghế còn lại: {avaibility_count}</div>
+                        <div className="d-flex flex-column gap-1">
+                            <div className="d-flex align-items-start justify-content-between gap-2">
+                                <div className="min-w-0">
+                                    <h5 className="mb-1 fw-bold text-truncate">
+                                        {departureLocation} - {arrivalLocation}
+                                    </h5>
+                                    <div className="d-flex flex-wrap gap-1 mt-1">
+                                        <Badge bg="primary" text="light" className="rounded-0">
+                                            Khởi hành: {formatHour(departureTime)}
+                                        </Badge>
+                                        <Badge bg="primary" text="light" className="rounded-0">
+                                            Đến nơi: {formatHour(arrivalTime)}
+                                        </Badge>
+                                    </div>
+                                    <div className="text-muted small text-truncate">
+                                        {companyName}
+                                    </div>
+                                </div>
 
-                            <div className="d-flex justify-content-md-end justify-content-start mb-3">
-                                <Badge className="success">{rating} / 10</Badge>
+                                <Badge
+                                    bg="warning"
+                                    text="dark"
+                                    className="rounded-0 align-self-start"
+                                >
+                                    {avgRating} / 10
+                                </Badge>
+                            </div>
+
+                            <div className="text-muted">
+                                Loại phương tiện: {typeOfTransportation}
+                            </div>
+
+                            <div className="d-flex flex-column gap-2 pt-2 border-top border-dark-subtle">
+                                <div className="small text-muted">
+                                    📝 {reviewCount} nhận xét
+                                </div>
+                                <div className="small text-muted">
+                                    📅 {bookingCount} lượt đặt
+                                </div>
+                                <div className="small text-muted">
+                                    ⏳ {remainingQuantity}/{quantity} chỗ còn trống
+                                </div>
                             </div>
                         </div>
                     </Col>
+
                     <Col
                         xs={12}
                         md={3}
-                        className="p-3 p-md-4 d-flex flex-column justify-content-between"
+                        className="p-2 p-md-3 d-flex flex-column justify-content-between"
                     >
-                        <div className="d-flex flex-column align-items-md-end align-items-start gap-3">
-                            <div className="fs-3 fw-semibold text-nowrap">
-                                {price}
+                        <div className="d-flex flex-column align-items-md-end align-items-start gap-2">
+                            <div className="fs-5 fw-semibold text-nowrap text-primary">
+                                {formatCurrency(price)}
                             </div>
-                            <Button variant="primary" onClick={onSelect}>
+                            <Button
+                                variant="primary"
+                                className="rounded-0 w-100"
+                                onClick={onSelect}
+                            >
                                 Đặt vé
                             </Button>
                         </div>

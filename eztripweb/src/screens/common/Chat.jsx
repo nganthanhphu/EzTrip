@@ -7,6 +7,8 @@ import FirebaseConfigs from "../../configs/FirebaseConfigs";
 import { MessageBubble, ChatInput } from "@components/common/ChatComponents";
 import defaultAvatar from "@assets/images/default_avatar.jpg";
 
+//TODO: chat srceen không theo dạng screen mà dạng Modal Component, id chuyển sang dạng mã băm, dùng thuật toán băm và SECRET_KEY 
+
 const MOCK_USERS = {
     1: { id: "1", name: "User 1 (Khách hàng)", avatar: defaultAvatar },
     2: { id: "2", name: "User 2 (Nhà cung cấp)", avatar: defaultAvatar },

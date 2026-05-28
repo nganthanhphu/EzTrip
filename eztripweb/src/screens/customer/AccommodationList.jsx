@@ -40,11 +40,12 @@ function AccommodationList() {
         <CustomerLayout>
             <Container className="py-4">
                 <Form className="mb-3" onSubmit={handleSearch}>
+                    {/* TODO: Sort theo độ hot(cao-thấp), giá (cao-thấp); Filter khoảng giá, rating*/}
                     <Row className="g-2 align-items-center">
                         <Col md={5}>
                             <Form.Control
                                 type="text"
-                                placeholder="Tìm kiếm (tên, nhà cung cấp, địa điểm)..."
+                                placeholder="Tìm kiếm địa điểm"
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
                             />
@@ -88,7 +89,9 @@ function AccommodationList() {
 
                 <div md={12} className="h-50 d-flex flex-column gap-3">
                     {accommodationList.map((accommodation) => (
-                        <CardAccomodationItem key={accommodation.id} {...accommodation}
+                        <CardAccomodationItem
+                            key={accommodation.id}
+                            {...accommodation}
                         />
                     ))}
                 </div>

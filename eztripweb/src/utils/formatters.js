@@ -15,4 +15,17 @@ export function formatDate(dateString) {
     });
 }
 
+export function formatHour(value) {
+    if (value === null || value === undefined || value === "") {
+        return "--:--";
+    }
+
+    const parsedValue = Number(value);
+    if (Number.isNaN(parsedValue)) {
+        return String(value);
+    }
+
+    return `${String(parsedValue).padStart(2, "0")}:00`;
+}
+
 export default formatCurrency;
