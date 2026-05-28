@@ -76,3 +76,18 @@ export async function getBookingById(id) {
 export async function createBooking(booking) {
 	return requestJsonCreate("/api/secure/bookings", booking);
 }
+
+export default {
+	getAccommodations,
+	getAccommodationById,
+	createAccommodation,
+	getTourisms,
+	getTourismById,
+	createTourism,
+	getTransportations,
+	getTransportationById,
+	createTransportation,
+	getBookings,
+	getBookingById,
+	createBooking,
+};

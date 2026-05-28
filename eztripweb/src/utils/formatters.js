@@ -14,3 +14,5 @@ export function formatDate(dateString) {
         year: "numeric",
     });
 }
+
+export default formatCurrency;

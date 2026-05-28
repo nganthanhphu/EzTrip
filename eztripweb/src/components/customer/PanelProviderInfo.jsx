@@ -1,4 +1,7 @@
 import { Button, Card, Image, ListGroup } from "react-bootstrap";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthContext from "@contexts/AuthContext";
 import defaultAccommodationImage from "../../assets/images/default_accommodation_item.jpg";
 
 function PanelProviderInfo({
@@ -7,8 +10,11 @@ function PanelProviderInfo({
 	address = "Địa chỉ chưa cập nhật",
 	phone = "Chưa có số điện thoại",
 	email = "Chưa có email",
-	onChat,
+	providerId,
 }) {
+	const nav = useNavigate();
+	const { currentUser } = useContext(AuthContext);
+
 	return (
 		<Card className="h-100 shadow-sm">
 			<Card.Header className="bg-white fw-semibold">
@@ -41,7 +47,10 @@ function PanelProviderInfo({
 				</ListGroup>
 
 				<div className="d-grid">
-					<Button variant="primary" onClick={onChat}>
+					<Button
+						variant="primary"
+						onClick={() => nav(`chat/${currentUser?.id || ''}/${providerId}`)}
+					>
 						Chat ngay
 					</Button>
 				</div>

@@ -1,72 +1,69 @@
-import { useState } from "react";
-import { Badge, Button, Card, Col, Container, ListGroup, Row } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Alert, Badge, Button, Card, Col, Container, ListGroup, Row } from "react-bootstrap";
+import { useParams } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
 import PanelAlbum from "@components/customer/PanelAlbum";
 import PanelProviderInfo from "@components/customer/PanelProviderInfo";
 import PanelReview from "@components/customer/PanelReview";
 import PanelCompare from "@components/customer/PanelCompare";
 import ModalConfirmAccommodationBooking from "@components/customer/ModalConfirmAccommodationBooking";
-import defaultAccommodationImage from "../../assets/images/default_accommodation_item.jpg";
-
-const accommodationDetail = {
-	name: "Khách sạn Hoa Hồng",
-	address: "Phường Văn Xá, TP.HCM",
-	beds: 2,
-	area: 15,
-	pricePerNight: 300000,
-	price: "300.000 VNĐ / đêm",
-	description:
-		"Phòng nghỉ rộng rãi, phù hợp cho 2 khách, có cửa sổ thoáng, nội thất cơ bản sạch sẽ và thuận tiện di chuyển đến trung tâm thành phố.",
-	images: [defaultAccommodationImage, defaultAccommodationImage, defaultAccommodationImage],
-	provider: {
-		avatarUrl: defaultAccommodationImage,
-		name: "HappyCorp Travel",
-		address: "123 Nguyễn Văn Linh, Quận 7, TP.HCM",
-		phone: "0123456789",
-		email: "hello@happycorp.vn",
-	},
-	reviews: [
-		{
-			reviewer: "Nguyễn Văn A",
-			date: "12/05/2026",
-			rating: 9,
-			comment: "Phòng sạch sẽ, đúng như mô tả và nhân viên hỗ trợ rất nhanh.",
-		},
-		{
-			reviewer: "Trần Thị B",
-			date: "10/05/2026",
-			rating: 8,
-			comment: "Vị trí thuận tiện, giá hợp lý cho chuyến đi ngắn ngày.",
-		},
-	],
-	compareServices: [
-		{
-			name: "Khách sạn Hoa Mai",
-			providerName: "HappyCorp Travel",
-			imageUrl: defaultAccommodationImage,
-		},
-		{
-			name: "Homestay Hoa Đào",
-			providerName: "City Stay",
-			imageUrl: defaultAccommodationImage,
-		},
-		{
-			name: "Resort Ven Sông",
-			providerName: "River Escape",
-			imageUrl: defaultAccommodationImage,
-		},
-	],
-};
+import MySpinner from "@components/common/MySpinner";
+import { getAccommodationById } from "@services/customerService";
 
 function AccommodationDetail() {
 	const [showBookingModal, setShowBookingModal] = useState(false);
+	const { id } = useParams();
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState("");
+	const [accommodationDetail, setAccommodationDetail] = useState(null);
+
+	const loadAccommodationDetail = async (id) => {
+		try {
+			setError("");
+			setLoading(true);
+			const response = await getAccommodationById(id);
+			console.log("Accommodation detail:", response);
+			setAccommodationDetail(response);
+		} catch (error) {
+			console.error("Error fetching accommodations:", error);
+			setError("Không thể tải thông tin chỗ nghỉ. Vui lòng thử lại sau.");
+		} finally {
+			setLoading(false);
+		}
+	}
+
+	useEffect(() => {
+		loadAccommodationDetail(id);
+	}, [id]);
+
+	if (loading) {
+		return (
+			<CustomerLayout>
+				<Container className="py-5 d-flex justify-content-center align-items-center">
+					<MySpinner />
+				</Container>
+			</CustomerLayout>
+		);
+	}
+
+	if (error || !accommodationDetail) {
+		return (
+			<CustomerLayout>
+				<Container className="py-4">
+					<Alert variant="warning" className="mb-0">
+						{error || "Không tìm thấy thông tin chỗ nghỉ."}
+					</Alert>
+				</Container>
+			</CustomerLayout>
+		);
+	}
 
 	return (
 		<CustomerLayout>
 			<Container className="py-4">
 				<Row className="g-4 mb-4 align-items-stretch">
 					<Col xs={12} lg={4}>
-						<PanelAlbum urls={accommodationDetail.images} />
+						<PanelAlbum urls={accommodationDetail.baseInfo.images} />
 					</Col>
 
 					<Col xs={12} lg={5}>
@@ -76,15 +73,15 @@ function AccommodationDetail() {
 							</Card.Header>
 							<Card.Body className="d-flex flex-column justify-content-between gap-3">
 								<div>
-									<h1 className="h3 fw-semibold mb-2">{accommodationDetail.name}</h1>
+									<h1 className="h3 fw-semibold mb-2">{accommodationDetail.baseInfo.name}</h1>
 									<div className="text-body-secondary mb-3">
-										{accommodationDetail.address}
+										{accommodationDetail.location}
 									</div>
 
 									<ListGroup variant="flush" className="mb-3">
 										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
 											<span>Số giường</span>
-											<Badge bg="secondary">{accommodationDetail.beds}</Badge>
+											<Badge bg="secondary">{accommodationDetail.quantityOfBed}</Badge>
 										</ListGroup.Item>
 										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
 											<span>Diện tích</span>
@@ -92,7 +89,7 @@ function AccommodationDetail() {
 										</ListGroup.Item>
 										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
 											<span>Giá</span>
-											<Badge bg="success">{accommodationDetail.price}</Badge>
+											<Badge bg="success">{accommodationDetail.baseInfo.price}</Badge>
 										</ListGroup.Item>
 									</ListGroup>
 								</div>
@@ -107,13 +104,19 @@ function AccommodationDetail() {
 					</Col>
 
 					<Col xs={12} lg={3}>
-						<PanelProviderInfo {...accommodationDetail.provider} />
+						<PanelProviderInfo
+							avatarUrl={accommodationDetail.baseInfo.companyAvatar}
+							name={accommodationDetail.baseInfo.companyName}
+							address={accommodationDetail.baseInfo.companyAddress}
+							phone={accommodationDetail.baseInfo.companyPhone}
+							email={accommodationDetail.baseInfo.companyEmail}
+						/>
 					</Col>
 				</Row>
 
 				<Row className="g-4 align-items-stretch">
 					<Col xs={12} lg={4}>
-						<PanelReview reviews={accommodationDetail.reviews} />
+						<PanelReview reviews={accommodationDetail.baseInfo.id} />
 					</Col>
 
 					<Col xs={12} lg={5}>
@@ -122,13 +125,13 @@ function AccommodationDetail() {
 								Mô tả dịch vụ
 							</Card.Header>
 							<Card.Body>
-								<p className="mb-0">{accommodationDetail.description}</p>
+								<p className="mb-0">{accommodationDetail.baseInfo.description}</p>
 							</Card.Body>
 						</Card>
 					</Col>
 
 					<Col xs={12} lg={3}>
-						<PanelCompare services={accommodationDetail.compareServices} />
+						<PanelCompare services={accommodationDetail.AccommodationDetail} />
 					</Col>
 				</Row>
 
