@@ -110,6 +110,7 @@ public class BookingRepositoryImpl implements BookingRepository {
         }
 
         q.where(predicates.toArray(Predicate[]::new));
+        q.orderBy(b.desc(root.get("createdDate")));
 
         Query<Booking> query = s.createQuery(q);
 
