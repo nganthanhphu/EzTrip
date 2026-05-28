@@ -20,6 +20,8 @@ import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  *
  * @author Joon
@@ -30,6 +32,7 @@ import java.util.Set;
     @NamedQuery(name = "BookingStatus.findAll", query = "SELECT b FROM BookingStatus b"),
     @NamedQuery(name = "BookingStatus.findById", query = "SELECT b FROM BookingStatus b WHERE b.id = :id"),
     @NamedQuery(name = "BookingStatus.findByName", query = "SELECT b FROM BookingStatus b WHERE b.name = :name")})
+@JsonIgnoreProperties({"bookingSet"})
 public class BookingStatus implements Serializable {
 
     private static final long serialVersionUID = 1L;
