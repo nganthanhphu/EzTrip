@@ -20,6 +20,7 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hp.dto.image.ImageViewDTO;
 import com.hp.dto.service.BaseServiceViewDTO;
 import com.hp.dto.service.TourismListViewDTO;
 import com.hp.dto.service.TourismViewDTO;
@@ -199,7 +200,9 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
                 b.coalesce(b.avg(review.get("rating")), 0.0),
                 b.coalesce(b.count(review.get("id")), 0),
                 b.coalesce(b.countDistinct(booking.get("id")), 0),
+                providerUser.get("id"),
                 providerProfile.get("companyName"),
+                providerUser.get("avatar"),
                 providerProfile.get("companyAddress"),
                 providerUser.get("phoneNumber"),
                 providerUser.get("email"),
@@ -216,11 +219,11 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
         Query<TourismViewDTO> query = s.createQuery(q);
         TourismViewDTO result = query.uniqueResult();
         if (result != null) {
-            Query<String> imageQuery = s.createQuery("SELECT i.url FROM Image i WHERE i.serviceId.id = :serviceId",
-                    String.class);
+            Query<ImageViewDTO> imageQuery = s.createQuery("SELECT new com.hp.dto.image.ImageViewDTO(i.id, i.url) FROM Image i WHERE i.serviceId.id = :serviceId",
+                    ImageViewDTO.class);
             imageQuery.setParameter("serviceId", id);
-            Set<String> imageUrls = new HashSet<>(imageQuery.getResultList());
-            BaseServiceViewDTO baseInfo = result.baseInfo().setImages(imageUrls);
+            Set<ImageViewDTO> images = new HashSet<>(imageQuery.getResultList());
+            BaseServiceViewDTO baseInfo = result.baseInfo().setImages(images);
             result = new TourismViewDTO(baseInfo, result.id(), result.tourDuration(), result.location());
         }
 
