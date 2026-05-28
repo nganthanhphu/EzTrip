@@ -3,7 +3,8 @@ import axiosClient from "@services/axiosClient";
 const lookupEndpoints = {
     genders: "/api/genders",
     roles: "/api/roles",
-    typeOfProviders: "/api/type-of-providers",
+	typeOfProviders: "/api/type-of-providers",
+	typeOfServices: "/api/type-of-services",
     typeOfTransportations: "/api/type-of-transportations",
     bookingStatuses: "/api/booking-statuses",
 };

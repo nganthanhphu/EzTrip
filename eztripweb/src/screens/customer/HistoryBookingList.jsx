@@ -1,44 +1,10 @@
-import React, { useState } from "react";
-import { Container, Stack, Row, Col, Form, Button } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
-import HistoryBookingItem from "../../components/customer/CardHistoryBookingItem";
-import { useLookupTables } from "../../contexts/LookupTablesContext";
-
-const HistoryBookingItems = [
-    {
-        name_of_service: "Phòng VIP",
-        type_of_service: "Khách sạn",
-        name_of_provider: "Khách sạn Hoa Hồng",
-        created_at: "25/05/2026",
-        booking_day: "26/05/2026",
-        payment_method: "Momo",
-        quantity: 1,
-        total_amount: "150.000 VNĐ",
-        status: "Pending",
-    },
-    {
-        name_of_service: "Tour Sài Gòn",
-        type_of_service: "Tour",
-        name_of_provider: "Công ty Du Lịch ABC",
-        created_at: "20/05/2026",
-        booking_day: "22/05/2026",
-        payment_method: "Thẻ tín dụng",
-        quantity: 2,
-        total_amount: "1.200.000 VNĐ",
-        status: "Confirmed",
-    },
-    {
-        name_of_service: "Vé Xe",
-        type_of_service: "Vận chuyển",
-        name_of_provider: "Xe khách Phương Trang",
-        created_at: "10/05/2026",
-        booking_day: "15/05/2026",
-        payment_method: "Tiền mặt",
-        quantity: 1,
-        total_amount: "200.000 VNĐ",
-        status: "Completed",
-    },
-];
+import HistoryBookingItem from "@components/customer/CardHistoryBookingItem";
+import { useLookupTables } from "@contexts/LookupTablesContext";
+import MySpinner from "@components/common/MySpinner";
+import { getBookings } from "@services/customerService";
 
 const handleChat = (item) => {
     console.log("Chat for", item);
@@ -51,75 +17,120 @@ const handlePrimary = (item) => {
 function HistoryBookingList() {
     const [serviceType, setServiceType] = useState("");
     const [status, setStatus] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [bookings, setBookings] = useState([]);
     const { lookupTables } = useLookupTables();
+    const typeOfServiceOptions = lookupTables.typeOfServices || [];
+
+    const loadBookings = async () => {
+        try {
+            setLoading(true);
+
+            const params = {};
+            if (serviceType) {
+                params.serviceType = Number(serviceType);
+            }
+            if (status) {
+                params.status = status;
+            }
+
+            const response = await getBookings(params);
+            const nextBookings = Array.isArray(response)
+                ? response
+                : response?.content || response?.data || response?.items || [];
+
+            setBookings(nextBookings);
+        } catch (error) {
+            console.error("Error fetching bookings:", error);
+            setBookings([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadBookings();
+    }, []);
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        loadBookings();
+    };
 
     return (
         <CustomerLayout>
             <Container className="p-4">
-                <Form className="mb-3">
+                <Form className="mb-3" onSubmit={handleSearch}>
                     <Row className="g-2 align-items-center">
                         <Col md={2}>
-                            <Form.Control
-                                as="select"
+                            <Form.Select
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value)}
                             >
                                 <option value="">Loại dịch vụ</option>
-                                {lookupTables.typeOfProviders.map((option) => (
-                                    <option key={option.value} value={option.value}>
+                                {typeOfServiceOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
                                         {option.label}
                                     </option>
                                 ))}
-                            </Form.Control>
+                            </Form.Select>
                         </Col>
 
                         <Col md={2}>
-                            <Form.Control
-                                as="select"
+                            <Form.Select
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value)}
                             >
                                 <option value="">Trạng thái</option>
-                                {lookupTables.bookingStatuses.map(
-                                    (option) => (
-                                        <option
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </option>
-                                    ),
-                                )}
-                            </Form.Control>
+                                {lookupTables.bookingStatuses.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </Form.Select>
                         </Col>
 
                         <Col md={2} className="d-grid">
-                            <Button variant="primary">Tìm kiếm</Button>
+                            <Button variant="primary" type="submit" disabled={loading}>
+                                Tìm kiếm
+                            </Button>
                         </Col>
                     </Row>
                 </Form>
 
-                <div className="d-flex flex-column gap-3">
-                    {HistoryBookingItems.map((item, index) => {
-                        console.log("Rendering history item", index, item);
-                        return (
+                {loading ? (
+                    <div className="py-5 d-flex justify-content-center">
+                        <MySpinner />
+                    </div>
+                ) : (
+                    <div className="d-flex flex-column gap-3">
+                        {bookings.map((item) => (
                             <HistoryBookingItem
-                                key={index}
-                                name_of_service={item.name_of_service}
-                                type_of_service={item.type_of_service}
-                                name_of_provider={item.name_of_provider}
-                                created_at={item.created_at}
-                                booking_day={item.booking_day}
-                                payment_method={item.payment_method}
+                                key={item.id}
+                                serviceName={item.serviceName}
+                                serviceType={item.serviceType}
+                                serviceImage={item.serviceImage}
+                                providerName={item.providerName}
+                                createdDate={item.createdDate}
+                                bookingDay={item.bookingDay}
+                                paymentMethod={item.paymentMethod}
                                 quantity={item.quantity}
-                                total_amount={item.total_amount}
+                                totalAmount={item.totalAmount}
                                 status={item.status}
+                                note={item.note}
+                                customerName={item.customerName}
+                                customerPhone={item.customerPhone}
+                                customerAvatar={item.customerAvatar}
+                                review={item.review}
                                 onChat={() => handleChat(item)}
                                 onPrimaryAction={() => handlePrimary(item)}
                             />
-                        );
-                    })}
-                </div>
+                        ))}
+                    </div>
+                )}
             </Container>
         </CustomerLayout>
     );

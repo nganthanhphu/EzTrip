@@ -18,6 +18,11 @@ const DEFAULT_LABELS = {
 		ACCOMMODATION: "Lưu trú",
 		TRANSPORTATION: "Vận chuyển",
 	},
+	typeOfServices: {
+		TOURISM: "Tour",
+		ACCOMMODATION: "Lưu trú",
+		TRANSPORTATION: "Vận chuyển",
+	},
 	typeOfTransportations: {
 		BUS: "Xe khách",
 		AIRPLANE: "Máy bay",
@@ -36,6 +41,7 @@ const EMPTY_LOOKUP_TABLES = {
 	genders: [],
 	roles: [],
 	typeOfProviders: [],
+	typeOfServices: [],
 	typeOfTransportations: [],
 	bookingStatuses: [],
 };
@@ -54,6 +60,7 @@ function buildLookupOptions(rawTables) {
 		genders: toOptionList(rawTables.genders, DEFAULT_LABELS.genders),
 		roles: toOptionList(rawTables.roles, DEFAULT_LABELS.roles),
 		typeOfProviders: toOptionList(rawTables.typeOfProviders, DEFAULT_LABELS.typeOfProviders),
+		typeOfServices: toOptionList(rawTables.typeOfServices, DEFAULT_LABELS.typeOfServices),
 		typeOfTransportations: toOptionList(
 			rawTables.typeOfTransportations,
 			DEFAULT_LABELS.typeOfTransportations,

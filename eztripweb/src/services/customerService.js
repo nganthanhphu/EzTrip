@@ -69,10 +69,6 @@ export async function getBookings(params = {}) {
 	return requestList("/api/secure/bookings", params);
 }
 
-export async function getBookingById(id) {
-	return requestById("/api/secure/bookings", id);
-}
-
 export async function createBooking(booking) {
 	return requestJsonCreate("/api/secure/bookings", booking);
 }
@@ -88,6 +84,5 @@ export default {
 	getTransportationById,
 	createTransportation,
 	getBookings,
-	getBookingById,
 	createBooking,
 };
