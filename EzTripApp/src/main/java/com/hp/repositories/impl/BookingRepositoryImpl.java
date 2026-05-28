@@ -119,7 +119,7 @@ public class BookingRepositoryImpl implements BookingRepository {
 
             String customerName = params.get("customerName");
             if (customerName != null && !customerName.isEmpty()) {
-                predicates.add(b.like(root.get("customerId").get("userId").get("name"), String.format("%%%s%%", customerName)));
+                predicates.add(b.like(root.get("customerId").get("userId").get("fullname"), String.format("%%%s%%", customerName)));
             }
 
         }
