@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
 import Apis, { endpoints } from "../../configs/Apis";
+import { useLookupTables } from "../../contexts/LookupTablesContext";
 
 const providerFields = [
 	{
@@ -44,19 +45,14 @@ const providerFields = [
 	},
 ];
 
-const providerTypeOptions = [
-	{ value: "", label: "Chọn loại nhà cung cấp" },
-	{ value: "TRAVEL_AGENCY", label: "Đơn vị du lịch" },
-	{ value: "ACCOMMODATION", label: "Lưu trú" },
-	{ value: "TRANSPORTATION", label: "Vận chuyển" },
-];
-
 const RegisterProvider = () => {
 	const [user, setUser] = useState({ role: "PROVIDER" });
 	const [err, setErr] = useState("");
 	const [loading, setLoading] = useState(false);
 	const avatar = useRef();
 	const nav = useNavigate();
+	const { lookupTables } = useLookupTables();
+	const providerTypeOptions = [{ value: "", label: "Chọn loại nhà cung cấp" }, ...lookupTables.typeOfProviders];
 
 	const validate = () => {
 		for (const field of providerFields) {

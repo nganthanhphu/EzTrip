@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Container, Stack, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
 import HistoryBookingItem from "../../components/customer/CardHistoryBookingItem";
+import { useLookupTables } from "../../contexts/LookupTablesContext";
 
 const HistoryBookingItems = [
     {
@@ -51,6 +52,7 @@ function HistoryBookingList() {
     const [searchText, setSearchText] = useState("");
     const [serviceType, setServiceType] = useState("");
     const [status, setStatus] = useState("");
+    const { lookupTables } = useLookupTables();
 
     return (
         <CustomerLayout>
@@ -73,9 +75,11 @@ function HistoryBookingList() {
                                 onChange={(e) => setServiceType(e.target.value)}
                             >
                                 <option value="">Loại dịch vụ</option>
-                                <option value="Khách sạn">Khách sạn</option>
-                                <option value="Tour">Tour</option>
-                                <option value="Vận chuyển">Vận chuyển</option>
+                                {lookupTables.typeOfProviders.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                             </Form.Control>
                         </Col>
 
@@ -86,9 +90,16 @@ function HistoryBookingList() {
                                 onChange={(e) => setStatus(e.target.value)}
                             >
                                 <option value="">Trạng thái</option>
-                                <option value="Pending">Đang chờ</option>
-                                <option value="Confirmed">Đã xác nhận</option>
-                                <option value="Completed">Hoàn thành</option>
+                                {lookupTables.bookingStatuses.map(
+                                    (option) => (
+                                        <option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.label}
+                                        </option>
+                                    ),
+                                )}
                             </Form.Control>
                         </Col>
 

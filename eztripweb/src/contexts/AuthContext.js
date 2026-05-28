@@ -6,7 +6,7 @@ import {
 	getStoredToken,
 	getStoredUser,
 	setStoredAuth,
-} from "@utils/localStorageHelper";
+} from "@utils/authCookieHelper";
 
 const AuthContext = createContext(null);
 
@@ -112,7 +112,7 @@ export function AuthContextProvider({ children }) {
 			login,
 			logout,
 		}),
-		[token, currentUser, loading],
+		[token, currentUser, loading, login, logout],
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

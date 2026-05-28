@@ -3,7 +3,8 @@ import { Alert, Button, Card, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
-import Apis, { endpoints } from "../../configs/Apis";
+import Apis, { endpoints } from "@configs/Apis";
+import { useLookupTables } from "@contexts/LookupTablesContext";
 
 const customerFields = [
 	{
@@ -38,19 +39,14 @@ const customerFields = [
 	},
 ];
 
-const genderOptions = [
-	{ value: "", label: "Chọn giới tính" },
-	{ value: "MALE", label: "Nam" },
-	{ value: "FEMALE", label: "Nữ" },
-	{ value: "OTHER", label: "Khác" },
-];
-
 const RegisterCustomer = () => {
 	const [user, setUser] = useState({ role: "CUSTOMER" });
 	const [err, setErr] = useState("");
 	const [loading, setLoading] = useState(false);
 	const avatar = useRef();
 	const nav = useNavigate();
+	const { lookupTables } = useLookupTables();
+	const genderOptions = [{ value: "", label: "Chọn giới tính" }, ...lookupTables.genders];
 
 	const validate = () => {
 		for (const field of customerFields) {

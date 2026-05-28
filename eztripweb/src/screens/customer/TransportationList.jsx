@@ -3,6 +3,7 @@ import { Container, Stack, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TransportationItem from "@components/customer/CardTransportationItem";
 import ModalConfirmTransportationBooking from "@components/customer/ModalConfirmTransportationBooking";
+import { useLookupTables } from "../../contexts/LookupTablesContext";
 
 const transportationOptions = [
     {
@@ -25,6 +26,7 @@ function TransportationList() {
     const [departureTime, setDepartureTime] = useState("");
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedTransportation, setSelectedTransportation] = useState(null);
+    const { lookupTables } = useLookupTables();
 
     function handleSelectTransportation(option) {
         setSelectedTransportation(option);
@@ -58,12 +60,14 @@ function TransportationList() {
                         </Col>
 
                         <Col md={2}>
-                            <Form.Control as ="select" value={typerOfTransportation} onChange={(e) => setTypeOfTransportation(e.target.value)}>
+                            <Form.Select value={typerOfTransportation} onChange={(e) => setTypeOfTransportation(e.target.value)}>
                                 <option value="">Loại phương tiện</option>
-                                <option value="Xe khách">Xe khách</option>
-                                <option value="Máy bay">Máy bay</option>
-                                <option value="Tàu hỏa">Tàu hỏa</option>
-                            </Form.Control>
+                                {lookupTables.typeOfTransportations.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </Form.Select>
                         </Col>
 
                         <Col md={2}>
