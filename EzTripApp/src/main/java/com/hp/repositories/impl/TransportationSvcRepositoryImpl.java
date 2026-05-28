@@ -115,6 +115,11 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
         if (params != null) {
 
+            String name = params.get("name");
+            if (name != null && !name.isEmpty()) {
+                predicates.add(b.like(root.get("name"), String.format("%%%s%%", name)));
+            }
+
             String arrivalLocation = params.get("arrivalLocation");
             if (arrivalLocation != null && !arrivalLocation.isEmpty()) {
                 predicates.add(b.like(transportation.get("arrivalLocation"), String.format("%%%s%%", arrivalLocation)));
@@ -169,9 +174,28 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
                 }
             }
 
-            String hot = params.get("hot");
-            if (hot != null && !hot.isEmpty() && Boolean.parseBoolean(hot)) {
-                q.orderBy(b.desc(b.countDistinct(booking.get("id"))));
+            String sortBy = params.get("sortBy");
+            String order = params.get("order");
+            if (sortBy != null && !sortBy.isEmpty()) {
+                if (sortBy.equals("price")) {
+                    if (order == null || order.isEmpty()) {
+                        order = "asc";
+                    }
+                    if (order.equals("asc")) {
+                        q.orderBy(b.asc(root.get("price")));
+                    } else {
+                        q.orderBy(b.desc(root.get("price")));
+                    }
+                } else if (sortBy.equals("hot")) {
+                    if (order == null || order.isEmpty()) {
+                        order = "desc";
+                    }
+                    if (order.equals("asc")) {
+                        q.orderBy(b.asc(b.countDistinct(booking.get("id"))));
+                    } else {
+                        q.orderBy(b.desc(b.countDistinct(booking.get("id"))));
+                    }
+                }
             }
 
         }
