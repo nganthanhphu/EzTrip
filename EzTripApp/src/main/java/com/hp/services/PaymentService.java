@@ -12,5 +12,5 @@ import java.util.Map;
  */
 public interface PaymentService {
     String createPaymentLink(int bookingId, String redirectUrl);
-    void handlePaymentResult(int bookingId, Map<String, String> ipnRequest);
+    void handlePaymentResult(Map<String, String> ipnRequest, String paymentMethod);
 }

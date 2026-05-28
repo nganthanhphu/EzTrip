@@ -15,5 +15,5 @@ import com.hp.pojo.Booking;
 public interface PaymentHandler {
     String createPaymentLink(Booking booking, String redirectUrl);
     
-    void handlePaymentResult(Booking booking, Map<String, String> ipnRequest);
+    void handlePaymentResult(Map<String, String> ipnRequest);
 }

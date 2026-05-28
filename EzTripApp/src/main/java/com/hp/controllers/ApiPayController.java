@@ -36,9 +36,9 @@ public class ApiPayController {
         return new ResponseEntity<>(paymentUrl, HttpStatus.OK);
     }
 
-    @PostMapping("/bookings/{id}/pay/ipn")
+    @PostMapping("/momo/ipn")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void handlePaymentIpn(@PathVariable(value = "id") int bookingId, @RequestBody Map<String, String> ipnRequest) {
-        this.paymentService.handlePaymentResult(bookingId, ipnRequest);
+    public void handleMomoPaymentIpn(@RequestBody Map<String, String> ipnRequest) {
+        this.paymentService.handlePaymentResult(ipnRequest, "MOMO");
     }
 }

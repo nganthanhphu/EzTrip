@@ -13,12 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.hp.dto.payment.MomoCreateResponseDTO;
 import com.hp.pojo.Booking;
 import com.hp.pojo.BookingStatus;
+import com.hp.repositories.BookingRepository;
 
 /**
  *
@@ -26,10 +28,14 @@ import com.hp.pojo.BookingStatus;
  */
 @Component("MOMO")
 @PropertySource("classpath:momo.properties")
+@Transactional
 public class MomoPaymentHandler implements PaymentHandler {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    private BookingRepository bookingRepository;
 
     @Override
     public String createPaymentLink(Booking booking, String redirectUrl) {
@@ -41,7 +47,7 @@ public class MomoPaymentHandler implements PaymentHandler {
         String orderId = String.valueOf(booking.getId());
         String orderInfo = "Thanh toán cho dịch vụ: " + booking.getServiceId().getName();
         String ipnUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/bookings/" + booking.getId() + "/pay/ipn").toUriString();
+                .path("/api/momo/ipn").toUriString();
         String requestType = "captureWallet";
         String extraData = "";
         String lang = "vi";
@@ -78,8 +84,14 @@ public class MomoPaymentHandler implements PaymentHandler {
     }
 
     @Override
-    public void handlePaymentResult(Booking booking, Map<String, String> ipnRequest) {
+    public void handlePaymentResult(Map<String, String> ipnRequest) {
         if (ipnRequest.get("resultCode").equals("0")) {
+
+            int bookingId = Integer.parseInt(ipnRequest.get("orderId"));
+            Booking booking = this.bookingRepository.getBookingById(bookingId);
+
+            if (booking == null || !booking.getStatusId().getName().equals("PENDING"))
+                return;
 
             String secretKey = this.env.getProperty("MOMO_SECRET_KEY");
             String accessKey = this.env.getProperty("MOMO_ACCESS_KEY");
@@ -96,7 +108,8 @@ public class MomoPaymentHandler implements PaymentHandler {
             int resultCode = Integer.parseInt(ipnRequest.get("resultCode"));
             Long transId = Long.parseLong(ipnRequest.get("transId"));
 
-            String rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData + "&message=" + message + "&orderId=" + orderId
+            String rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData
+                    + "&message=" + message + "&orderId=" + orderId
                     + "&orderInfo=" + orderInfo + "&orderType=" + orderType + "&partnerCode=" + partnerCode
                     + "&payType=" + payType + "&requestId=" + requestId + "&responseTime=" + responseTime
                     + "&resultCode=" + resultCode + "&transId=" + transId;

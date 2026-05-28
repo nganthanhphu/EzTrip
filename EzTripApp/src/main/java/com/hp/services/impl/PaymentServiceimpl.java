@@ -33,28 +33,6 @@ public class PaymentServiceimpl implements PaymentService {
     @Override
     public String createPaymentLink(int bookingId, String redirectUrl) {
         Booking booking = this.bookingRepository.getBookingById(bookingId);
-        PaymentHandler handler = this.getPaymentHandler(booking);
-
-        return handler.createPaymentLink(booking, redirectUrl);
-    }
-
-
-    @Override
-    public void handlePaymentResult(int bookingId, Map<String, String> ipnRequest) {
-        Booking booking = this.bookingRepository.getBookingById(bookingId);
-        if (booking == null) {
-            throw new IllegalArgumentException("Booking không tồn tại!");
-        }
-
-        PaymentHandler handler = this.paymentHandlers.get(booking.getPaymentMethodId().getName());
-
-        handler.handlePaymentResult(booking, ipnRequest);
-
-        this.bookingRepository.addOrUpdateBooking(booking);
-
-    }
-
-    private PaymentHandler getPaymentHandler(Booking booking) {
 
         if (booking == null) {
             throw new IllegalArgumentException("Booking không tồn tại!");
@@ -67,8 +45,14 @@ public class PaymentServiceimpl implements PaymentService {
         if (handler == null)
             throw new IllegalStateException("Phương thức thanh toán không được hỗ trợ!");
 
-        return handler;
+        return handler.createPaymentLink(booking, redirectUrl);
+    }
 
+    @Override
+    public void handlePaymentResult(Map<String, String> ipnRequest, String paymentMethod) {
+        PaymentHandler handler = this.paymentHandlers.get(paymentMethod);
+
+        handler.handlePaymentResult(ipnRequest);
     }
 
 }
