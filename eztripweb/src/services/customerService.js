@@ -10,15 +10,6 @@ const requestById = async (endpoint, id) => {
 	return response.data;
 };
 
-const requestMultipartCreate = async (endpoint, data) => {
-	const response = await axiosClient.post(endpoint, data, {
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
-	});
-	return response.data;
-};
-
 const requestJsonCreate = async (endpoint, data) => {
 	const response = await axiosClient.post(endpoint, data);
 	return response.data;
@@ -34,10 +25,6 @@ export async function getAccommodationById(id) {
 	return requestById("/api/accommodations", id);
 }
 
-export async function createAccommodation(accommodationFormData) {
-	return requestMultipartCreate("/api/secure/accommodations", accommodationFormData);
-}
-
 //2. Nghiệp vụ tour du lịch
 export async function getTourisms(params = {}) {
 	return requestList("/api/tourisms", params);
@@ -47,21 +34,9 @@ export async function getTourismById(id) {
 	return requestById("/api/tourisms", id);
 }
 
-export async function createTourism(tourismFormData) {
-	return requestMultipartCreate("/api/secure/tourisms", tourismFormData);
-}
-
 //3. Nghiệp vụ phương tiện vận chuyển
 export async function getTransportations(params = {}) {
 	return requestList("/api/transportations", params);
-}
-
-export async function getTransportationById(id) {
-	return requestById("/api/transportations", id);
-}
-
-export async function createTransportation(transportationFormData) {
-	return requestMultipartCreate("/api/secure/transportations", transportationFormData);
 }
 
 //4. Nghiệp vụ đặt chỗ
@@ -73,16 +48,18 @@ export async function createBooking(booking) {
 	return requestJsonCreate("/api/secure/bookings", booking);
 }
 
+//5. Nghiệp vụ đánh giá
+export async function createReview(bookingId, review) {
+	return requestJsonCreate(`/api/secure/bookings/${bookingId}/reviews`, review);
+}
+
 export default {
 	getAccommodations,
 	getAccommodationById,
-	createAccommodation,
 	getTourisms,
 	getTourismById,
-	createTourism,
 	getTransportations,
-	getTransportationById,
-	createTransportation,
 	getBookings,
 	createBooking,
+	createReview,
 };

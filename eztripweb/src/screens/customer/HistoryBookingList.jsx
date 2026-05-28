@@ -110,6 +110,7 @@ function HistoryBookingList() {
                         {bookings.map((item) => (
                             <HistoryBookingItem
                                 key={item.id}
+                                bookingId={item.id}
                                 serviceName={item.serviceName}
                                 serviceType={item.serviceType}
                                 serviceImage={item.serviceImage}

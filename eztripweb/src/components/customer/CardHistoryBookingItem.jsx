@@ -1,6 +1,8 @@
+import { useMemo, useState } from "react";
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
 import defaultImage from "../../assets/images/default_accommodation_item.jpg";
 import { formatCurrency } from "@utils/formatters";
+import ModalReview from "@components/customer/ModalReview";
 
 const SERVICE_TYPE_LABELS = {
 	1: "Tour",
@@ -22,6 +24,8 @@ const PAYMENT_METHOD_LABELS = {
 };
 
 function CardHistoryBookingItem(props) {
+	const [showReviewModal, setShowReviewModal] = useState(false);
+	const bookingId = props.bookingId ?? props.id ?? null;
 	const serviceName = props.serviceName ?? props.name_of_service ?? "Tên dịch vụ";
 	const serviceType = props.serviceType ?? props.type_of_service ?? "";
 	const serviceImage = props.serviceImage ?? props.service_image ?? defaultImage;
@@ -35,6 +39,7 @@ function CardHistoryBookingItem(props) {
 	const status = String(props.status ?? "PENDING").toUpperCase();
 	const onChat = props.onChat;
 	const onPrimaryAction = props.onPrimaryAction;
+	const review = useMemo(() => props.review ?? null, [props.review]);
 
 	const isPending = status === "PENDING";
 	const isConfirmed = status === "CONFIRMED";
@@ -54,7 +59,9 @@ function CardHistoryBookingItem(props) {
 			: isConfirmed
 			? "Chi tiết"
 			: isCompleted
-			? "Đánh giá"
+			? review
+				? "Xem đánh giá"
+				: "Đánh giá"
 			: "Xem";
 	const primaryVariant = isPending ? "danger" : isCompleted ? "success" : "primary";
 	const serviceTypeLabel = SERVICE_TYPE_LABELS[serviceType] || serviceType || "Loại dịch vụ";
@@ -133,7 +140,14 @@ function CardHistoryBookingItem(props) {
 
 							<Button
 								variant={primaryVariant}
-								onClick={onPrimaryAction}
+								onClick={() => {
+									if (isCompleted) {
+										setShowReviewModal(true);
+										return;
+									}
+
+									onPrimaryAction?.();
+								}}
 								className="w-100 rounded-0"
 							>
 								{primaryLabel}
@@ -142,8 +156,16 @@ function CardHistoryBookingItem(props) {
 					</Col>
 				</Row>
 			</Card.Body>
+			<ModalReview
+				show={showReviewModal}
+				onHide={() => setShowReviewModal(false)}
+				bookingId={bookingId}
+				serviceName={serviceName}
+				review={review}
+				onSaved={props.onReviewSaved}
+			/>
 		</Card>
-    );
+	);
 }
 
 export default CardHistoryBookingItem;

@@ -28,4 +28,24 @@ export function formatHour(value) {
     return `${String(parsedValue).padStart(2, "0")}:00`;
 }
 
+export function formatDateTime(value) {
+	if (!value) {
+		return "";
+	}
+
+	if (typeof value === "string") {
+		return value;
+	}
+
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) {
+		return String(value);
+	}
+
+	return new Intl.DateTimeFormat("vi-VN", {
+		dateStyle: "short",
+		timeStyle: "short",
+	}).format(date);
+}
+
 export default formatCurrency;
