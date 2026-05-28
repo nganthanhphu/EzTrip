@@ -61,7 +61,7 @@ public class PaymentServiceimpl implements PaymentService {
         }
 
         if (!booking.getStatusId().getName().equals("PENDING"))
-            throw new IllegalStateException("Booking này đã hoàn thành hoặc hủy!");
+            throw new IllegalStateException("Booking này đã thanh toán, hoàn thành hoặc bị hủy!");
 
         PaymentHandler handler = this.paymentHandlers.get(booking.getPaymentMethodId().getName());
         if (handler == null)
