@@ -15,3 +15,13 @@ export async function fetchCurrentUser() {
 
 	return response.data;
 }
+
+export async function updateCurrentUserProfile(formData) {
+	const response = await axiosClient.patch(endpoints.profile, formData, {
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+	});
+
+	return response.data;
+}

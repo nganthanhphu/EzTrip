@@ -96,6 +96,20 @@ export function AuthContextProvider({ children }) {
 		}
 	}, []);
 
+	const syncCurrentUser = useCallback((user) => {
+		const normalizedUser = normalizeUser(user);
+
+		if (!normalizedUser) {
+			return;
+		}
+
+		if (token) {
+			setStoredAuth(token, normalizedUser);
+		}
+
+		dispatch({ type: "LOGIN", payload: normalizedUser });
+	}, [token]);
+
 	const logout = useCallback(() => {
 		clearStoredAuth();
 		setToken(null);
@@ -111,8 +125,9 @@ export function AuthContextProvider({ children }) {
 			isAuthenticated: Boolean(token && currentUser),
 			login,
 			logout,
+			syncCurrentUser,
 		}),
-		[token, currentUser, loading, login, logout],
+		[token, currentUser, loading, login, logout, syncCurrentUser],
 	);
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

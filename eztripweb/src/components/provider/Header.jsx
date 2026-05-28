@@ -1,9 +1,12 @@
-import { Container, Navbar, Nav } from "react-bootstrap";
+import { useState } from "react";
+import { Button, Container, Navbar, Nav } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useAuth } from "@hooks/useAuth";
+import ModalProfile from "@components/common/ModalProfile";
 
 function Header() {
     const { currentUser } = useAuth();
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
     return (
         <Navbar expand="lg" className="bg-body-tertiary">
@@ -21,13 +24,14 @@ function Header() {
             <Container className="d-flex justify-content-end">
                 <Nav>
                     {currentUser && (
-                        <Link className="nav-link" to="/provider/profile">
+                        <Button variant="link" className="nav-link p-0 text-decoration-none" onClick={() => setShowProfileModal(true)}>
                             {currentUser.name || currentUser.fullname || "Hồ sơ"}
-                        </Link>
+                        </Button>
                     )}
                     <Link className="nav-link" to="/provider/logout">Đăng xuất</Link>
                 </Nav>
             </Container>
+            <ModalProfile show={showProfileModal} onHide={() => setShowProfileModal(false)} />
         </Navbar>
     );
 }
