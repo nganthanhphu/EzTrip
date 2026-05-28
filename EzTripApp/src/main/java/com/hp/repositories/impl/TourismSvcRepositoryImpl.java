@@ -144,6 +144,15 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
             if (hot != null && !hot.isEmpty() && Boolean.parseBoolean(hot)) {
                 q.orderBy(b.desc(b.countDistinct(booking.get("id"))));
             }
+
+            String tourDuration = params.get("tourDuration");
+            if (tourDuration != null && !tourDuration.isEmpty()) {
+                try {
+                    predicates.add(b.equal(tourism.get("tourDuration"), Integer.parseInt(tourDuration)));
+                } catch (NumberFormatException e) {
+
+                }
+            }
         }
 
         q.where(predicates.toArray(Predicate[]::new));
