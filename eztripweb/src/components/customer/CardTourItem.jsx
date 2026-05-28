@@ -47,10 +47,10 @@ function CardTourItem(props) {
                             <div className="text-muted">📍 {location}</div>
 
                             <div className="d-flex flex-column gap-2 pt-2 border-top border-dark-subtle">
-                                <div className="small text-muted">🧭 {tourDuration} ngày</div>
-                                <div className="small text-muted">📝 {reviewCount} nhận xét</div>
-                                <div className="small text-muted">📅 {bookingCount} lượt đặt</div>
-                                <div className="small text-muted">⏳ {remainingQuantity}/{quantity} chỗ còn lại</div>
+                                <div className="small text-muted">🧭 <b>Thời lượng tour:</b> {tourDuration} ngày</div>
+                                <div className="small text-muted">📝 <b>Tổng số đánh giá:</b> {reviewCount}</div>
+                                <div className="small text-muted">📅 <b>Số lượt đặt:</b> {bookingCount}</div>
+                                <div className="small text-muted">⏳ <b>Chỗ còn lại:</b> {remainingQuantity}/{quantity} chỗ</div>
                             </div>
                         </div>
                     </Col>

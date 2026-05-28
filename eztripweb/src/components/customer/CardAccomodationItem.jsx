@@ -53,24 +53,23 @@ function CardAccommodationItem(props) {
                                 </Badge>
                             </div>
 
-                            <div className="text-muted">📍 {location}</div>
+                            <div className="text-muted">📍{location}</div>
 
                             <div className="d-flex flex-column gap-2 pt-2 border-top border-dark-subtle">
                                 <div className="small text-muted">
-                                    🛏️ {quantityOfBed} giường
+                                    🛏️ <b>Số giường:</b> {quantityOfBed}
                                 </div>
                                 <div className="small text-muted">
-                                    📐 {area} m²
+                                    📐 <b>Diện tích:</b> {area} m²
                                 </div>
                                 <div className="small text-muted">
-                                    📝 {reviewCount} nhận xét
+                                    📝 <b>Tổng số đánh giá:</b> {reviewCount}
                                 </div>
                                 <div className="small text-muted">
-                                    📅 {bookingCount} lượt đặt
+                                    📅 <b>Số lượt đặt:</b> {bookingCount}
                                 </div>
                                 <div className="small text-muted">
-                                    ⏳ {remainingQuantity}/{quantity} phòng còn
-                                    trống
+                                    ⏳ <b>Phòng trống:</b> {remainingQuantity} / {quantity} phòng
                                 </div>
                             </div>
                         </div>

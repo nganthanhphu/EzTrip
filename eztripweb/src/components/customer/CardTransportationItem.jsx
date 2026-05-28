@@ -75,18 +75,18 @@ function CardTransportationItem(props) {
                             </div>
 
                             <div className="text-muted">
-                                Loại phương tiện: {typeOfTransportation}
+                                <b>Loại phương tiện:</b> {typeOfTransportation}
                             </div>
 
                             <div className="d-flex flex-column gap-2 pt-2 border-top border-dark-subtle">
                                 <div className="small text-muted">
-                                    📝 {reviewCount} nhận xét
+                                    📝 <b>Tổng số đánh giá:</b> {reviewCount}
                                 </div>
                                 <div className="small text-muted">
-                                    📅 {bookingCount} lượt đặt
+                                    📅 <b>Số lượt đặt:</b> {bookingCount}
                                 </div>
                                 <div className="small text-muted">
-                                    ⏳ {remainingQuantity}/{quantity} chỗ còn trống
+                                    ⏳ <b>Chỗ còn trống:</b> {remainingQuantity} / {quantity} chỗ
                                 </div>
                             </div>
                         </div>
