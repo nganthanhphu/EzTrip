@@ -47,7 +47,9 @@ public class BookingRepositoryImpl implements BookingRepository {
         Query<Booking> query = s.createQuery("""
                 SELECT b
                 FROM Booking b
-                LEFT JOIN FETCH b.serviceId
+                LEFT JOIN FETCH b.serviceId s
+                LEFT JOIN FETCH s.typeOfServiceId
+                LEFT JOIN FETCH s.imageSet
                 LEFT JOIN FETCH b.statusId
                 LEFT JOIN FETCH b.paymentMethodId
                 LEFT JOIN FETCH b.review
@@ -76,12 +78,12 @@ public class BookingRepositoryImpl implements BookingRepository {
         CriteriaQuery<Booking> q = b.createQuery(Booking.class);
         Root<Booking> root = q.from(Booking.class);
 
-        root.fetch("serviceId", JoinType.LEFT);
+        root.fetch("serviceId", JoinType.LEFT).fetch("typeOfServiceId", JoinType.LEFT);
+        root.fetch("serviceId", JoinType.LEFT).fetch("imageSet", JoinType.LEFT);
         root.fetch("statusId", JoinType.LEFT);
         root.fetch("paymentMethodId", JoinType.LEFT);
         root.fetch("review", JoinType.LEFT);
         root.fetch("customerId", JoinType.LEFT).fetch("userId", JoinType.LEFT);
-
         q.select(root);
 
         List<Predicate> predicates = new ArrayList<>();

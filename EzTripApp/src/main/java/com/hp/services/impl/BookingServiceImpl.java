@@ -132,6 +132,8 @@ public class BookingServiceImpl implements BookingService {
         return new BookingViewDTO(
                 booking.getId(),
                 booking.getServiceId().getName(),
+                booking.getServiceId().getTypeOfServiceId().getId(),
+                booking.getServiceId().getImageSet().stream().findFirst().orElse(null).getUrl(),
                 booking.getCreatedDate(),
                 booking.getBookingDay(),
                 booking.getQuantity(),
