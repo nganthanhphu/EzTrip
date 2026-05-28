@@ -17,7 +17,6 @@ import com.hp.dto.booking.BookingViewDTO;
  */
 public interface BookingService {
     void addBooking(BookingCreateDTO bk);
-    BookingViewDTO getBookingById(int id);
     List<BookingViewDTO> getBookings(Map<String, String> params);
     void updateBooking(int bookingId, BookingUpdateDTO bk);
 }

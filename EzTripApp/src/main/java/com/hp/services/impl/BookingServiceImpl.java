@@ -91,12 +91,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingViewDTO getBookingById(int id) {
-        Booking booking = this.bookingRepository.getBookingById(id);
-        return this.toBookingViewDTO(booking);
-    }
-
-    @Override
     public List<BookingViewDTO> getBookings(Map<String, String> params) {
         BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
 
@@ -132,6 +126,8 @@ public class BookingServiceImpl implements BookingService {
         return new BookingViewDTO(
                 booking.getId(),
                 booking.getServiceId().getName(),
+                booking.getServiceId().getTypeOfServiceId().getId(),
+                booking.getServiceId().getImageSet().stream().findFirst().orElse(null).getUrl(),
                 booking.getCreatedDate(),
                 booking.getBookingDay(),
                 booking.getQuantity(),
@@ -158,7 +154,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         String newStatusString = bk.status();
-        if (statusName.equals("PENDING")){
+        if (statusName.equals("PENDING")) {
             if (!newStatusString.equals("CONFIRMED") && !newStatusString.equals("CANCELLED")) {
                 throw new IllegalArgumentException("Trạng thái mới không hợp lệ!");
             }

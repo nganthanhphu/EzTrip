@@ -48,16 +48,6 @@ public class ApiBookingController {
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 
-    @GetMapping("/secure/bookings/{id}")
-    public ResponseEntity<BookingViewDTO> getBookingById(@PathVariable(value = "id") int id) {
-        BookingViewDTO booking = this.bookingService.getBookingById(id);
-        if (booking != null) {
-            return new ResponseEntity<>(booking, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     @PatchMapping("/secure/bookings/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateBooking(@PathVariable(value = "id") int id, @RequestBody BookingUpdateDTO booking) {

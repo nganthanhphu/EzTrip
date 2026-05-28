@@ -70,7 +70,7 @@ public class ReviewServiceImpl implements ReviewService {
         this.reviewRepository.addReview(newReview);
     }
 
-    public ReviewViewDTO toReviewViewDTO(Review review) {
+    private ReviewViewDTO toReviewViewDTO(Review review) {
         return new ReviewViewDTO(
                 review.getId(),
                 review.getRating(),

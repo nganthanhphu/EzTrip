@@ -76,12 +76,12 @@ public class BookingRepositoryImpl implements BookingRepository {
         CriteriaQuery<Booking> q = b.createQuery(Booking.class);
         Root<Booking> root = q.from(Booking.class);
 
-        root.fetch("serviceId", JoinType.LEFT);
+        root.fetch("serviceId", JoinType.LEFT).fetch("typeOfServiceId", JoinType.LEFT);
+        root.fetch("serviceId", JoinType.LEFT).fetch("imageSet", JoinType.LEFT);
         root.fetch("statusId", JoinType.LEFT);
         root.fetch("paymentMethodId", JoinType.LEFT);
         root.fetch("review", JoinType.LEFT);
         root.fetch("customerId", JoinType.LEFT).fetch("userId", JoinType.LEFT);
-
         q.select(root);
 
         List<Predicate> predicates = new ArrayList<>();
