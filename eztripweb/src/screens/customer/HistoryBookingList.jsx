@@ -20,6 +20,7 @@ const handlePrimary = (item) => {
 function HistoryBookingList() {
     const [serviceType, setServiceType] = useState("");
     const [status, setStatus] = useState("");
+    const [serviceId, setServiceId] = useState("");
     const { lookupTables } = useLookupTables();
     const typeOfServiceOptions = lookupTables.typeOfServices || [];
     const pageSize = 5;
@@ -31,11 +32,15 @@ function HistoryBookingList() {
             };
 
             if (serviceType) {
-                params.serviceType = Number(serviceType);
+                params.typeOfService = Number(serviceType);
             }
 
             if (status) {
                 params.status = status;
+            }
+
+            if (serviceId) {
+                params.serviceId = Number(serviceId);
             }
 
             return getBookings(params);
@@ -86,6 +91,16 @@ function HistoryBookingList() {
                                     </option>
                                 ))}
                             </Form.Select>
+                        </Col>
+
+                        <Col md={2}>
+                            <Form.Control
+                                type="number"
+                                min="1"
+                                placeholder="Mã dịch vụ"
+                                value={serviceId}
+                                onChange={(e) => setServiceId(e.target.value)}
+                            />
                         </Col>
 
                         <Col md={2} className="d-grid">

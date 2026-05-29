@@ -48,9 +48,9 @@ const EMPTY_LOOKUP_TABLES = {
 
 const LOOKUP_TABLES_QUERY_KEY = ["lookupTables"];
 
-function toOptionList(items, labelMap) {
+function toOptionList(items, labelMap, valueSelector = (item) => item?.name || "") {
 	return (items || []).map((item) => ({
-		value: item?.name || "",
+		value: valueSelector(item),
 		label: labelMap[item?.name] || item?.name || "",
 	}));
 }
@@ -60,7 +60,11 @@ function buildLookupOptions(rawTables) {
 		genders: toOptionList(rawTables.genders, DEFAULT_LABELS.genders),
 		roles: toOptionList(rawTables.roles, DEFAULT_LABELS.roles),
 		typeOfProviders: toOptionList(rawTables.typeOfProviders, DEFAULT_LABELS.typeOfProviders),
-		typeOfServices: toOptionList(rawTables.typeOfServices, DEFAULT_LABELS.typeOfServices),
+		typeOfServices: toOptionList(
+			rawTables.typeOfServices,
+			DEFAULT_LABELS.typeOfServices,
+			(item) => item?.id || "",
+		),
 		typeOfTransportations: toOptionList(
 			rawTables.typeOfTransportations,
 			DEFAULT_LABELS.typeOfTransportations,
