@@ -11,12 +11,13 @@ function Header() {
     return (
         <Navbar expand="lg" className="bg-body-tertiary">
             <Container>
-                <Link className="navbar-brand" to="/">EzTrip</Link>
+                <Link className="navbar-brand" to="/provider">EzTrip</Link>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                         <Link className="nav-link" to="/provider/dashboard">Dashboard</Link>
                         <Link className="nav-link" to="/provider/services">Quản lý Dịch vụ</Link>
+                        <Link className="nav-link" to="/provider/chats">Tin nhắn</Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>
