@@ -1,19 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { createBooking } from "@services/customerService";
+import { formatCurrency, formatBookingDate } from "@utils/formatters";
 
 const PAYMENT_METHODS = [
-	{ value: "CASH", label: "Tiền mặt" },
-	{ value: "MOMO", label: "MOMO" },
-	{ value: "BANK_TRANSFER", label: "Chuyển khoản" },
+	{ id: 1, label: "Tiền mặt" },
+	{ id: 2, label: "MOMO" },
+	{ id: 3, label: "Chuyển khoản" },
 ];
-
-function formatCurrency(value) {
-	return new Intl.NumberFormat("vi-VN", {
-		style: "currency",
-		currency: "VND",
-		maximumFractionDigits: 0,
-	}).format(value);
-}
 
 function getDateInputValue(offsetDays = 0) {
 	const date = new Date();
@@ -25,7 +19,10 @@ function ModalConfirmTourBooking({ show, onHide, tour }) {
 	const [tourDate, setTourDate] = useState(getDateInputValue(1));
 	const [quantity, setQuantity] = useState(1);
 	const [note, setNote] = useState("");
-	const [paymentMethod, setPaymentMethod] = useState("BANK_TRANSFER");
+	const [paymentMethodId, setPaymentMethodId] = useState(3);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [submitError, setSubmitError] = useState("");
+	const [submitSuccess, setSubmitSuccess] = useState("");
 
 	useEffect(() => {
 		if (!show) {
@@ -35,17 +32,51 @@ function ModalConfirmTourBooking({ show, onHide, tour }) {
 		setTourDate(getDateInputValue(1));
 		setQuantity(1);
 		setNote("");
-		setPaymentMethod("BANK_TRANSFER");
+		setPaymentMethodId(3);
+		setSubmitError("");
+		setSubmitSuccess("");
 	}, [show]);
 
 	const totalAmount = useMemo(
 		() => (tour?.pricePerTicket ?? 0) * quantity,
 		[tour?.pricePerTicket, quantity],
 	);
+	const bookingDay = formatBookingDate(tourDate);
 
-	function handleSubmit(event) {
+	async function handleSubmit(event) {
 		event.preventDefault();
-		onHide?.();
+
+		const serviceId = tour?.id ?? tour?.baseInfo?.id;
+
+		if (!serviceId) {
+			setSubmitError("Không tìm thấy dịch vụ để đặt tour.");
+			return;
+		}
+
+		if (!tourDate) {
+			setSubmitError("Vui lòng chọn ngày đi tour.");
+			return;
+		}
+
+		setIsSubmitting(true);
+		setSubmitError("");
+		setSubmitSuccess("");
+
+		try {
+			await createBooking({
+				serviceId,
+				paymentMethodId,
+				bookingDay,
+				quantity,
+				note: note.trim(),
+			});
+			setSubmitSuccess("Đặt tour thành công. Vui lòng kiểm tra thông tin trong lịch sử đặt chỗ.");
+			setTimeout(() => onHide?.(), 5000);
+		} catch (error) {
+			setSubmitError(error?.response?.data?.message || "Không thể tạo booking, vui lòng thử lại.");
+		} finally {
+			setIsSubmitting(false);
+		}
 	}
 
 	return (
@@ -59,6 +90,9 @@ function ModalConfirmTourBooking({ show, onHide, tour }) {
 						<h5 className="fw-semibold mb-1">{tour?.name}</h5>
 						<div className="text-body-secondary">{tour?.location}</div>
 					</div>
+
+					{submitSuccess ? <div className="alert alert-success py-2">{submitSuccess}</div> : null}
+					{submitError ? <div className="alert alert-danger py-2">{submitError}</div> : null}
 
 					<Row className="g-3">
 						<Col xs={12} md={6}>
@@ -105,11 +139,11 @@ function ModalConfirmTourBooking({ show, onHide, tour }) {
 						<Col xs={12} md={6}>
 							<Form.Label>Phương thức thanh toán</Form.Label>
 							<Form.Select
-								value={paymentMethod}
-								onChange={(event) => setPaymentMethod(event.target.value)}
+								value={paymentMethodId}
+								onChange={(event) => setPaymentMethodId(Number(event.target.value))}
 							>
 								{PAYMENT_METHODS.map((method) => (
-									<option key={method.value} value={method.value}>
+									<option key={method.id} value={method.id}>
 										{method.label}
 									</option>
 								))}
@@ -130,16 +164,20 @@ function ModalConfirmTourBooking({ show, onHide, tour }) {
 										{formatCurrency(totalAmount)}
 									</span>
 								</div>
+								<div className="d-flex justify-content-between gap-3">
+									<span className="text-body-secondary">Ngày đi</span>
+									<span className="fw-semibold text-end">{bookingDay}</span>
+								</div>
 							</div>
 						</Col>
 					</Row>
 				</Modal.Body>
 				<Modal.Footer>
-					<Button variant="outline-secondary" onClick={onHide}>
+					<Button variant="outline-secondary" onClick={onHide} disabled={isSubmitting}>
 						Hủy
 					</Button>
-					<Button type="submit" variant="primary">
-						Xác nhận đặt tour
+					<Button type="submit" variant="primary" disabled={isSubmitting}>
+						{isSubmitting ? "Đang xử lý..." : "Xác nhận đặt tour"}
 					</Button>
 				</Modal.Footer>
 			</Form>

@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import { formatCurrency } from "@utils/formatters";
+import { formatCurrency, formatBookingDate} from "@utils/formatters";
+import { createBooking } from "@services/customerService";
 
 const PAYMENT_METHODS = [
-	{ value: "CASH", label: "Tiền mặt" },
-	{ value: "MOMO", label: "MOMO" },
-	{ value: "BANK_TRANSFER", label: "Chuyển khoản" },
+	{ id: 1, label: "Tiền mặt" },
+	{ id: 2, label: "MOMO" },
+	{ id: 3, label: "Chuyển khoản" },
 ];
 
 function getDateInputValue(offsetDays = 0) {
@@ -18,7 +19,10 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 	const [departureDate, setDepartureDate] = useState(getDateInputValue(1));
 	const [quantity, setQuantity] = useState(1);
 	const [seatNumbers, setSeatNumbers] = useState("");
-	const [paymentMethod, setPaymentMethod] = useState("BANK_TRANSFER");
+	const [paymentMethodId, setPaymentMethodId] = useState(3);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [submitError, setSubmitError] = useState("");
+	const [submitSuccess, setSubmitSuccess] = useState("");
 
 	useEffect(() => {
 		if (!show) {
@@ -28,7 +32,9 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 		setDepartureDate(getDateInputValue(1));
 		setQuantity(1);
 		setSeatNumbers("");
-		setPaymentMethod("BANK_TRANSFER");
+		setPaymentMethodId(3);
+		setSubmitError("");
+		setSubmitSuccess("");
 	}, [show]);
 
 	const priceValue = useMemo(() => {
@@ -38,10 +44,48 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 	}, [transportation?.pricePerTicket, transportation?.price]);
 
 	const totalAmount = priceValue * quantity;
+	const bookingDay = formatBookingDate(departureDate);
 
-	function handleSubmit(event) {
+	async function handleSubmit(event) {
 		event.preventDefault();
-		onHide?.();
+
+		const serviceId = transportation?.id ?? transportation?.baseInfo?.id;
+		const seatNote = seatNumbers.trim();
+
+		if (!serviceId) {
+			setSubmitError("Không tìm thấy dịch vụ để đặt vé.");
+			return;
+		}
+
+		if (!departureDate) {
+			setSubmitError("Vui lòng chọn ngày khởi hành.");
+			return;
+		}
+
+		if (!seatNote) {
+			setSubmitError("Vui lòng nhập số ghế.");
+			return;
+		}
+
+		setIsSubmitting(true);
+		setSubmitError("");
+		setSubmitSuccess("");
+
+		try {
+			await createBooking({
+				serviceId,
+				paymentMethodId,
+				bookingDay,
+				quantity,
+				note: seatNote,
+			});
+			setSubmitSuccess("Đặt vé thành công. Thông tin ghế của bạn đã được lưu.");
+			setTimeout(() => onHide?.(), 5000);
+		} catch (error) {
+			setSubmitError(error?.response?.data?.message || "Không thể tạo booking, vui lòng thử lại.");
+		} finally {
+			setIsSubmitting(false);
+		}
 	}
 
 	return (
@@ -59,6 +103,9 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 							{transportation?.arrivalLocation || transportation?.arrival_location}
 						</div>
 					</div>
+
+					{submitSuccess ? <div className="alert alert-success py-2">{submitSuccess}</div> : null}
+					{submitError ? <div className="alert alert-danger py-2">{submitError}</div> : null}
 
 					<Row className="g-3">
 						<Col xs={12} md={6}>
@@ -105,11 +152,11 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 						<Col xs={12} md={6}>
 							<Form.Label>Phương thức thanh toán</Form.Label>
 							<Form.Select
-								value={paymentMethod}
-								onChange={(event) => setPaymentMethod(event.target.value)}
+								value={paymentMethodId}
+								onChange={(event) => setPaymentMethodId(Number(event.target.value))}
 							>
 								{PAYMENT_METHODS.map((method) => (
-									<option key={method.value} value={method.value}>
+									<option key={method.id} value={method.id}>
 										{method.label}
 									</option>
 								))}
@@ -130,16 +177,20 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 										{formatCurrency(totalAmount)}
 									</span>
 								</div>
+								<div className="d-flex justify-content-between gap-3">
+									<span className="text-body-secondary">Ngày khởi hành</span>
+									<span className="fw-semibold text-end">{bookingDay}</span>
+								</div>
 							</div>
 						</Col>
 					</Row>
 				</Modal.Body>
 				<Modal.Footer>
-					<Button variant="outline-secondary" onClick={onHide}>
+					<Button variant="outline-secondary" onClick={onHide} disabled={isSubmitting}>
 						Hủy
 					</Button>
-					<Button type="submit" variant="primary">
-						Xác nhận đặt vé
+					<Button type="submit" variant="primary" disabled={isSubmitting}>
+						{isSubmitting ? "Đang xử lý..." : "Xác nhận đặt vé"}
 					</Button>
 				</Modal.Footer>
 			</Form>

@@ -48,4 +48,13 @@ export function formatDateTime(value) {
 	}).format(date);
 }
 
+export function formatBookingDate(dateValue) {
+    if (!dateValue) {
+        return "";
+    }
+
+    const [year, month, day] = dateValue.split("-");
+    return `${day}/${month}/${year}`;
+}
+
 export default formatCurrency;
