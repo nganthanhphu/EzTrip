@@ -59,7 +59,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
     private Environment env;
 
     @Override
-    public List<TourismListViewDTO> getTourismServices(Map<String, String> params) {
+    public List<TourismListViewDTO> getTourismServices(Map<String, String> params, int providerId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<TourismListViewDTO> q = b.createQuery(TourismListViewDTO.class);
@@ -178,6 +178,11 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
 
                 }
             }
+        }
+
+        
+        if (providerId > 0) {
+            predicates.add(b.equal(provider.get("id"), providerId));
         }
 
         q.where(predicates.toArray(Predicate[]::new));

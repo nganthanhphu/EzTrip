@@ -32,6 +32,7 @@ import com.hp.pojo.TypeOfService;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.TourismSvcRepository;
 import com.hp.repositories.UserRepository;
+import com.hp.security.MyUserDetails;
 import com.hp.services.TourismSvcService;
 import com.hp.utils.UserUtils;
 
@@ -57,7 +58,21 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Override
     public List<TourismListViewDTO> getTourismServices(Map<String, String> params) {
-        return this.tourismSvcRepository.getTourismServices(params);
+        int providerId = 0;
+
+        MyUserDetails userDetails = UserUtils.getCurrentUserDetails();
+
+        if (userDetails != null) {
+            if (userDetails.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_PROVIDER")) {
+                BaseUser currentUser = this.userRepository
+                        .getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+                if (currentUser.getProviderProfile() != null) {
+                    providerId = currentUser.getProviderProfile().getId();
+                }
+            }
+        }
+
+        return this.tourismSvcRepository.getTourismServices(params, providerId);
     }
 
     @Override

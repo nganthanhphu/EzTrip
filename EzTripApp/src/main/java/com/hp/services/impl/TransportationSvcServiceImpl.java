@@ -34,6 +34,7 @@ import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.TransportationSvcRepository;
 import com.hp.repositories.TypeOfTransportationRepository;
 import com.hp.repositories.UserRepository;
+import com.hp.security.MyUserDetails;
 import com.hp.services.TransportationSvcService;
 import com.hp.utils.UserUtils;
 
@@ -61,7 +62,21 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
     private TypeOfTransportationRepository typeOfTransportationRepository;
 
     public List<TransportationListViewDTO> getTransportationServices(Map<String, String> params) {
-        return this.transportationSvcRepository.getTransportationServices(params);
+        int providerId = 0;
+
+        MyUserDetails userDetails = UserUtils.getCurrentUserDetails();
+
+        if (userDetails != null) {
+            if (userDetails.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_PROVIDER")) {
+                BaseUser currentUser = this.userRepository
+                        .getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+                if (currentUser.getProviderProfile() != null) {
+                    providerId = currentUser.getProviderProfile().getId();
+                }
+            }
+        }
+        
+        return this.transportationSvcRepository.getTransportationServices(params, providerId);
     }
 
     @Override

@@ -16,7 +16,7 @@ import com.hp.dto.service.TransportationViewDTO;
  */
 public interface TransportationSvcRepository {
 
-    List<TransportationListViewDTO> getTransportationServices(Map<String, String> params);
+    List<TransportationListViewDTO> getTransportationServices(Map<String, String> params, int providerId);
 
     TransportationViewDTO getTransportationById(Integer id);
 

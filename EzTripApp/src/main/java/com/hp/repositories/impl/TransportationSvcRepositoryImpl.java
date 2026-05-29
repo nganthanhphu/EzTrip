@@ -60,7 +60,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
     private Environment env;
 
     @Override
-    public List<TransportationListViewDTO> getTransportationServices(Map<String, String> params) {
+    public List<TransportationListViewDTO> getTransportationServices(Map<String, String> params, int providerId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<TransportationListViewDTO> q = b.createQuery(TransportationListViewDTO.class);
@@ -198,6 +198,11 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
                 }
             }
 
+        }
+
+        
+        if (providerId > 0) {
+            predicates.add(b.equal(provider.get("id"), providerId));
         }
 
         q.where(predicates.toArray(Predicate[]::new));

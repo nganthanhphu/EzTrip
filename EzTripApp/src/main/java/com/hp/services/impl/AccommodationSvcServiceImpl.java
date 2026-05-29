@@ -31,6 +31,7 @@ import com.hp.pojo.TypeOfService;
 import com.hp.repositories.AccommodationSvcRepository;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.UserRepository;
+import com.hp.security.MyUserDetails;
 import com.hp.services.AccommodationSvcService;
 import com.hp.utils.UserUtils;
 
@@ -56,7 +57,21 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Override
     public List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params) {
-        return this.accommodationSvcRepository.getAccommodationServices(params);
+        int providerId = 0;
+
+        MyUserDetails userDetails = UserUtils.getCurrentUserDetails();
+
+        if (userDetails != null) {
+            if (userDetails.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_PROVIDER")) {
+                BaseUser currentUser = this.userRepository
+                        .getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+                if (currentUser.getProviderProfile() != null) {
+                    providerId = currentUser.getProviderProfile().getId();
+                }
+            }
+        }
+
+        return this.accommodationSvcRepository.getAccommodationServices(params, providerId);
     }
 
     @Override

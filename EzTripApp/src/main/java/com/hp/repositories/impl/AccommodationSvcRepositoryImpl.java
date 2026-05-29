@@ -59,7 +59,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
     private Environment env;
 
     @Override
-    public List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params) {
+    public List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params, int providerId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<AccommodationListViewDTO> q = b.createQuery(AccommodationListViewDTO.class);
@@ -172,6 +172,10 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
                 }
             }
 
+        }
+
+        if (providerId > 0) {
+            predicates.add(b.equal(provider.get("id"), providerId));
         }
 
         q.where(predicates.toArray(Predicate[]::new));

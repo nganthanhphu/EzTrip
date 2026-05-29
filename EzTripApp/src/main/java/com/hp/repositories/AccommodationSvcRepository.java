@@ -16,7 +16,7 @@ import com.hp.dto.service.AccommodationViewDTO;
  */
 public interface AccommodationSvcRepository {
 
-    List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params);
+    List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params, int providerId);
 
     AccommodationViewDTO getAccommodationById(Integer id);
 
