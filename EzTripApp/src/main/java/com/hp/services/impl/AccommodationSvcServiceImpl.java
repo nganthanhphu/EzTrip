@@ -23,14 +23,12 @@ import com.hp.dto.service.AccommodationCreateDTO;
 import com.hp.dto.service.AccommodationListViewDTO;
 import com.hp.dto.service.AccommodationViewDTO;
 import com.hp.dto.service.BaseServiceCreateDTO;
-import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceAccommodation;
 import com.hp.pojo.TypeOfService;
 import com.hp.repositories.AccommodationSvcRepository;
 import com.hp.repositories.BaseServiceRepository;
-import com.hp.repositories.UserRepository;
 import com.hp.security.MyUserDetails;
 import com.hp.services.AccommodationSvcService;
 import com.hp.utils.UserUtils;
@@ -50,9 +48,6 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
     private BaseServiceRepository baseServiceRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private Cloudinary cloudinary;
 
     @Override
@@ -63,11 +58,8 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
         if (userDetails != null) {
             if (userDetails.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_PROVIDER")) {
-                BaseUser currentUser = this.userRepository
-                        .getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
-                if (currentUser.getProviderProfile() != null) {
-                    providerId = currentUser.getProviderProfile().getId();
-                }
+                if (userDetails.getProviderId() != null)
+                    providerId = userDetails.getProviderId();
             }
         }
 
@@ -82,7 +74,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
     @Override
     public void addAccommodation(AccommodationCreateDTO accommodation) throws ParseException {
         BaseServiceCreateDTO baseInfo = accommodation.baseInfo();
-        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+        Integer providerId = UserUtils.getCurrentUserDetails().getProviderId();
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(baseInfo.name());
         svc.setDescription(baseInfo.description());
@@ -108,7 +100,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
         }
         svc.setImageSet(images);
 
-        svc.setProviderId(new ProviderProfile(currentUser.getProviderProfile().getId()));
+        svc.setProviderId(new ProviderProfile(providerId));
         svc.setTypeOfServiceId(new TypeOfService(2));
 
         ServiceAccommodation additionalInfo = new ServiceAccommodation();

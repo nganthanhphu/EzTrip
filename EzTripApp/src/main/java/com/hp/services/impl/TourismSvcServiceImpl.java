@@ -24,14 +24,12 @@ import com.hp.dto.service.BaseServiceCreateDTO;
 import com.hp.dto.service.TourismCreateDTO;
 import com.hp.dto.service.TourismListViewDTO;
 import com.hp.dto.service.TourismViewDTO;
-import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceTourism;
 import com.hp.pojo.TypeOfService;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.TourismSvcRepository;
-import com.hp.repositories.UserRepository;
 import com.hp.security.MyUserDetails;
 import com.hp.services.TourismSvcService;
 import com.hp.utils.UserUtils;
@@ -51,9 +49,6 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     private BaseServiceRepository baseServiceRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private Cloudinary cloudinary;
 
     @Override
@@ -64,11 +59,8 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
         if (userDetails != null) {
             if (userDetails.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_PROVIDER")) {
-                BaseUser currentUser = this.userRepository
-                        .getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
-                if (currentUser.getProviderProfile() != null) {
-                    providerId = currentUser.getProviderProfile().getId();
-                }
+                if (userDetails.getProviderId() != null)
+                    providerId = userDetails.getProviderId();
             }
         }
 
@@ -83,7 +75,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     @Override
     public void addTourism(TourismCreateDTO tourism) throws ParseException {
         BaseServiceCreateDTO baseInfo = tourism.baseInfo();
-        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+        Integer providerId = UserUtils.getCurrentUserDetails().getProviderId();
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(baseInfo.name());
         svc.setDescription(baseInfo.description());
@@ -109,7 +101,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
         }
         svc.setImageSet(images);
 
-        svc.setProviderId(new ProviderProfile(currentUser.getProviderProfile().getId()));
+        svc.setProviderId(new ProviderProfile(providerId));
         svc.setTypeOfServiceId(new TypeOfService(1));
 
         ServiceTourism additionalInfo = new ServiceTourism();
