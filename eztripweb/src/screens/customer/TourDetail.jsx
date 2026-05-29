@@ -67,6 +67,7 @@ function TourDetail() {
 
 	const { baseInfo, location, tourDuration } = tourDetail;
 	const bookingTour = {
+        id: baseInfo?.id,
 		name: baseInfo?.name,
 		location,
 		pricePerTicket: baseInfo?.price,
