@@ -15,6 +15,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public record CustomerViewDTO(
         Integer id,
         @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd-MM-yyyy") Date dob,
-        String gender
+        Integer gender
 ) {
 }

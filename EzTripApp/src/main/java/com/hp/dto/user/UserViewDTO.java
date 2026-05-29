@@ -15,7 +15,7 @@ public record UserViewDTO(
         String phoneNumber,
         String avatar,
         Boolean isActive,
-        String role,
+        Integer role,
         CustomerViewDTO customerProfile,
         ProviderViewDTO providerProfile
 ) {

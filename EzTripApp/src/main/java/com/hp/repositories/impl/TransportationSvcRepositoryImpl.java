@@ -103,7 +103,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
                 transportation.get("departureLocation"),
                 transportation.get("arrivalTime"),
                 transportation.get("departureTime"),
-                type.get("name")));
+                type.get("id")));
 
         q.orderBy(b.desc(root.get("id")));
 
@@ -273,7 +273,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
                 transportation.get("departureLocation"),
                 transportation.get("arrivalTime"),
                 transportation.get("departureTime"),
-                type.get("name")));
+                type.get("id")));
 
         q.where(b.and(
                 b.equal(root.get("id"), id),

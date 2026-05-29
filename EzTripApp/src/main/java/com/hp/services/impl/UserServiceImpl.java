@@ -131,14 +131,14 @@ public class UserServiceImpl implements UserService {
         CustomerProfile customerProfile = user.getCustomerProfile();
         if (customerProfile != null) {
             Gender gender = customerProfile.getGenderId();
-            String genderName = null;
+            Integer genderId = null;
             if (gender != null) {
-                genderName = gender.getName();
+                genderId = gender.getId();
             }
             customerProfileDto = new CustomerViewDTO(
                     customerProfile.getId(),
                     customerProfile.getDob(),
-                    genderName);
+                    genderId);
         }
 
         ProviderViewDTO providerProfileDto = null;
@@ -148,7 +148,7 @@ public class UserServiceImpl implements UserService {
                     providerProfile.getId(),
                     providerProfile.getCompanyName(),
                     providerProfile.getCompanyAddress(),
-                    providerProfile.getTypeOfProviderId().getName());
+                    providerProfile.getTypeOfProviderId().getId());
         }
 
         return new UserViewDTO(
@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService {
                 user.getPhoneNumber(),
                 user.getAvatar(),
                 user.getIsActive(),
-                user.getRoleId().getName(),
+                user.getRoleId().getId(),
                 customerProfileDto,
                 providerProfileDto);
     }

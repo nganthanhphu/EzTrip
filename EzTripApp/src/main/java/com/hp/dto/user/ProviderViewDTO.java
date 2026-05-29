@@ -12,6 +12,6 @@ public record ProviderViewDTO(
         Integer id,
         String companyName,
         String companyAddress,
-        String typeOfProvider
+        Integer typeOfProvider
 ) {
 }
