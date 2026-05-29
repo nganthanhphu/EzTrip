@@ -37,9 +37,13 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public BaseUser addUser(BaseUser u) {
+    public BaseUser addOrUpdateUser(BaseUser u) {
         Session s = this.factory.getObject().getCurrentSession();
-        s.persist(u);
+        if (u.getId() != null) {
+            s.merge(u);
+        } else {
+            s.persist(u);
+        }
         return u;
     }
 

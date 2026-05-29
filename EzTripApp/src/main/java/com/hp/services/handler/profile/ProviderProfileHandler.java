@@ -4,9 +4,12 @@
  */
 package com.hp.services.handler.profile;
 
+import java.text.ParseException;
+
 import org.springframework.stereotype.Component;
 
 import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserUpdateDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.Role;
@@ -20,7 +23,7 @@ import com.hp.pojo.TypeOfProvider;
 public class ProviderProfileHandler implements UserProfileHandler {
 
     @Override
-    public void handleProfileInfo(BaseUser user, UserCreateDTO u) {
+    public void handleProfileCreate(BaseUser user, UserCreateDTO u) {
         Integer roleId = u.role();
         user.setRoleId(new Role(roleId));
 
@@ -32,6 +35,22 @@ public class ProviderProfileHandler implements UserProfileHandler {
 
         Integer typeOfProviderId = u.typeOfProvider();
         profile.setTypeOfProviderId(new TypeOfProvider(typeOfProviderId));
+
+        user.setProviderProfile(profile);
+        user.setIsActive(false);
+    }
+
+    @Override
+    public void handleProfileUpdate(BaseUser user, UserUpdateDTO u) throws ParseException {
+        ProviderProfile profile = user.getProviderProfile();
+
+        if (u.companyName() != null) {
+            profile.setCompanyName(u.companyName());
+        }
+
+        if (u.companyAddress() != null) {
+            profile.setCompanyAddress(u.companyAddress());
+        }
 
         user.setProviderProfile(profile);
         user.setIsActive(false);

@@ -9,6 +9,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.user.CustomerViewDTO;
 import com.hp.dto.user.ProviderViewDTO;
 import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserUpdateDTO;
 import com.hp.dto.user.UserViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
@@ -18,6 +19,7 @@ import com.hp.repositories.UserRepository;
 import com.hp.security.MyUserDetails;
 import com.hp.services.UserService;
 import com.hp.services.handler.profile.UserProfileHandler;
+import com.hp.utils.UserUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -102,7 +104,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Vai trò không hợp lệ!");
         }
 
-        handler.handleProfileInfo(user, u);
+        handler.handleProfileCreate(user, u);
 
         MultipartFile avatar = u.avatar();
         if (avatar != null && !avatar.isEmpty()) {
@@ -115,7 +117,51 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        return toUserProfileDTO(this.userRepository.addUser(user));
+        return toUserProfileDTO(this.userRepository.addOrUpdateUser(user));
+    }
+
+    @Override
+    public UserViewDTO updateUser(UserUpdateDTO request) throws ParseException {
+        String currentUserPhoneNumber = UserUtils.getCurrentUserDetails().getUsername();
+
+        BaseUser currentUser = this.userRepository.getUserByPhone(currentUserPhoneNumber);
+        
+        if (request.fullname() != null && !request.fullname().isEmpty())
+            currentUser.setFullname(request.fullname());
+
+        if (request.email() != null && !request.email().isEmpty())
+            currentUser.setEmail(request.email());
+
+        if (request.newPassword() != null && !request.newPassword().isEmpty()) {
+            if (request.oldPassword() == null || request.oldPassword().isEmpty()) {
+                throw new IllegalArgumentException("Mật khẩu cũ không được để trống!");
+            }
+
+            if (!this.passwordEncoder.matches(request.oldPassword(), currentUser.getPassword())) {
+                throw new IllegalArgumentException("Mật khẩu cũ không đúng!");
+            }
+
+            currentUser.setPassword(this.passwordEncoder.encode(request.newPassword()));
+        }
+
+        MultipartFile avatar = request.avatar();
+        if (avatar != null && !avatar.isEmpty()) {
+            try {
+                Map<?, ?> res = this.cloudinary.uploader().upload(avatar.getBytes(),
+                        ObjectUtils.asMap("resource_type", "auto"));
+                currentUser.setAvatar(res.get("secure_url").toString());
+            } catch (IOException ex) {
+                Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        Integer roleId = currentUser.getRoleId().getId();
+        UserProfileHandler handler = this.profileHandlers.get("ROLE_" + roleId);
+
+        if (handler != null)
+            handler.handleProfileUpdate(currentUser, request);
+
+        return toUserProfileDTO(this.userRepository.addOrUpdateUser(currentUser));
     }
 
     @Override

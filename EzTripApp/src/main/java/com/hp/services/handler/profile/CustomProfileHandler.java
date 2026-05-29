@@ -10,6 +10,7 @@ import java.util.Date;
 import org.springframework.stereotype.Component;
 
 import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserUpdateDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
 import com.hp.pojo.Gender;
@@ -23,7 +24,7 @@ import com.hp.pojo.Role;
 public class CustomProfileHandler implements UserProfileHandler {
 
     @Override
-    public void handleProfileInfo(BaseUser user, UserCreateDTO u) throws ParseException {
+    public void handleProfileCreate(BaseUser user, UserCreateDTO u) throws ParseException {
         Integer roleId = u.role();
         user.setRoleId(new Role(roleId));
 
@@ -41,5 +42,24 @@ public class CustomProfileHandler implements UserProfileHandler {
         user.setCustomerProfile(profile);
         user.setIsActive(true);
 
+    }
+
+    @Override
+    public void handleProfileUpdate(BaseUser user, UserUpdateDTO u) throws ParseException {
+        CustomerProfile profile = user.getCustomerProfile();
+
+        if (u.gender() != null) {
+            Integer genderId = u.gender();
+            profile.setGenderId(new Gender(genderId));
+        }
+
+        if (u.dob() != null) {
+            String dobString = u.dob();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date dob = sdf.parse(dobString);
+            profile.setDob(dob);
+        }
+
+        user.setCustomerProfile(profile);
     }
 }

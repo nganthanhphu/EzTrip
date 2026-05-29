@@ -12,7 +12,7 @@ import com.hp.pojo.BaseUser;
  */
 public interface UserRepository {
     BaseUser getUserByPhone(String phoneNumber);
-    BaseUser addUser(BaseUser u);
+    BaseUser addOrUpdateUser(BaseUser u);
     BaseUser authenticate(String phoneNumber, String password);
     
 }
