@@ -1,8 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TransportationItem from "@components/customer/CardTransportationItem";
 import ModalConfirmTransportationBooking from "@components/customer/ModalConfirmTransportationBooking";
+import PaginationComponent from "@components/common/PaginationComponent";
 import { useLookupTables } from "../../contexts/LookupTablesContext";
 import MySpinner from "@components/common/MySpinner";
 import { getTransportations } from "@services/customerService";
@@ -16,7 +18,10 @@ function TransportationList() {
     const [transportationList, setTransportationList] = useState([]);
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedTransportation, setSelectedTransportation] = useState(null);
+    const [page, setPage] = useState(1);
+    const [hasNextPage, setHasNextPage] = useState(false);
     const { lookupTables } = useLookupTables();
+    const pageSize = 5;
 
     function buildBookingTransportation(option) {
         const baseInfo = option?.baseInfo || {};
@@ -36,19 +41,28 @@ function TransportationList() {
         };
     }
 
-    const loadTransportations = async () => {
+    const loadTransportations = async (pageNumber = 1) => {
         try {
             setLoading(true);
             const response = await getTransportations({
                 departureLocation,
                 arrivalLocation,
-                typeOfTransportation,
+                type: typeOfTransportation,
                 departureTime,
+                page: pageNumber,
+                size: pageSize,
             });
 
-            setTransportationList(Array.isArray(response) ? response : []);
+            const items = Array.isArray(response)
+                ? response
+                : response?.content || response?.items || response?.results || [];
+
+            setTransportationList(items);
+            setHasNextPage(items.length === pageSize);
         } catch (error) {
             console.error("Error fetching transportations:", error);
+            setTransportationList([]);
+            setHasNextPage(false);
         } finally {
             setLoading(false);
         }
@@ -60,8 +74,16 @@ function TransportationList() {
 
     function handleSearch(event) {
         event.preventDefault();
-        loadTransportations();
+        setPage(1);
+        loadTransportations(1);
     }
+
+    function handlePageChange(nextPage) {
+        setPage(nextPage);
+        loadTransportations(nextPage);
+    }
+
+    const totalPages = hasNextPage ? page + 1 : page;
 
     function handleSelectTransportation(option) {
         setSelectedTransportation(buildBookingTransportation(option));
@@ -147,6 +169,16 @@ function TransportationList() {
                         />
                     ))}
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="d-flex justify-content-center mt-4">
+                        <PaginationComponent
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+                )}
 
                 {loading && <MySpinner />}
 

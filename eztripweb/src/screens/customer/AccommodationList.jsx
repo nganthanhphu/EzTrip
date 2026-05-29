@@ -1,39 +1,38 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
 import CardAccomodationItem from "@components/customer/CardAccomodationItem";
+import PaginationComponent from "@components/common/PaginationComponent";
 import { getAccommodations } from "@services/customerService";
+import usePagedList from "@hooks/usePagedList";
 
 function AccommodationList() {
-    const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [beds, setBeds] = useState("");
     const [area, setArea] = useState("");
-    const [accommodationList, setAccommodationList] = useState([]);
 
-    const loadAccommodations = async () => {
-        try {
-            setLoading(true);
-            const response = await getAccommodations({
+    const pageSize = 5;
+    const { items: accommodationList, loading, page, totalPages, loadPage } = usePagedList(
+        (nextPage) =>
+            getAccommodations({
                 beds,
                 area,
-            });
-            setAccommodationList(response);
-        } catch (error) {
-            console.error("Error fetching accommodations:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadAccommodations();
-    }, []);
+                searchText,
+                page: nextPage,
+                size: pageSize,
+            }),
+        pageSize
+    );
 
     const handleSearch = (event) => {
         event.preventDefault();
-        loadAccommodations();
+        loadPage(1);
+    };
+
+    const handlePageChange = (nextPage) => {
+        loadPage(nextPage);
     };
 
     return (
@@ -95,6 +94,16 @@ function AccommodationList() {
                         />
                     ))}
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="d-flex justify-content-center mt-4">
+                        <PaginationComponent
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </div>
+                )}
 
                 {loading && <MySpinner />}
             </Container>

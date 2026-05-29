@@ -22,7 +22,8 @@ import RoleRoute from '@routes/RoleRoute';
 
 const AppRoutes = () => {
 	return (
-		<Routes>
+      <Routes>
+            <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<RegisterCustomer />} />
             <Route path="/register/provider" element={<RegisterProvider />} />
@@ -31,25 +32,32 @@ const AppRoutes = () => {
             <Route path="/provider/logout" element={<Logout />} />
 
             <Route element={<RoleRoute role="CUSTOMER" />}>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/accommodation" element={<AccommodationList />} />
-                  <Route path="/accommodation/:id" element={<AccommodationDetail />} />
-                  <Route path="/transportation" element={<TransportationList />} />
-                  <Route path="/tours" element={<TourList />} />
-                  <Route path="/tours/:id" element={<TourDetail />} />
-                  <Route path="/history" element={<HistoryBookingList />} />
+            <Route path="/accommodation" element={<AccommodationList />} />
+            <Route
+                  path="/accommodation/:id"
+                  element={<AccommodationDetail />}
+            />
+            <Route
+                  path="/transportation"
+                  element={<TransportationList />}
+            />
+            <Route path="/tours" element={<TourList />} />
+            <Route path="/tours/:id" element={<TourDetail />} />
+            <Route path="/history" element={<HistoryBookingList />} />
             </Route>
 
-                  <Route element={<RoleRoute role="PROVIDER" />}>
-                        <Route path="/provider" element={<HomeProvider />} />
-                        <Route path="/provider/dashboard" element={<Dashboard />} />
-                        <Route path="/provider/services" element={<ServiceList />} />
-                        <Route path="/provider/services/:id/BookingList" element={<BookingList />} />
-                        <Route path="/provider/chats" element={<ChatList />} />
-                  </Route>
-
-		</Routes>
-	);
+            <Route element={<RoleRoute role="PROVIDER" />}>
+            <Route path="/provider" element={<HomeProvider />} />
+            <Route path="/provider/dashboard" element={<Dashboard />} />
+            <Route path="/provider/services" element={<ServiceList />} />
+            <Route
+                  path="/provider/services/:id/BookingList"
+                  element={<BookingList />}
+            />
+            <Route path="/provider/chats" element={<ChatList />} />
+            </Route>
+      </Routes>
+);
 };
 
 export default AppRoutes;

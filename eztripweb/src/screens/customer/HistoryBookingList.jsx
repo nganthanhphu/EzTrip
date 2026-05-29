@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
 import HistoryBookingItem from "@components/customer/CardHistoryBookingItem";
+import PaginationComponent from "@components/common/PaginationComponent";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import MySpinner from "@components/common/MySpinner";
 import { getBookings } from "@services/customerService";
+import usePagedList from "@hooks/usePagedList";
 
 const handleChat = (item) => {
     console.log("Chat for", item);
@@ -17,44 +20,36 @@ const handlePrimary = (item) => {
 function HistoryBookingList() {
     const [serviceType, setServiceType] = useState("");
     const [status, setStatus] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [bookings, setBookings] = useState([]);
     const { lookupTables } = useLookupTables();
     const typeOfServiceOptions = lookupTables.typeOfServices || [];
+    const pageSize = 5;
+    const { items: bookings, loading, page, totalPages, loadPage } = usePagedList(
+        (nextPage) => {
+            const params = {
+                page: nextPage,
+                size: pageSize,
+            };
 
-    const loadBookings = async () => {
-        try {
-            setLoading(true);
-
-            const params = {};
             if (serviceType) {
                 params.serviceType = Number(serviceType);
             }
+
             if (status) {
                 params.status = status;
             }
 
-            const response = await getBookings(params);
-            const nextBookings = Array.isArray(response)
-                ? response
-                : response?.content || response?.data || response?.items || [];
-
-            setBookings(nextBookings);
-        } catch (error) {
-            console.error("Error fetching bookings:", error);
-            setBookings([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        loadBookings();
-    }, []);
+            return getBookings(params);
+        },
+        pageSize
+    );
 
     const handleSearch = (event) => {
         event.preventDefault();
-        loadBookings();
+        loadPage(1);
+    };
+
+    const handlePageChange = (nextPage) => {
+        loadPage(nextPage);
     };
 
     return (
@@ -130,6 +125,16 @@ function HistoryBookingList() {
                                 onPrimaryAction={() => handlePrimary(item)}
                             />
                         ))}
+                    </div>
+                )}
+
+                {totalPages > 1 && (
+                    <div className="d-flex justify-content-center mt-4">
+                        <PaginationComponent
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
                     </div>
                 )}
             </Container>
