@@ -8,15 +8,15 @@ import com.hp.dto.booking.BookingCreateDTO;
 import com.hp.dto.booking.BookingUpdateDTO;
 import com.hp.dto.booking.BookingViewDTO;
 import com.hp.dto.review.ReviewViewDTO;
-import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
 import com.hp.pojo.BookingStatus;
+import com.hp.pojo.CustomerProfile;
 import com.hp.pojo.PaymentMethod;
 import com.hp.pojo.Review;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.BookingRepository;
 import com.hp.repositories.BookingStatusRepository;
-import com.hp.repositories.UserRepository;
+import com.hp.security.MyUserDetails;
 import com.hp.services.BookingService;
 import com.hp.utils.UserUtils;
 
@@ -39,9 +39,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private BookingRepository bookingRepository;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private BaseServiceRepository serviceRepository;
@@ -74,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Ngày bắt đầu dịch vụ không hợp lệ!");
         }
 
-        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+        Integer customerId = UserUtils.getCurrentUserDetails().getCustomerId();
 
         Booking booking = new Booking();
         booking.setCreatedDate(new Date());
@@ -83,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setTotalAmount(((Number) service[2]).intValue() * quantity);
         booking.setNote(bk.note());
         booking.setStatusId(new BookingStatus(1));
-        booking.setCustomerId(currentUser.getCustomerProfile());
+        booking.setCustomerId(new CustomerProfile(customerId));
         booking.setPaymentMethodId(new PaymentMethod(bk.paymentMethodId()));
         booking.setServiceId(new com.hp.pojo.Service(bk.serviceId()));
 
@@ -92,14 +89,15 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingViewDTO> getBookings(Map<String, String> params) {
-        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
-
         int customerId = 0, providerId = 0;
 
-        if (currentUser.getRoleId().getName().equals("CUSTOMER")) {
-            customerId = currentUser.getCustomerProfile().getId();
-        } else if (currentUser.getRoleId().getName().equals("PROVIDER")) {
-            providerId = currentUser.getProviderProfile().getId();
+        MyUserDetails currentUser = UserUtils.getCurrentUserDetails();
+        if (currentUser != null) {
+            if (currentUser.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_CUSTOMER")) {
+                customerId = currentUser.getCustomerId();
+            } else if (currentUser.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_PROVIDER")) {
+                providerId = currentUser.getProviderId();
+            }
         }
 
         return this.bookingRepository.getBookings(params, customerId, providerId).stream()
@@ -133,11 +131,14 @@ public class BookingServiceImpl implements BookingService {
                 booking.getQuantity(),
                 booking.getTotalAmount(),
                 booking.getNote(),
-                booking.getStatusId().getName(),
+                booking.getStatusId().getId(),
+                booking.getCustomerId().getUserId().getId(),
                 booking.getCustomerId().getUserId().getFullname(),
                 booking.getCustomerId().getUserId().getPhoneNumber(),
                 booking.getCustomerId().getUserId().getAvatar(),
-                booking.getPaymentMethodId().getName(),
+                booking.getServiceId().getProviderId().getUserId().getId(),
+                booking.getServiceId().getProviderId().getCompanyName(),
+                booking.getPaymentMethodId().getId(),
                 reviewDTO);
     }
 

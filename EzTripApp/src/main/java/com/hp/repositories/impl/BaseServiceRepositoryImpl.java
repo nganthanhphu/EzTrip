@@ -70,4 +70,22 @@ public class BaseServiceRepositoryImpl implements BaseServiceRepository {
             s.persist(svc);
     }
 
+    @Override
+    public Service getServiceById(int id) {
+        Session s = this.factory.getObject().getCurrentSession();
+        Query<Service> q = s.createQuery("""
+                SELECT s
+                FROM Service s
+                LEFT JOIN FETCH s.imageSet
+                LEFT JOIN FETCH s.typeOfServiceId
+                LEFT JOIN FETCH s.providerId
+                LEFT JOIN FETCH s.serviceAccommodation
+                LEFT JOIN FETCH s.serviceTourism
+                LEFT JOIN FETCH s.serviceTransportation
+                WHERE s.id = :id
+                """, Service.class);
+        q.setParameter("id", id);
+        return q.uniqueResult();
+    }
+
 }

@@ -9,6 +9,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.user.CustomerViewDTO;
 import com.hp.dto.user.ProviderViewDTO;
 import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserUpdateDTO;
 import com.hp.dto.user.UserViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
@@ -18,6 +19,7 @@ import com.hp.repositories.UserRepository;
 import com.hp.security.MyUserDetails;
 import com.hp.services.UserService;
 import com.hp.services.handler.profile.UserProfileHandler;
+import com.hp.utils.UserUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -64,10 +66,21 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("Người dùng không tồn tại!");
         }
 
+        Integer customerId = null;
+        if (user.getCustomerProfile() != null) {
+            customerId = user.getCustomerProfile().getId();
+        }
+
+        Integer providerId = null;
+        if (user.getProviderProfile() != null) {
+            providerId = user.getProviderProfile().getId();
+        }
+
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRoleId().getName()));
 
-        return new MyUserDetails(user.getId(), user.getPhoneNumber(), user.getPassword(), authorities);
+        return new MyUserDetails(user.getId(), customerId, providerId, user.getPhoneNumber(), user.getPassword(),
+                authorities);
     }
 
     @Override
@@ -84,6 +97,15 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(u.phoneNumber());
         user.setPassword(this.passwordEncoder.encode(u.password()));
 
+        Integer roleId = u.role();
+        UserProfileHandler handler = this.profileHandlers.get("ROLE_" + roleId);
+
+        if (handler == null) {
+            throw new IllegalArgumentException("Vai trò không hợp lệ!");
+        }
+
+        handler.handleProfileCreate(user, u);
+
         MultipartFile avatar = u.avatar();
         if (avatar != null && !avatar.isEmpty()) {
             try {
@@ -95,16 +117,51 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        String roleName = u.role();
-        UserProfileHandler handler = this.profileHandlers.get(roleName);
+        return toUserProfileDTO(this.userRepository.addOrUpdateUser(user));
+    }
 
-        if (handler == null) {
-            throw new IllegalArgumentException("Vai trò không hợp lệ!");
+    @Override
+    public UserViewDTO updateUser(UserUpdateDTO request) throws ParseException {
+        String currentUserPhoneNumber = UserUtils.getCurrentUserDetails().getUsername();
+
+        BaseUser currentUser = this.userRepository.getUserByPhone(currentUserPhoneNumber);
+        
+        if (request.fullname() != null && !request.fullname().isEmpty())
+            currentUser.setFullname(request.fullname());
+
+        if (request.email() != null && !request.email().isEmpty())
+            currentUser.setEmail(request.email());
+
+        if (request.newPassword() != null && !request.newPassword().isEmpty()) {
+            if (request.oldPassword() == null || request.oldPassword().isEmpty()) {
+                throw new IllegalArgumentException("Mật khẩu cũ không được để trống!");
+            }
+
+            if (!this.passwordEncoder.matches(request.oldPassword(), currentUser.getPassword())) {
+                throw new IllegalArgumentException("Mật khẩu cũ không đúng!");
+            }
+
+            currentUser.setPassword(this.passwordEncoder.encode(request.newPassword()));
         }
 
-        handler.handleProfileInfo(user, u);
+        MultipartFile avatar = request.avatar();
+        if (avatar != null && !avatar.isEmpty()) {
+            try {
+                Map<?, ?> res = this.cloudinary.uploader().upload(avatar.getBytes(),
+                        ObjectUtils.asMap("resource_type", "auto"));
+                currentUser.setAvatar(res.get("secure_url").toString());
+            } catch (IOException ex) {
+                Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
-        return toUserProfileDTO(this.userRepository.addUser(user));
+        Integer roleId = currentUser.getRoleId().getId();
+        UserProfileHandler handler = this.profileHandlers.get("ROLE_" + roleId);
+
+        if (handler != null)
+            handler.handleProfileUpdate(currentUser, request);
+
+        return toUserProfileDTO(this.userRepository.addOrUpdateUser(currentUser));
     }
 
     @Override
@@ -121,14 +178,14 @@ public class UserServiceImpl implements UserService {
         CustomerProfile customerProfile = user.getCustomerProfile();
         if (customerProfile != null) {
             Gender gender = customerProfile.getGenderId();
-            String genderName = null;
+            Integer genderId = null;
             if (gender != null) {
-                genderName = gender.getName();
+                genderId = gender.getId();
             }
             customerProfileDto = new CustomerViewDTO(
                     customerProfile.getId(),
                     customerProfile.getDob(),
-                    genderName);
+                    genderId);
         }
 
         ProviderViewDTO providerProfileDto = null;
@@ -138,7 +195,7 @@ public class UserServiceImpl implements UserService {
                     providerProfile.getId(),
                     providerProfile.getCompanyName(),
                     providerProfile.getCompanyAddress(),
-                    providerProfile.getTypeOfProviderId().getName());
+                    providerProfile.getTypeOfProviderId().getId());
         }
 
         return new UserViewDTO(
@@ -148,7 +205,7 @@ public class UserServiceImpl implements UserService {
                 user.getPhoneNumber(),
                 user.getAvatar(),
                 user.getIsActive(),
-                user.getRoleId().getName(),
+                user.getRoleId().getId(),
                 customerProfileDto,
                 providerProfileDto);
     }

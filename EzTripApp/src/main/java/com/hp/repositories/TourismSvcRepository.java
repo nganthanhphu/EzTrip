@@ -16,7 +16,7 @@ import com.hp.dto.service.TourismViewDTO;
  */
 public interface TourismSvcRepository {
 
-    List<TourismListViewDTO> getTourismServices(Map<String, String> params);
+    List<TourismListViewDTO> getTourismServices(Map<String, String> params, int providerId);
 
     TourismViewDTO getTourismById(Integer id);
 

@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.hp.dto.service.TourismCreateDTO;
 import com.hp.dto.service.TourismListViewDTO;
+import com.hp.dto.service.TourismUpdateDTO;
 import com.hp.dto.service.TourismViewDTO;
 import com.hp.services.TourismSvcService;
 
@@ -58,5 +61,18 @@ public class ApiTourismController {
     @ResponseStatus(HttpStatus.CREATED)
     public void addTourism(@ModelAttribute TourismCreateDTO tourism) throws ParseException {
         this.tourismService.addTourism(tourism);
+    }
+
+    @PatchMapping(path = "/secure/tourisms/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateTourism(@PathVariable(value = "id") int id,
+            @ModelAttribute TourismUpdateDTO tourism) throws ParseException {
+        this.tourismService.updateTourism(id, tourism);
+    }
+
+    @DeleteMapping("/secure/tourisms/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTourism(@PathVariable(value = "id") int id) {
+        this.tourismService.deleteTourism(id);
     }
 }

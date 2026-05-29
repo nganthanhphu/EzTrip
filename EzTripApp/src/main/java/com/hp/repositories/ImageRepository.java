@@ -4,15 +4,13 @@
  */
 package com.hp.repositories;
 
-import com.hp.pojo.BaseUser;
+import com.hp.pojo.Image;
 
 /**
  *
  * @author Joon
  */
-public interface UserRepository {
-    BaseUser getUserByPhone(String phoneNumber);
-    BaseUser addOrUpdateUser(BaseUser u);
-    BaseUser authenticate(String phoneNumber, String password);
-    
+public interface ImageRepository {
+    Image getImageById(Integer id);
+    void deleteImage(Image image);
 }

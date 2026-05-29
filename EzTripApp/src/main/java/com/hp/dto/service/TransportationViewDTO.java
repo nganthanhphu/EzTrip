@@ -17,13 +17,13 @@ public record TransportationViewDTO(
                 String departureLocation,
                 int arrivalTime,
                 int departureTime,
-                String typeOfTransportation) {
+                Integer typeOfTransportation) {
         public TransportationViewDTO(Integer baseId, String name, String description, BigDecimal price,
                         Integer quantity,
                         Integer remainingQuantity, Double avgRating, Long reviewCount, Long bookingCount,
                         Integer companyId, String companyName, String companyAvatar, String companyAddress,
                         String companyPhone, String companyEmail, Integer id, String arrivalLocation,
-                        String departureLocation, int arrivalTime, int departureTime, String typeOfTransportation) {
+                        String departureLocation, int arrivalTime, int departureTime, Integer typeOfTransportation) {
                 this(new BaseServiceViewDTO(baseId, name, description, price, quantity, remainingQuantity, avgRating,
                                 reviewCount, bookingCount, companyId, companyName, companyAvatar, companyAddress,
                                 companyPhone, companyEmail), id, arrivalLocation,

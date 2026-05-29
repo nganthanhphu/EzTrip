@@ -5,6 +5,7 @@
 package com.hp.services.handler.profile;
 
 import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserUpdateDTO;
 import com.hp.pojo.BaseUser;
 import java.text.ParseException;
 
@@ -13,5 +14,6 @@ import java.text.ParseException;
  * @author Joon
  */
 public interface UserProfileHandler {
-    void handleProfileInfo(BaseUser user, UserCreateDTO u) throws ParseException;
+    void handleProfileCreate(BaseUser user, UserCreateDTO u) throws ParseException;
+    void handleProfileUpdate(BaseUser user, UserUpdateDTO u) throws ParseException;
 }

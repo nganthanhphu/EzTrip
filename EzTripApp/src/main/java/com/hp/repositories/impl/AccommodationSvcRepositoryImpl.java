@@ -59,7 +59,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
     private Environment env;
 
     @Override
-    public List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params) {
+    public List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params, int providerId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<AccommodationListViewDTO> q = b.createQuery(AccommodationListViewDTO.class);
@@ -70,7 +70,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
         imageUrl.select(b.least(image.<String>get("url")));
         imageUrl.where(b.equal(image.get("serviceId").as(Integer.class), root.get("id")));
 
-        Join<Service, ProviderProfile> provider = root.join("providerId", JoinType.INNER);
+        Join<Service, ProviderProfile> providerProfile = root.join("providerId", JoinType.INNER);
         Join<Service, ServiceAccommodation> accommodation = root.join("serviceAccommodation", JoinType.INNER);
         Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
         Join<Booking, BookingStatus> bookingStatus = booking.join("statusId", JoinType.LEFT);
@@ -95,7 +95,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
                 b.coalesce(b.avg(review.get("rating")), 0.0),
                 b.coalesce(b.count(review.get("id")), 0),
                 b.coalesce(b.countDistinct(booking.get("id")), 0),
-                provider.get("companyName"),
+                providerProfile.get("companyName"),
                 accommodation.get("quantityOfBed"),
                 accommodation.get("area"),
                 accommodation.get("location")));
@@ -114,7 +114,7 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
             if (name != null && !name.isEmpty()) {
                 predicates.add(b.like(root.get("name"), String.format("%%%s%%", name)));
             }
-            
+
             String location = params.get("location");
             if (location != null && !location.isEmpty()) {
                 predicates.add(b.like(accommodation.get("location"), String.format("%%%s%%", location)));
@@ -172,6 +172,13 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
                 }
             }
 
+        }
+
+        if (providerId > 0) {
+            predicates.add(b.equal(providerProfile.get("id"), providerId));
+        } else {
+            Join<ProviderProfile, BaseUser> providerUser = providerProfile.join("userId", JoinType.INNER);
+            predicates.add(b.equal(providerUser.get("isActive"), true));
         }
 
         q.where(predicates.toArray(Predicate[]::new));

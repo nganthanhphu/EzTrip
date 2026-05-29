@@ -4,38 +4,28 @@
  */
 package com.hp.services.handler.profile;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.text.ParseException;
+
 import org.springframework.stereotype.Component;
 
 import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserUpdateDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.Role;
 import com.hp.pojo.TypeOfProvider;
-import com.hp.repositories.RoleRepository;
-import com.hp.repositories.TypeOfProviderRepository;
 
 /**
  *
  * @author Joon
  */
-@Component("PROVIDER")
+@Component("ROLE_3")
 public class ProviderProfileHandler implements UserProfileHandler {
 
-    @Autowired
-    private RoleRepository roleRepo;
-
-    @Autowired
-    private TypeOfProviderRepository typeOfProviderRepo;
-
     @Override
-    public void handleProfileInfo(BaseUser user, UserCreateDTO u) {
-        String roleName = u.role();
-        Role role = roleRepo.getRoleByName(roleName);
-        if (role == null || !role.getName().equals("PROVIDER")) {
-            throw new IllegalArgumentException("Vai trò không hợp lệ!");
-        }
-        user.setRoleId(role);
+    public void handleProfileCreate(BaseUser user, UserCreateDTO u) {
+        Integer roleId = u.role();
+        user.setRoleId(new Role(roleId));
 
         ProviderProfile profile = new ProviderProfile();
         profile.setUserId(user);
@@ -43,12 +33,24 @@ public class ProviderProfileHandler implements UserProfileHandler {
         profile.setCompanyName(u.companyName());
         profile.setCompanyAddress(u.companyAddress());
 
-        String typeOfProviderName = u.typeOfProvider();
-        TypeOfProvider typeOfProvider = typeOfProviderRepo.getTypeOfProviderByName(typeOfProviderName);
-        if (typeOfProvider == null) {
-            throw new IllegalArgumentException("Loại nhà cung cấp không hợp lệ!");
+        Integer typeOfProviderId = u.typeOfProvider();
+        profile.setTypeOfProviderId(new TypeOfProvider(typeOfProviderId));
+
+        user.setProviderProfile(profile);
+        user.setIsActive(false);
+    }
+
+    @Override
+    public void handleProfileUpdate(BaseUser user, UserUpdateDTO u) throws ParseException {
+        ProviderProfile profile = user.getProviderProfile();
+
+        if (u.companyName() != null) {
+            profile.setCompanyName(u.companyName());
         }
-        profile.setTypeOfProviderId(typeOfProvider);
+
+        if (u.companyAddress() != null) {
+            profile.setCompanyAddress(u.companyAddress());
+        }
 
         user.setProviderProfile(profile);
         user.setIsActive(false);

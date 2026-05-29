@@ -21,17 +21,18 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.service.BaseServiceCreateDTO;
+import com.hp.dto.service.BaseServiceUpdateDTO;
 import com.hp.dto.service.TourismCreateDTO;
 import com.hp.dto.service.TourismListViewDTO;
+import com.hp.dto.service.TourismUpdateDTO;
 import com.hp.dto.service.TourismViewDTO;
-import com.hp.pojo.BaseUser;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceTourism;
 import com.hp.pojo.TypeOfService;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.TourismSvcRepository;
-import com.hp.repositories.UserRepository;
+import com.hp.security.MyUserDetails;
 import com.hp.services.TourismSvcService;
 import com.hp.utils.UserUtils;
 
@@ -50,14 +51,22 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     private BaseServiceRepository baseServiceRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private Cloudinary cloudinary;
 
     @Override
     public List<TourismListViewDTO> getTourismServices(Map<String, String> params) {
-        return this.tourismSvcRepository.getTourismServices(params);
+        int providerId = 0;
+
+        MyUserDetails userDetails = UserUtils.getCurrentUserDetails();
+
+        if (userDetails != null) {
+            if (userDetails.getAuthorities().stream().findFirst().get().getAuthority().equals("ROLE_PROVIDER")) {
+                if (userDetails.getProviderId() != null)
+                    providerId = userDetails.getProviderId();
+            }
+        }
+
+        return this.tourismSvcRepository.getTourismServices(params, providerId);
     }
 
     @Override
@@ -68,7 +77,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
     @Override
     public void addTourism(TourismCreateDTO tourism) throws ParseException {
         BaseServiceCreateDTO baseInfo = tourism.baseInfo();
-        BaseUser currentUser = this.userRepository.getUserByPhone(UserUtils.getCurrentUserDetails().getUsername());
+        Integer providerId = UserUtils.getCurrentUserDetails().getProviderId();
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
         svc.setName(baseInfo.name());
         svc.setDescription(baseInfo.description());
@@ -94,7 +103,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
         }
         svc.setImageSet(images);
 
-        svc.setProviderId(new ProviderProfile(currentUser.getProviderProfile().getId()));
+        svc.setProviderId(new ProviderProfile(providerId));
         svc.setTypeOfServiceId(new TypeOfService(1));
 
         ServiceTourism additionalInfo = new ServiceTourism();
@@ -106,4 +115,66 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
         this.baseServiceRepository.addOrUpdateService(svc);
     }
+
+    @Override
+    public void updateTourism(Integer id, TourismUpdateDTO tourism) throws ParseException {
+        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+
+        if (svc == null)
+            throw new IllegalArgumentException("Dịch vụ không tồn tại!");
+
+        BaseServiceUpdateDTO baseInfo = tourism.baseInfo();
+
+        if (baseInfo.name() != null && !baseInfo.name().isEmpty())
+            svc.setName(baseInfo.name());
+
+        if (baseInfo.description() != null && !baseInfo.description().isEmpty())
+            svc.setDescription(baseInfo.description());
+
+        if (baseInfo.price() != null)
+            svc.setPrice(baseInfo.price());
+
+        if (baseInfo.quantity() != null)
+            svc.setQuantity(baseInfo.quantity());
+
+        ServiceTourism additionalInfo = svc.getServiceTourism();
+
+        if (tourism.tourDuration() != null)
+            additionalInfo.setTourDuration(tourism.tourDuration());
+
+        if (tourism.location() != null && !tourism.location().isEmpty())
+            additionalInfo.setLocation(tourism.location());
+
+        Set<Image> images = svc.getImageSet();
+
+        if (baseInfo.imgFiles() != null) {
+            for (MultipartFile img : baseInfo.imgFiles()) {
+                if (img.isEmpty())
+                    continue;
+                try {
+                    Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
+                            ObjectUtils.asMap("resource_type", "auto"));
+                    Image image = new Image();
+                    image.setUrl(res.get("secure_url").toString());
+                    image.setServiceId(svc);
+                    images.add(image);
+                } catch (IOException ex) {
+                    Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        svc.setImageSet(images);
+        svc.setServiceTourism(additionalInfo);
+        this.baseServiceRepository.addOrUpdateService(svc);
+
+    }
+
+    @Override
+    public void deleteTourism(Integer id) {
+        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+        svc.setIsActive(false);
+        this.baseServiceRepository.addOrUpdateService(svc);
+    }
+
 }

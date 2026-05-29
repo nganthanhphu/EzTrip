@@ -15,12 +15,12 @@ public record UserCreateDTO(
         String email,
         String phoneNumber,
         String password,
-        String role,
-        String gender,
+        Integer role,
+        Integer gender,
         String dob,
         String companyName,
         String companyAddress,
-        String typeOfProvider,
+        Integer typeOfProvider,
         MultipartFile avatar
 ) {
 }

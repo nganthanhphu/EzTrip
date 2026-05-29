@@ -59,7 +59,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
     private Environment env;
 
     @Override
-    public List<TourismListViewDTO> getTourismServices(Map<String, String> params) {
+    public List<TourismListViewDTO> getTourismServices(Map<String, String> params, int providerId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<TourismListViewDTO> q = b.createQuery(TourismListViewDTO.class);
@@ -70,7 +70,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
         imageUrl.select(b.least(image.<String>get("url")));
         imageUrl.where(b.equal(image.get("serviceId").as(Integer.class), root.get("id")));
 
-        Join<Service, ProviderProfile> provider = root.join("providerId", JoinType.INNER);
+        Join<Service, ProviderProfile> providerProfile = root.join("providerId", JoinType.INNER);
         Join<Service, ServiceTourism> tourism = root.join("serviceTourism", JoinType.INNER);
         Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
         Join<Booking, BookingStatus> bookingStatus = booking.join("statusId", JoinType.LEFT);
@@ -95,7 +95,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
                 b.coalesce(b.avg(review.get("rating")), 0.0),
                 b.coalesce(b.count(review.get("id")), 0),
                 b.coalesce(b.countDistinct(booking.get("id")), 0),
-                provider.get("companyName"),
+                providerProfile.get("companyName"),
                 tourism.get("tourDuration"),
                 tourism.get("location")));
 
@@ -178,6 +178,13 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
 
                 }
             }
+        }
+
+        if (providerId > 0) {
+            predicates.add(b.equal(providerProfile.get("id"), providerId));
+        } else {
+            Join<ProviderProfile, BaseUser> providerUser = providerProfile.join("userId", JoinType.INNER);
+            predicates.add(b.equal(providerUser.get("isActive"), true));
         }
 
         q.where(predicates.toArray(Predicate[]::new));

@@ -14,15 +14,21 @@ import org.springframework.security.core.userdetails.User;
  */
 public class MyUserDetails extends User{
     private Integer id;
+    private Integer customerId;
+    private Integer providerId;
 
-    public MyUserDetails(Integer id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public MyUserDetails(Integer id, Integer customerId, Integer providerId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
+        this.customerId = customerId;
+        this.providerId = providerId;
     }
 
-    public MyUserDetails(Integer id, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
+    public MyUserDetails(Integer id, Integer customerId, Integer providerId, String username, String password, boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
         this.id = id;
+        this.customerId = customerId;
+        this.providerId = providerId;
     }
 
     /**
@@ -31,5 +37,19 @@ public class MyUserDetails extends User{
     public Integer getId() {
         return id;
     }
-    
+
+    /**
+     * @return the customerId
+     */
+    public Integer getCustomerId() {
+        return customerId;
+    }
+
+    /**
+     * @return the providerId
+     */
+    public Integer getProviderId() {
+        return providerId;
+    }
+
 }

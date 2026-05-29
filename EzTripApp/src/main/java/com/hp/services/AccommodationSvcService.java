@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.hp.dto.service.AccommodationCreateDTO;
 import com.hp.dto.service.AccommodationListViewDTO;
+import com.hp.dto.service.AccommodationUpdateDTO;
 import com.hp.dto.service.AccommodationViewDTO;
 
 /**
@@ -22,4 +23,8 @@ public interface AccommodationSvcService {
     AccommodationViewDTO getAccommodationById(Integer id);
 
     void addAccommodation(AccommodationCreateDTO accommodation) throws ParseException;
+
+    void updateAccommodation(Integer id, AccommodationUpdateDTO accommodation) throws ParseException;
+
+    void deleteAccommodation(Integer id);
 }

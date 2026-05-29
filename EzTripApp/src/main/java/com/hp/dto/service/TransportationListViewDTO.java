@@ -16,12 +16,12 @@ public record TransportationListViewDTO(
         String departureLocation,
         int arrivalTime,
         int departureTime,
-        String typeOfTransportation
+        Integer typeOfTransportation
 ) {
     public TransportationListViewDTO(Integer id, String name, BigDecimal price, String image, Integer quantity,
             Integer remainingQuantity, Double avgRating, Long reviewCount, Long bookingCount, String companyName,
             String arrivalLocation, String departureLocation, int arrivalTime, int departureTime,
-            String typeOfTransportation) {
+            Integer typeOfTransportation) {
         this(new BaseServiceListViewDTO(id, name, price, image, quantity, remainingQuantity, avgRating, reviewCount,
                 bookingCount, companyName), arrivalLocation, departureLocation, arrivalTime, departureTime,
                 typeOfTransportation);

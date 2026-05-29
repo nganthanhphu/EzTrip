@@ -7,49 +7,32 @@ package com.hp.services.handler.profile;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.dto.user.UserCreateDTO;
+import com.hp.dto.user.UserUpdateDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
 import com.hp.pojo.Gender;
 import com.hp.pojo.Role;
-import com.hp.repositories.GenderRepository;
-import com.hp.repositories.RoleRepository;
 
 /**
  *
  * @author Joon
  */
-@Component("CUSTOMER")
+@Component("ROLE_2")
 public class CustomProfileHandler implements UserProfileHandler {
 
-    @Autowired
-    private RoleRepository roleRepo;
-
-    @Autowired
-    private GenderRepository genderRepo;
-
     @Override
-    public void handleProfileInfo(BaseUser user, UserCreateDTO u) throws ParseException {
-        String roleName = u.role();
-        Role role = roleRepo.getRoleByName(roleName);
-        if (role == null || !role.getName().equals("CUSTOMER")) {
-            throw new IllegalArgumentException("Vai trò không hợp lệ!");
-        }
-        user.setRoleId(role);
+    public void handleProfileCreate(BaseUser user, UserCreateDTO u) throws ParseException {
+        Integer roleId = u.role();
+        user.setRoleId(new Role(roleId));
 
         CustomerProfile profile = new CustomerProfile();
         profile.setUserId(user);
 
-        String genderName = u.gender();
-        Gender gender = genderRepo.getGenderByName(genderName);
-        if (gender == null) {
-            throw new IllegalArgumentException("Giới tính không hợp lệ!");
-        }
-        profile.setGenderId(gender);
+        Integer genderId = u.gender();
+        profile.setGenderId(new Gender(genderId));
 
         String dobString = u.dob();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -59,5 +42,24 @@ public class CustomProfileHandler implements UserProfileHandler {
         user.setCustomerProfile(profile);
         user.setIsActive(true);
 
+    }
+
+    @Override
+    public void handleProfileUpdate(BaseUser user, UserUpdateDTO u) throws ParseException {
+        CustomerProfile profile = user.getCustomerProfile();
+
+        if (u.gender() != null) {
+            Integer genderId = u.gender();
+            profile.setGenderId(new Gender(genderId));
+        }
+
+        if (u.dob() != null) {
+            String dobString = u.dob();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date dob = sdf.parse(dobString);
+            profile.setDob(dob);
+        }
+
+        user.setCustomerProfile(profile);
     }
 }

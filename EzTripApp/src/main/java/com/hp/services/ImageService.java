@@ -2,16 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.hp.repositories;
-
-import com.hp.pojo.Service;
+package com.hp.services;
 
 /**
  *
  * @author Joon
  */
-public interface BaseServiceRepository {
-    Object[] getServiceForBookingValidation(int id);
-    Service getServiceById(int id);
-    void addOrUpdateService(Service svc);
+public interface ImageService {
+    void deleteImageById(Integer id);
 }

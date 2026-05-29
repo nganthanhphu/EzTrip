@@ -60,7 +60,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
     private Environment env;
 
     @Override
-    public List<TransportationListViewDTO> getTransportationServices(Map<String, String> params) {
+    public List<TransportationListViewDTO> getTransportationServices(Map<String, String> params, int providerId) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<TransportationListViewDTO> q = b.createQuery(TransportationListViewDTO.class);
@@ -71,7 +71,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         imageUrl.select(b.least(image.<String>get("url")));
         imageUrl.where(b.equal(image.get("serviceId").as(Integer.class), root.get("id")));
 
-        Join<Service, ProviderProfile> provider = root.join("providerId", JoinType.INNER);
+        Join<Service, ProviderProfile> providerProfile = root.join("providerId", JoinType.INNER);
         Join<Service, ServiceTransportation> transportation = root.join("serviceTransportation", JoinType.INNER);
         Join<ServiceTransportation, TypeOfTransportation> type = transportation.join("typeOfTransportationId",
                 JoinType.INNER);
@@ -98,12 +98,12 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
                 b.coalesce(b.avg(review.get("rating")), 0.0),
                 b.coalesce(b.count(review.get("id")), 0),
                 b.coalesce(b.countDistinct(booking.get("id")), 0),
-                provider.get("companyName"),
+                providerProfile.get("companyName"),
                 transportation.get("arrivalLocation"),
                 transportation.get("departureLocation"),
                 transportation.get("arrivalTime"),
                 transportation.get("departureTime"),
-                type.get("name")));
+                type.get("id")));
 
         q.orderBy(b.desc(root.get("id")));
 
@@ -200,6 +200,14 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
         }
 
+        
+        if (providerId > 0) {
+            predicates.add(b.equal(providerProfile.get("id"), providerId));
+        } else {
+            Join<ProviderProfile, BaseUser> providerUser = providerProfile.join("userId", JoinType.INNER);
+            predicates.add(b.equal(providerUser.get("isActive"), true));
+        }
+
         q.where(predicates.toArray(Predicate[]::new));
 
         if (!havingPredicates.isEmpty()) {
@@ -268,7 +276,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
                 transportation.get("departureLocation"),
                 transportation.get("arrivalTime"),
                 transportation.get("departureTime"),
-                type.get("name")));
+                type.get("id")));
 
         q.where(b.and(
                 b.equal(root.get("id"), id),

@@ -45,42 +45,53 @@ public class JwtFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) sr;
         HttpServletResponse response = (HttpServletResponse) sr1;
 
+        String header = request.getHeader("Authorization");
+
         if (request.getRequestURI().startsWith(String.format("%s/api/secure", request.getContextPath()))) {
-
-            String header = request.getHeader("Authorization");
-
             if (header == null || !header.startsWith("Bearer ")) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                         "Thiếu hoặc Header xác thực không hợp lệ!");
                 return;
-            } else {
-                String token = header.substring(7);
-                try {
-                    JWTClaimsSet claimsSet = this.jwtUtils.validateTokenAndGetClaimsSet(token);
-                    if (claimsSet != null) {
-                        String username = claimsSet.getSubject();
-                        Integer id = Integer.parseInt(claimsSet.getClaimAsString("id"));
-                        String role = claimsSet.getClaimAsString("role");
-                        Set<GrantedAuthority> authorities = new HashSet<>();
-                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-                        UserDetails userDetails = new MyUserDetails(id, username, "", authorities);
-                        if (userDetails != null) {
-                            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
-                            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                            fc.doFilter(request, response);
-                            return;
-                        }
-                    }
-                } catch (ParseException | JOSEException ex) {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ!");
-                    return;
-                }
             }
+        }
+
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+            try {
+                JWTClaimsSet claimsSet = this.jwtUtils.validateTokenAndGetClaimsSet(token);
+                if (claimsSet != null) {
+                    String username = claimsSet.getSubject();
+                    Integer id = Integer.parseInt(claimsSet.getClaimAsString("id"));
+                    Integer customerId = null;
+                    if (claimsSet.getClaim("customerId") != null) {
+                        customerId = Integer.parseInt(claimsSet.getClaimAsString("customerId"));
+                    }
+                    Integer providerId = null;
+                    if (claimsSet.getClaim("providerId") != null) {
+                        providerId = Integer.parseInt(claimsSet.getClaimAsString("providerId"));
+                    }
+                    String role = claimsSet.getClaimAsString("role");
+                    Set<GrantedAuthority> authorities = new HashSet<>();
+                    authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
+                    UserDetails userDetails = new MyUserDetails(id, customerId, providerId, username, "", authorities);
+                    if (userDetails != null) {
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                        fc.doFilter(request, response);
+                        return;
+                    }
+                }
+            } catch (ParseException | JOSEException ex) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ!");
+                return;
+            }
+
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ!");
             return;
         }
+
         fc.doFilter(request, response);
     }
 

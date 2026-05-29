@@ -6,6 +6,7 @@ package com.hp.controllers;
 
 import com.hp.dto.user.UserCreateDTO;
 import com.hp.dto.user.UserLoginDTO;
+import com.hp.dto.user.UserUpdateDTO;
 import com.hp.dto.user.UserViewDTO;
 import com.hp.pojo.BaseUser;
 import com.hp.services.UserService;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,14 +50,26 @@ public class ApiUserController {
     public ResponseEntity<?> login(@RequestBody UserLoginDTO u) {
         BaseUser user = this.userService.authenticate(u.phoneNumber(), u.password());
         if (user != null) {
+            Integer customerId = null;
+            if (user.getCustomerProfile() != null) {
+                customerId = user.getCustomerProfile().getId();
+            }
+
+            Integer providerId = null;
+            if (user.getProviderProfile() != null) {
+                providerId = user.getProviderProfile().getId();
+            }
+
             try {
-                String token = this.jwtUtils.generateToken(user.getId(), user.getPhoneNumber(), user.getRoleId().getName());
+                String token = this.jwtUtils.generateToken(user.getId(), customerId, providerId, user.getPhoneNumber(),
+                        user.getRoleId().getName());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {
                 return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo JWT"));
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Số điện thoại hoặc mật khẩu không đúng"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Collections.singletonMap("error", "Số điện thoại hoặc mật khẩu không đúng"));
     }
 
     @RequestMapping("/secure/profile")
@@ -70,4 +84,10 @@ public class ApiUserController {
         }
     }
 
+    @PatchMapping(path = "/secure/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserViewDTO> update(@ModelAttribute UserUpdateDTO user) throws ParseException {
+        UserViewDTO u = this.userService.updateUser(user);
+
+        return new ResponseEntity<>(u, HttpStatus.OK);
+    }
 }
