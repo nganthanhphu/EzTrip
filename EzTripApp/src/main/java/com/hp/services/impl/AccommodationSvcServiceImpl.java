@@ -21,8 +21,10 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.service.AccommodationCreateDTO;
 import com.hp.dto.service.AccommodationListViewDTO;
+import com.hp.dto.service.AccommodationUpdateDTO;
 import com.hp.dto.service.AccommodationViewDTO;
 import com.hp.dto.service.BaseServiceCreateDTO;
+import com.hp.dto.service.BaseServiceUpdateDTO;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.ServiceAccommodation;
@@ -114,4 +116,61 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
         this.baseServiceRepository.addOrUpdateService(svc);
     }
+
+    @Override
+    public void updateAccommodation(Integer id, AccommodationUpdateDTO accommodation) throws ParseException {
+        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+
+        if (svc == null)
+            throw new IllegalArgumentException("Dịch vụ không tồn tại!");
+
+        BaseServiceUpdateDTO baseInfo = accommodation.baseInfo();
+
+        if (baseInfo.name() != null && !baseInfo.name().isEmpty())
+            svc.setName(baseInfo.name());
+
+        if (baseInfo.description() != null && !baseInfo.description().isEmpty())
+            svc.setDescription(baseInfo.description());
+
+        if (baseInfo.price() != null)
+            svc.setPrice(baseInfo.price());
+
+        if (baseInfo.quantity() != null)
+            svc.setQuantity(baseInfo.quantity());
+
+        ServiceAccommodation additionalInfo = svc.getServiceAccommodation();
+
+        if (accommodation.quantityOfBed() != null)
+            additionalInfo.setQuantityOfBed(accommodation.quantityOfBed());
+
+        if (accommodation.area() != null)
+            additionalInfo.setArea(accommodation.area());
+
+        if (accommodation.location() != null && !accommodation.location().isEmpty())
+            additionalInfo.setLocation(accommodation.location());
+
+        Set<Image> images = svc.getImageSet();
+
+        if (baseInfo.imgFiles() != null) {
+            for (MultipartFile img : baseInfo.imgFiles()) {
+                if (img.isEmpty())
+                    continue;
+                try {
+                    Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
+                            ObjectUtils.asMap("resource_type", "auto"));
+                    Image image = new Image();
+                    image.setUrl(res.get("secure_url").toString());
+                    image.setServiceId(svc);
+                    images.add(image);
+                } catch (IOException ex) {
+                    Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        svc.setImageSet(images);
+        svc.setServiceAccommodation(additionalInfo);
+        this.baseServiceRepository.addOrUpdateService(svc);
+    }
+
 }

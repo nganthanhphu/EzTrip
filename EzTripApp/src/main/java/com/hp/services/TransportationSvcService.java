@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.hp.dto.service.TransportationCreateDTO;
 import com.hp.dto.service.TransportationListViewDTO;
+import com.hp.dto.service.TransportationUpdateDTO;
 import com.hp.dto.service.TransportationViewDTO;
 
 /**
@@ -22,4 +23,6 @@ public interface TransportationSvcService {
     TransportationViewDTO getTransportationById(Integer id);
 
     void addTransportation(TransportationCreateDTO transportation) throws ParseException;
+
+    void updateTransportation(Integer id, TransportationUpdateDTO transportation) throws ParseException;
 }

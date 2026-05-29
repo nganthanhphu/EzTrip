@@ -21,8 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.service.BaseServiceCreateDTO;
+import com.hp.dto.service.BaseServiceUpdateDTO;
 import com.hp.dto.service.TransportationCreateDTO;
 import com.hp.dto.service.TransportationListViewDTO;
+import com.hp.dto.service.TransportationUpdateDTO;
 import com.hp.dto.service.TransportationViewDTO;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
@@ -119,4 +121,67 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
 
         this.baseServiceRepository.addOrUpdateService(svc);
     }
+
+    @Override
+    public void updateTransportation(Integer id, TransportationUpdateDTO transportation) throws ParseException {
+        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+
+        if (svc == null)
+            throw new IllegalArgumentException("Dịch vụ không tồn tại!");
+
+        BaseServiceUpdateDTO baseInfo = transportation.baseInfo();
+
+        if (baseInfo.name() != null && !baseInfo.name().isEmpty())
+            svc.setName(baseInfo.name());
+
+        if (baseInfo.description() != null && !baseInfo.description().isEmpty())
+            svc.setDescription(baseInfo.description());
+
+        if (baseInfo.price() != null)
+            svc.setPrice(baseInfo.price());
+
+        if (baseInfo.quantity() != null)
+            svc.setQuantity(baseInfo.quantity());
+
+        ServiceTransportation additionalInfo = svc.getServiceTransportation();
+
+        if (transportation.arrivalLocation() != null && !transportation.arrivalLocation().isEmpty())
+            additionalInfo.setArrivalLocation(transportation.arrivalLocation());
+
+        if (transportation.departureLocation() != null && !transportation.departureLocation().isEmpty())
+            additionalInfo.setDepartureLocation(transportation.departureLocation());
+
+        if (transportation.arrivalTime() != null)
+            additionalInfo.setArrivalTime(transportation.arrivalTime());
+
+        if (transportation.departureTime() != null)
+            additionalInfo.setDepartureTime(transportation.departureTime());
+
+        if (transportation.typeOfTransportation() != null)
+            additionalInfo.setTypeOfTransportationId(new TypeOfTransportation(transportation.typeOfTransportation()));
+
+        Set<Image> images = svc.getImageSet();
+
+        if (baseInfo.imgFiles() != null) {
+            for (MultipartFile img : baseInfo.imgFiles()) {
+                if (img.isEmpty())
+                    continue;
+                try {
+                    Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
+                            ObjectUtils.asMap("resource_type", "auto"));
+                    Image image = new Image();
+                    image.setUrl(res.get("secure_url").toString());
+                    image.setServiceId(svc);
+                    images.add(image);
+                } catch (IOException ex) {
+                    Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        svc.setImageSet(images);
+        svc.setServiceTransportation(additionalInfo);
+        this.baseServiceRepository.addOrUpdateService(svc);
+    }
+
 }

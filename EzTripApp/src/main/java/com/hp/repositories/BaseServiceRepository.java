@@ -12,5 +12,6 @@ import com.hp.pojo.Service;
  */
 public interface BaseServiceRepository {
     Object[] getServiceForBookingValidation(int id);
+    Service getServiceById(int id);
     void addOrUpdateService(Service svc);
 }

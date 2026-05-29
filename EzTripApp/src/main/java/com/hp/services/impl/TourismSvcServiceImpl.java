@@ -21,8 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.hp.dto.service.BaseServiceCreateDTO;
+import com.hp.dto.service.BaseServiceUpdateDTO;
 import com.hp.dto.service.TourismCreateDTO;
 import com.hp.dto.service.TourismListViewDTO;
+import com.hp.dto.service.TourismUpdateDTO;
 import com.hp.dto.service.TourismViewDTO;
 import com.hp.pojo.Image;
 import com.hp.pojo.ProviderProfile;
@@ -113,4 +115,59 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
         this.baseServiceRepository.addOrUpdateService(svc);
     }
+
+    @Override
+    public void updateTourism(Integer id, TourismUpdateDTO tourism) throws ParseException {
+        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+
+        if (svc == null)
+            throw new IllegalArgumentException("Dịch vụ không tồn tại!");
+
+        BaseServiceUpdateDTO baseInfo = tourism.baseInfo();
+
+        if (baseInfo.name() != null && !baseInfo.name().isEmpty())
+            svc.setName(baseInfo.name());
+
+        if (baseInfo.description() != null && !baseInfo.description().isEmpty())
+            svc.setDescription(baseInfo.description());
+
+        if (baseInfo.price() != null)
+            svc.setPrice(baseInfo.price());
+
+        if (baseInfo.quantity() != null)
+            svc.setQuantity(baseInfo.quantity());
+
+        ServiceTourism additionalInfo = svc.getServiceTourism();
+
+        if (tourism.tourDuration() != null)
+            additionalInfo.setTourDuration(tourism.tourDuration());
+
+        if (tourism.location() != null && !tourism.location().isEmpty())
+            additionalInfo.setLocation(tourism.location());
+
+        Set<Image> images = svc.getImageSet();
+
+        if (baseInfo.imgFiles() != null) {
+            for (MultipartFile img : baseInfo.imgFiles()) {
+                if (img.isEmpty())
+                    continue;
+                try {
+                    Map<?, ?> res = this.cloudinary.uploader().upload(img.getBytes(),
+                            ObjectUtils.asMap("resource_type", "auto"));
+                    Image image = new Image();
+                    image.setUrl(res.get("secure_url").toString());
+                    image.setServiceId(svc);
+                    images.add(image);
+                } catch (IOException ex) {
+                    Logger.getLogger(AccommodationSvcServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        svc.setImageSet(images);
+        svc.setServiceTourism(additionalInfo);
+        this.baseServiceRepository.addOrUpdateService(svc);
+
+    }
+
 }

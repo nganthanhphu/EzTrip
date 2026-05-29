@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.hp.dto.service.TourismCreateDTO;
 import com.hp.dto.service.TourismListViewDTO;
+import com.hp.dto.service.TourismUpdateDTO;
 import com.hp.dto.service.TourismViewDTO;
 
 /**
@@ -22,4 +23,6 @@ public interface TourismSvcService {
     TourismViewDTO getTourismById(Integer id);
     
     void addTourism(TourismCreateDTO tourism) throws ParseException;
+
+    void updateTourism(Integer id, TourismUpdateDTO tourism) throws ParseException;
 }
