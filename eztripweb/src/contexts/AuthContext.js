@@ -16,8 +16,7 @@ function normalizeUser(user) {
 	}
 
 	return {
-		...user,
-		name: user.name || user.fullname || "",
+		...user
 	};
 }
 
