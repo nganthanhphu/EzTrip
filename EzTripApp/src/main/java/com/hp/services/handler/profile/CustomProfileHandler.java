@@ -7,8 +7,6 @@ package com.hp.services.handler.profile;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hp.dto.user.UserCreateDTO;
@@ -16,40 +14,24 @@ import com.hp.pojo.BaseUser;
 import com.hp.pojo.CustomerProfile;
 import com.hp.pojo.Gender;
 import com.hp.pojo.Role;
-import com.hp.repositories.GenderRepository;
-import com.hp.repositories.RoleRepository;
 
 /**
  *
  * @author Joon
  */
-@Component("CUSTOMER")
+@Component("ROLE_2")
 public class CustomProfileHandler implements UserProfileHandler {
-
-    @Autowired
-    private RoleRepository roleRepo;
-
-    @Autowired
-    private GenderRepository genderRepo;
 
     @Override
     public void handleProfileInfo(BaseUser user, UserCreateDTO u) throws ParseException {
-        String roleName = u.role();
-        Role role = roleRepo.getRoleByName(roleName);
-        if (role == null || !role.getName().equals("CUSTOMER")) {
-            throw new IllegalArgumentException("Vai trò không hợp lệ!");
-        }
-        user.setRoleId(role);
+        Integer roleId = u.role();
+        user.setRoleId(new Role(roleId));
 
         CustomerProfile profile = new CustomerProfile();
         profile.setUserId(user);
 
-        String genderName = u.gender();
-        Gender gender = genderRepo.getGenderByName(genderName);
-        if (gender == null) {
-            throw new IllegalArgumentException("Giới tính không hợp lệ!");
-        }
-        profile.setGenderId(gender);
+        Integer genderId = u.gender();
+        profile.setGenderId(new Gender(genderId));
 
         String dobString = u.dob();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");

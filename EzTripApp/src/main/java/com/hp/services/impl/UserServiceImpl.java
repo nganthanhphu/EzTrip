@@ -77,7 +77,8 @@ public class UserServiceImpl implements UserService {
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRoleId().getName()));
 
-        return new MyUserDetails(user.getId(), customerId, providerId, user.getPhoneNumber(), user.getPassword(), authorities);
+        return new MyUserDetails(user.getId(), customerId, providerId, user.getPhoneNumber(), user.getPassword(),
+                authorities);
     }
 
     @Override
@@ -94,6 +95,15 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(u.phoneNumber());
         user.setPassword(this.passwordEncoder.encode(u.password()));
 
+        Integer roleId = u.role();
+        UserProfileHandler handler = this.profileHandlers.get("ROLE_" + roleId);
+
+        if (handler == null) {
+            throw new IllegalArgumentException("Vai trò không hợp lệ!");
+        }
+
+        handler.handleProfileInfo(user, u);
+
         MultipartFile avatar = u.avatar();
         if (avatar != null && !avatar.isEmpty()) {
             try {
@@ -104,15 +114,6 @@ public class UserServiceImpl implements UserService {
                 Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
-        String roleName = u.role();
-        UserProfileHandler handler = this.profileHandlers.get(roleName);
-
-        if (handler == null) {
-            throw new IllegalArgumentException("Vai trò không hợp lệ!");
-        }
-
-        handler.handleProfileInfo(user, u);
 
         return toUserProfileDTO(this.userRepository.addUser(user));
     }
