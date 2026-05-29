@@ -9,6 +9,7 @@ import PanelCompare from "@components/customer/PanelCompare";
 import ModalConfirmAccommodationBooking from "@components/customer/ModalConfirmAccommodationBooking";
 import MySpinner from "@components/common/MySpinner";
 import { getAccommodationById } from "@services/customerService";
+import { formatCurrency } from "@utils/formatters";
 
 function AccommodationDetail() {
 	const [showBookingModal, setShowBookingModal] = useState(false);
@@ -63,7 +64,7 @@ function AccommodationDetail() {
 			<Container className="py-4">
 				<Row className="g-4 mb-4 align-items-stretch">
 					<Col xs={12} lg={4}>
-						<PanelAlbum urls={accommodationDetail.baseInfo.images} />
+						<PanelAlbum images={accommodationDetail.baseInfo.images} />
 					</Col>
 
 					<Col xs={12} lg={5}>
@@ -89,7 +90,7 @@ function AccommodationDetail() {
 										</ListGroup.Item>
 										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
 											<span>Giá</span>
-											<Badge bg="success">{accommodationDetail.baseInfo.price}</Badge>
+											<Badge bg="success">{formatCurrency(accommodationDetail.baseInfo.price)}</Badge>
 										</ListGroup.Item>
 									</ListGroup>
 								</div>
@@ -105,11 +106,7 @@ function AccommodationDetail() {
 
 					<Col xs={12} lg={3}>
 						<PanelProviderInfo
-							avatarUrl={accommodationDetail.baseInfo.companyAvatar}
-							name={accommodationDetail.baseInfo.companyName}
-							address={accommodationDetail.baseInfo.companyAddress}
-							phone={accommodationDetail.baseInfo.companyPhone}
-							email={accommodationDetail.baseInfo.companyEmail}
+							key={accommodationDetail.id} {...accommodationDetail.baseInfo?.providerInfo}
 						/>
 					</Col>
 				</Row>

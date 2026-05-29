@@ -18,6 +18,24 @@ function TransportationList() {
     const [selectedTransportation, setSelectedTransportation] = useState(null);
     const { lookupTables } = useLookupTables();
 
+    function buildBookingTransportation(option) {
+        const baseInfo = option?.baseInfo || {};
+
+        return {
+            id: option?.id ?? baseInfo.id,
+            name: baseInfo.name,
+            departureLocation: option?.departureLocation,
+            arrivalLocation: option?.arrivalLocation,
+            departureTime: option?.departureTime,
+            arrivalTime: option?.arrivalTime,
+            pricePerTicket: baseInfo.price,
+            availableSeats: baseInfo.remainingQuantity,
+            quantity: baseInfo.quantity,
+            image: baseInfo?.images?.[0]?.url,
+            typeOfTransportation: option?.typeOfTransportation,
+        };
+    }
+
     const loadTransportations = async () => {
         try {
             setLoading(true);
@@ -46,7 +64,7 @@ function TransportationList() {
     }
 
     function handleSelectTransportation(option) {
-        setSelectedTransportation(option);
+        setSelectedTransportation(buildBookingTransportation(option));
         setShowBookingModal(true);
     }
 

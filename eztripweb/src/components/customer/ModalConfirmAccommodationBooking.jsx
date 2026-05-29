@@ -21,19 +21,6 @@ function getDateInputValue(offsetDays = 0) {
 	return date.toISOString().split("T")[0];
 }
 
-function getNightCount(checkInDate, checkOutDate) {
-	if (!checkInDate || !checkOutDate) {
-		return 1;
-	}
-
-	const checkIn = new Date(checkInDate);
-	const checkOut = new Date(checkOutDate);
-	const millisecondsPerDay = 1000 * 60 * 60 * 24;
-	const nights = Math.ceil((checkOut - checkIn) / millisecondsPerDay);
-
-	return Number.isFinite(nights) && nights > 0 ? nights : 1;
-}
-
 function ModalConfirmAccommodationBooking({ show, onHide, accommodation }) {
 	const [checkInDate, setCheckInDate] = useState(getDateInputValue(1));
 	const [checkOutDate, setCheckOutDate] = useState(getDateInputValue(2));
@@ -51,8 +38,7 @@ function ModalConfirmAccommodationBooking({ show, onHide, accommodation }) {
 		setPaymentMethod("BANK_TRANSFER");
 	}, [show]);
 
-	const nights = useMemo(() => getNightCount(checkInDate, checkOutDate), [checkInDate, checkOutDate]);
-	const totalAmount = (accommodation?.pricePerNight ?? 0) * quantity * nights;
+	const totalAmount = (accommodation?.baseInfo?.price ?? 0) * quantity;
 
 	function handleSubmit(event) {
 		event.preventDefault();
@@ -67,8 +53,8 @@ function ModalConfirmAccommodationBooking({ show, onHide, accommodation }) {
 			<Form onSubmit={handleSubmit}>
 				<Modal.Body className="p-4">
 					<div className="mb-4">
-						<h5 className="fw-semibold mb-1">{accommodation?.name}</h5>
-						<div className="text-body-secondary">{accommodation?.address}</div>
+						<h5 className="fw-semibold mb-1">{accommodation?.baseInfo?.name}</h5>
+						<div className="text-body-secondary">{accommodation?.location}</div>
 					</div>
 
 					<Row className="g-3">
@@ -117,12 +103,8 @@ function ModalConfirmAccommodationBooking({ show, onHide, accommodation }) {
 						<Col xs={12}>
 							<div className="rounded-3 bg-light p-3 d-flex flex-wrap gap-3 justify-content-between align-items-center">
 								<div>
-									<div className="text-body-secondary small">Số đêm</div>
-									<div className="fw-semibold">{nights} đêm</div>
-								</div>
-								<div>
 									<div className="text-body-secondary small">Đơn giá</div>
-									<div className="fw-semibold">{formatCurrency(accommodation?.pricePerNight ?? 0)}</div>
+									<div className="fw-semibold">{formatCurrency(accommodation?.baseInfo?.price ?? 0)}</div>
 								</div>
 								<div>
 									<div className="text-body-secondary small">Tổng tiền</div>

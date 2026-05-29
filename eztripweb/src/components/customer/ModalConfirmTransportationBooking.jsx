@@ -1,19 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { formatCurrency } from "@utils/formatters";
 
 const PAYMENT_METHODS = [
 	{ value: "CASH", label: "Tiền mặt" },
 	{ value: "MOMO", label: "MOMO" },
 	{ value: "BANK_TRANSFER", label: "Chuyển khoản" },
 ];
-
-function formatCurrency(value) {
-	return new Intl.NumberFormat("vi-VN", {
-		style: "currency",
-		currency: "VND",
-		maximumFractionDigits: 0,
-	}).format(value);
-}
 
 function getDateInputValue(offsetDays = 0) {
 	const date = new Date();
@@ -39,9 +32,10 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 	}, [show]);
 
 	const priceValue = useMemo(() => {
-		const parsedPrice = Number(String(transportation?.price ?? 0).replace(/[^0-9]/g, ""));
-		return Number.isFinite(parsedPrice) ? parsedPrice : 0;
-	}, [transportation?.price]);
+		const src = transportation?.pricePerTicket ?? transportation?.price ?? 0;
+		const n = Number(src);
+		return Number.isFinite(n) ? n : 0;
+	}, [transportation?.pricePerTicket, transportation?.price]);
 
 	const totalAmount = priceValue * quantity;
 
@@ -60,7 +54,9 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 					<div className="mb-4">
 						<h5 className="fw-semibold mb-1">{transportation?.name}</h5>
 						<div className="text-body-secondary">
-							{transportation?.departure_location} → {transportation?.arrival_location}
+							{transportation?.departureLocation || transportation?.departure_location}
+							{" → "}
+							{transportation?.arrivalLocation || transportation?.arrival_location}
 						</div>
 					</div>
 
@@ -79,19 +75,19 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 							<Form.Control
 								type="number"
 								min="1"
-								max={transportation?.avaibility_count ?? undefined}
+								max={transportation?.availableSeats ?? transportation?.avaibility_count ?? undefined}
 								value={quantity}
 								onChange={(event) =>
 									setQuantity(
 										Math.min(
 											Math.max(1, Number(event.target.value) || 1),
-											transportation?.avaibility_count ?? Number.POSITIVE_INFINITY,
+											transportation?.availableSeats ?? transportation?.avaibility_count ?? Number.POSITIVE_INFINITY,
 										),
 									)
 								}
 							/>
 							<div className="text-body-secondary small mt-1">
-								Còn lại {transportation?.avaibility_count ?? 0} chỗ
+								Còn lại {transportation?.availableSeats ?? transportation?.avaibility_count ?? 0} chỗ
 							</div>
 						</Col>
 

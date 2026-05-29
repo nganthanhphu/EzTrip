@@ -1,8 +1,11 @@
 import { Card, Carousel, Image } from "react-bootstrap";
 import defaultAccommodationImage from "../../assets/images/default_accommodation_item.jpg";
 
-function PanelAlbum({ urls = [] }) {
-	const images = urls.length > 0 ? urls : [defaultAccommodationImage];
+function PanelAlbum({ images = [], urls = [], image = [] }) {
+	const sourceImages = images.length > 0 ? images : urls.length > 0 ? urls : image;
+	const imagesList = Array.isArray(sourceImages) && sourceImages.length > 0
+		? sourceImages.map((item) => (typeof item === "string" ? item : item?.url)).filter(Boolean)
+		: [defaultAccommodationImage];
 
 	return (
 		<Card className="h-100 shadow-sm">
@@ -10,8 +13,8 @@ function PanelAlbum({ urls = [] }) {
 				Album ảnh
 			</Card.Header>
 			<Card.Body className="p-0">
-				<Carousel interval={null} indicators={images.length > 1} controls={images.length > 1}>
-					{images.map((url, index) => (
+				<Carousel interval={null} indicators={imagesList.length > 1} controls={imagesList.length > 1}>
+					{imagesList.map((url, index) => (
 						<Carousel.Item key={`${url}-${index}`}>
 							<div className="ratio ratio-4x3 bg-body-secondary">
 								<Image
