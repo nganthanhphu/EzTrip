@@ -9,22 +9,32 @@ import { getAccommodations } from "@services/customerService";
 import usePagedList from "@hooks/usePagedList";
 
 function AccommodationList() {
-    const [searchText, setSearchText] = useState("");
-    const [beds, setBeds] = useState("");
-    const [area, setArea] = useState("");
+    const [name, setName] = useState("");
+    const [location, setLocation] = useState("");
+    const [fromPrice, setFromPrice] = useState("");
+    const [toPrice, setToPrice] = useState("");
+    const [rating, setRating] = useState("");
+    const [sortOption, setSortOption] = useState("");
+
+    const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
     const pageSize = 5;
     const { items: accommodationList, loading, page, totalPages, loadPage } = usePagedList(
         (nextPage) =>
             getAccommodations({
-                beds,
-                area,
-                searchText,
+                name,
+                location,
+                fromPrice,
+                toPrice,
+                rating,
+                sortBy,
+                order,
                 page: nextPage,
                 size: pageSize,
             }),
         pageSize
     );
+
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -39,42 +49,26 @@ function AccommodationList() {
         <CustomerLayout>
             <Container className="py-4">
                 <Form className="mb-3" onSubmit={handleSearch}>
-                    {/* TODO: Sort theo độ hot(cao-thấp), giá (cao-thấp); Filter khoảng giá, rating*/}
-                    <Row className="g-2 align-items-center">
+                    <Row className="g-2 align-items-center mb-2">
                         <Col md={5}>
                             <Form.Control
                                 type="text"
-                                placeholder="Tìm kiếm địa điểm"
-                                value={searchText}
-                                onChange={(e) => setSearchText(e.target.value)}
+                                placeholder="Tìm theo tên chỗ ở"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
                             />
                         </Col>
 
-                        <Col md={2}>
+                        <Col md={4}>
                             <Form.Control
-                                type="number"
-                                placeholder="Số giường"
-                                value={beds}
-                                onChange={(e) => setBeds(e.target.value)}
+                                type="text"
+                                placeholder="Địa điểm"
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
                             />
                         </Col>
 
-                        <Col md={3}>
-                            <Row className="g-2">
-                                <Col>
-                                    <Form.Control
-                                        type="number"
-                                        placeholder="Diện tích (m²)"
-                                        value={area}
-                                        onChange={(e) =>
-                                            setArea(e.target.value)
-                                        }
-                                    />
-                                </Col>
-                            </Row>
-                        </Col>
-
-                        <Col md={2} className="d-grid">
+                        <Col md={3} className="d-grid">
                             <Button
                                 variant="primary"
                                 type="submit"
@@ -82,6 +76,53 @@ function AccommodationList() {
                             >
                                 Tìm kiếm
                             </Button>
+                        </Col>
+                    </Row>
+
+                    <Row className="g-2 align-items-center mb-3">
+                        <Col md={2}>
+                            <Form.Control
+                                type="number"
+                                min="0"
+                                placeholder="Giá từ"
+                                value={fromPrice}
+                                onChange={(e) => setFromPrice(e.target.value)}
+                            />
+                        </Col>
+
+                        <Col md={2}>
+                            <Form.Control
+                                type="number"
+                                min="0"
+                                placeholder="Giá đến"
+                                value={toPrice}
+                                onChange={(e) => setToPrice(e.target.value)}
+                            />
+                        </Col>
+
+                        <Col md={2}>
+                            <Form.Control
+                                type="number"
+                                min="0"
+                                max="10"
+                                step="0.1"
+                                placeholder="Rating từ"
+                                value={rating}
+                                onChange={(e) => setRating(e.target.value)}
+                            />
+                        </Col>
+
+                        <Col md={4}>
+                            <Form.Select
+                                value={sortOption}
+                                onChange={(e) => setSortOption(e.target.value)}
+                            >
+                                <option value="">Sắp xếp</option>
+                                <option value="price|asc">Giá thấp đến cao</option>
+                                <option value="price|desc">Giá cao đến thấp</option>
+                                <option value="hot|desc">Hot nhất đến thấp</option>
+                                <option value="hot|asc">Hot thấp đến cao</option>
+                            </Form.Select>
                         </Col>
                     </Row>
                 </Form>
