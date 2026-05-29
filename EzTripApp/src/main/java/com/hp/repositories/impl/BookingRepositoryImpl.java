@@ -78,6 +78,7 @@ public class BookingRepositoryImpl implements BookingRepository {
 
         root.fetch("serviceId", JoinType.LEFT).fetch("typeOfServiceId", JoinType.LEFT);
         root.fetch("serviceId", JoinType.LEFT).fetch("imageSet", JoinType.LEFT);
+        root.fetch("serviceId", JoinType.LEFT).fetch("providerId", JoinType.LEFT).fetch("userId", JoinType.LEFT);
         root.fetch("statusId", JoinType.LEFT);
         root.fetch("paymentMethodId", JoinType.LEFT);
         root.fetch("review", JoinType.LEFT);
@@ -104,22 +105,24 @@ public class BookingRepositoryImpl implements BookingRepository {
                     int serviceIdInt = Integer.parseInt(serviceId);
                     predicates.add(b.equal(root.get("serviceId").get("id"), serviceIdInt));
                 } catch (NumberFormatException e) {
-                    
+
                 }
             }
 
             String typeOfService = params.get("typeOfService");
             if (typeOfService != null && !typeOfService.isEmpty()) {
                 try {
-                    predicates.add(b.equal(root.get("serviceId").get("typeOfServiceId").get("id"), Integer.parseInt(typeOfService)));
+                    predicates.add(b.equal(root.get("serviceId").get("typeOfServiceId").get("id"),
+                            Integer.parseInt(typeOfService)));
                 } catch (NumberFormatException e) {
-                    
+
                 }
             }
 
             String customerName = params.get("customerName");
             if (customerName != null && !customerName.isEmpty()) {
-                predicates.add(b.like(root.get("customerId").get("userId").get("fullname"), String.format("%%%s%%", customerName)));
+                predicates.add(b.like(root.get("customerId").get("userId").get("fullname"),
+                        String.format("%%%s%%", customerName)));
             }
 
         }

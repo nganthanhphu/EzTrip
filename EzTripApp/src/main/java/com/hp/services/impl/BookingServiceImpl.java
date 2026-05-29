@@ -132,9 +132,12 @@ public class BookingServiceImpl implements BookingService {
                 booking.getTotalAmount(),
                 booking.getNote(),
                 booking.getStatusId().getId(),
+                booking.getCustomerId().getUserId().getId(),
                 booking.getCustomerId().getUserId().getFullname(),
                 booking.getCustomerId().getUserId().getPhoneNumber(),
                 booking.getCustomerId().getUserId().getAvatar(),
+                booking.getServiceId().getProviderId().getUserId().getId(),
+                booking.getServiceId().getProviderId().getCompanyName(),
                 booking.getPaymentMethodId().getId(),
                 reviewDTO);
     }
