@@ -48,6 +48,10 @@ export async function createBooking(booking) {
 	return requestJsonCreate("/api/secure/bookings", booking);
 }
 
+export async function updateBooking(bookingId, booking) {
+	return axiosClient.put(`/api/secure/bookings/${bookingId}`, booking);
+}
+
 //5. Nghiệp vụ đánh giá
 export async function createReview(bookingId, review) {
 	return requestJsonCreate(`/api/secure/bookings/${bookingId}/reviews`, review);
@@ -61,5 +65,6 @@ export default {
 	getTransportations,
 	getBookings,
 	createBooking,
-	createReview,
+	updateBooking,
+	createReview
 };

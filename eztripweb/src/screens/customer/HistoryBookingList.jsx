@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
-import HistoryBookingItem from "@components/customer/CardHistoryBookingItem";
+import CardHistoryBookingItem from "@components/customer/CardHistoryBookingItem";
 import PaginationComponent from "@components/common/PaginationComponent";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import MySpinner from "@components/common/MySpinner";
@@ -118,26 +118,8 @@ function HistoryBookingList() {
                 ) : (
                     <div className="d-flex flex-column gap-3">
                         {bookings.map((item) => (
-                            <HistoryBookingItem
-                                key={item.id}
-                                bookingId={item.id}
-                                serviceName={item.serviceName}
-                                serviceType={item.serviceType}
-                                serviceImage={item.serviceImage}
-                                providerName={item.providerName}
-                                createdDate={item.createdDate}
-                                bookingDay={item.bookingDay}
-                                paymentMethod={item.paymentMethod}
-                                quantity={item.quantity}
-                                totalAmount={item.totalAmount}
-                                status={item.status}
-                                note={item.note}
-                                customerName={item.customerName}
-                                customerPhone={item.customerPhone}
-                                customerAvatar={item.customerAvatar}
-                                review={item.review}
-                                onChat={() => handleChat(item)}
-                                onPrimaryAction={() => handlePrimary(item)}
+                            <CardHistoryBookingItem
+                                key={item.id} {...item}
                             />
                         ))}
                     </div>

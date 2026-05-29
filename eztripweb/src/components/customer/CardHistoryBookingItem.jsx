@@ -25,20 +25,9 @@ const PAYMENT_METHOD_LABELS = {
 
 function CardHistoryBookingItem(props) {
 	const [showReviewModal, setShowReviewModal] = useState(false);
-	const bookingId = props.bookingId ?? props.id ?? null;
-	const serviceName = props.serviceName ?? props.name_of_service ?? "Tên dịch vụ";
-	const serviceType = props.serviceType ?? props.type_of_service ?? "";
-	const serviceImage = props.serviceImage ?? props.service_image ?? defaultImage;
-	const providerName =
-		props.providerName ?? props.name_of_provider ?? props.note ?? props.customerName ?? "";
-	const createdDate = props.createdDate ?? props.created_at ?? "";
-	const bookingDay = props.bookingDay ?? props.booking_day ?? "";
-	const paymentMethod = props.paymentMethod ?? props.payment_method ?? "";
-	const quantity = props.quantity ?? 1;
-	const totalAmount = props.totalAmount ?? props.total_amount ?? 0;
-	const status = String(props.status ?? "PENDING").toUpperCase();
-	const onChat = props.onChat;
-	const onPrimaryAction = props.onPrimaryAction;
+	const {id, serviceName, serviceType, serviceImage, createdDate, bookingDay, quantity, totalAmount, note, status, customerName, customerPhone, customerAvatar, paymentMethod} = props;
+
+
 	const review = useMemo(() => props.review ?? null, [props.review]);
 
 	const isPending = status === "PENDING";
@@ -100,7 +89,7 @@ function CardHistoryBookingItem(props) {
 								{serviceName}
 							</h5>
 							<div className="text-secondary">{serviceTypeLabel}</div>
-							{providerName ? <div className="text-secondary text-truncate">{providerName}</div> : null}
+							{serviceName ? <div className="text-secondary text-truncate">{serviceName}</div> : null}
 						</div>
 
 						<div className="mt-3 d-flex justify-content-start">
