@@ -57,4 +57,16 @@ export function formatBookingDate(dateValue) {
     return `${day}/${month}/${year}`;
 }
 
+export function formatTimestamp(value) {
+    if (!value) {
+        return "";
+    }
+
+    try {
+        return new Date(value).toLocaleString("vi-VN");
+    } catch {
+        return "";
+    }
+}
+
 export default formatCurrency;

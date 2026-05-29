@@ -1,24 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Alert, Badge, Modal, Spinner } from "react-bootstrap";
+import { Alert, Badge, Modal } from "react-bootstrap";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getDatabase, onValue, push, ref } from "firebase/database";
 import FirebaseConfigs from "../../configs/FirebaseConfigs";
 import defaultAvatar from "@assets/images/default_avatar.jpg";
 import { MessageBubble, ChatInput } from "@components/common/ChatComponents";
 import { useAuth } from "@hooks/useAuth";
-
-async function sha256Hex(input) {
-	const encoded = new TextEncoder().encode(input);
-	const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
-	return Array.from(new Uint8Array(hashBuffer))
-		.map((byte) => byte.toString(16).padStart(2, "0"))
-		.join("");
-}
-
-function buildSeed(value) {
-	return `${FirebaseConfigs.tokenHashSalt}${String(value || "").trim()}`;
-}
 
 function resolveFallbackAvatar(senderId, currentUserId, partnerUserId, currentAvatar, partnerAvatar) {
 	if (String(senderId) === String(currentUserId)) {
@@ -35,8 +23,9 @@ function resolveFallbackAvatar(senderId, currentUserId, partnerUserId, currentAv
 function ModalChat({
 	show = true,
 	onHide,
-	currentPhoneNumber,
-	partnerPhoneNumber,
+	currentUserId,
+	partnerUserId,
+	roomId,
 	currentName,
 	partnerName,
 	currentAvatar,
@@ -48,16 +37,10 @@ function ModalChat({
 	const { currentUser } = useAuth();
 	const scrollRef = useRef(null);
 	const [messages, setMessages] = useState([]);
-	const [connectionError, setConnectionError] = useState("");
-	const [loadingRoom, setLoadingRoom] = useState(true);
-	const [chatMeta, setChatMeta] = useState({
-		currentUserId: "",
-		partnerUserId: "",
-		roomId: "",
-	});
 
-	const fallbackCurrentPhone = currentUser?.phoneNumber || currentPhoneNumber || params.fromId || "";
-	const fallbackPartnerPhone = partnerPhoneNumber || params.toId || "";
+	const fallbackCurrentUserId = String(currentUserId || currentUser?.id || params.fromId || "").trim();
+	const fallbackPartnerUserId = String(partnerUserId || params.toId || "").trim();
+	const fallbackRoomId = String(roomId || "").trim();
 	const resolvedCurrentName = currentName || currentUser?.name || currentUser?.fullname || "Tôi";
 	const resolvedPartnerName = partnerName || location.state?.partnerName || "Đối tác";
 	const resolvedCurrentAvatar = currentAvatar || currentUser?.avatar || defaultAvatar;
@@ -83,104 +66,46 @@ function ModalChat({
 		}
 	}, [messages]);
 
-	useEffect(() => {
-		let cancelled = false;
-
-		async function prepareRoom() {
-			setLoadingRoom(true);
-			setConnectionError("");
-
-			if (!show) {
-				setLoadingRoom(false);
-				return;
-			}
-
-			if (!FirebaseConfigs.tokenHashSalt) {
-				setConnectionError("Thiếu token hash salt cho phòng chat.");
-				setLoadingRoom(false);
-				return;
-			}
-
-			if (!fallbackCurrentPhone || !fallbackPartnerPhone) {
-				setConnectionError("Thiếu số điện thoại để tạo phòng chat.");
-				setLoadingRoom(false);
-				return;
-			}
-
-			try {
-				const [currentUserId, partnerUserId] = await Promise.all([
-					sha256Hex(buildSeed(fallbackCurrentPhone)),
-					sha256Hex(buildSeed(fallbackPartnerPhone)),
-				]);
-
-				const roomId = await sha256Hex([currentUserId, partnerUserId].sort().join("__"));
-
-				if (!cancelled) {
-					setChatMeta({
-						currentUserId,
-						partnerUserId,
-						roomId,
-					});
-				}
-			} catch {
-				if (!cancelled) {
-					setConnectionError("Không thể khởi tạo phòng chat đã băm.");
-				}
-			} finally {
-				if (!cancelled) {
-					setLoadingRoom(false);
-				}
-			}
-		}
-
-		prepareRoom();
-
-		return () => {
-			cancelled = true;
-		};
-	}, [fallbackCurrentPhone, fallbackPartnerPhone, show]);
+	const currentId = fallbackCurrentUserId;
+	const partnerId = fallbackPartnerUserId;
+	const resolvedRoomId = fallbackRoomId || (currentId && partnerId ? [currentId, partnerId].sort().join("__") : "");
 
 	useEffect(() => {
-		if (!database || !chatMeta.roomId || !chatMeta.currentUserId || !chatMeta.partnerUserId) {
-			return undefined;
-		}
+		if (!database || !resolvedRoomId || !currentId || !partnerId) return undefined;
 
-		const chatRef = ref(database, `chats/${chatMeta.roomId}`);
+		const chatRef = ref(database, `chats/${resolvedRoomId}`);
 		const unsubscribe = onValue(chatRef, (snapshot) => {
 			const payload = snapshot.val();
 			const nextMessages = payload
-				? Object.entries(payload).map(([id, value]) => ({
-					id,
-					...value,
-				}))
+				? Object.entries(payload).map(([id, value]) => ({ id, ...value }))
 				: [];
 
-			nextMessages.sort((left, right) => (left.timestamp || 0) - (right.timestamp || 0));
+			nextMessages.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
 
 			const normalized = nextMessages.map((message) => ({
 				...message,
-				senderAvatar: message.senderAvatar || resolveFallbackAvatar(message.senderId, chatMeta.currentUserId, chatMeta.partnerUserId, resolvedCurrentAvatar, resolvedPartnerAvatar),
-				recipientAvatar: message.recipientAvatar || resolveFallbackAvatar(message.recipientId, chatMeta.currentUserId, chatMeta.partnerUserId, resolvedCurrentAvatar, resolvedPartnerAvatar),
-				senderName: message.senderName || (String(message.senderId) === String(chatMeta.currentUserId) ? resolvedCurrentName : resolvedPartnerName),
-				recipientName: message.recipientName || (String(message.recipientId) === String(chatMeta.currentUserId) ? resolvedCurrentName : resolvedPartnerName),
+				senderAvatar: message.senderAvatar || resolveFallbackAvatar(message.senderId, currentId, partnerId, resolvedCurrentAvatar, resolvedPartnerAvatar),
+				recipientAvatar: message.recipientAvatar || resolveFallbackAvatar(message.recipientId, currentId, partnerId, resolvedCurrentAvatar, resolvedPartnerAvatar),
+				senderName: message.senderName || (String(message.senderId) === String(currentId) ? resolvedCurrentName : resolvedPartnerName),
+				recipientName: message.recipientName || (String(message.recipientId) === String(currentId) ? resolvedCurrentName : resolvedPartnerName),
 			}));
 
 			setMessages(normalized);
 		});
 
 		return () => unsubscribe();
-	}, [database, chatMeta, resolvedCurrentAvatar, resolvedCurrentName, resolvedPartnerAvatar, resolvedPartnerName]);
+	}, [database, resolvedRoomId, currentId, partnerId, resolvedCurrentAvatar, resolvedCurrentName, resolvedPartnerAvatar, resolvedPartnerName]);
+
+	const missingIds = !currentId || !partnerId;
 
 	const handleSend = (text) => {
-		if (!database || !chatMeta.roomId || !chatMeta.currentUserId || !chatMeta.partnerUserId) {
-			return;
-		}
+		if (missingIds || !database || !resolvedRoomId) return;
 
-		const chatRef = ref(database, `chats/${chatMeta.roomId}`);
+		const chatRef = ref(database, `chats/${resolvedRoomId}`);
 		void push(chatRef, {
-			senderId: chatMeta.currentUserId,
+			senderId: currentId,
 			senderName: resolvedCurrentName,
-			recipientId: chatMeta.partnerUserId,
+			recipientId: partnerId,
 			recipientName: resolvedPartnerName,
 			text,
 			timestamp: Date.now(),
@@ -208,7 +133,7 @@ function ModalChat({
 			<Modal.Header closeButton>
 				<div>
 					<Modal.Title className="mb-1">{headerTitle}</Modal.Title>
-					<div className="text-muted small">Phòng chat sử dụng định danh đã băm từ số điện thoại.</div>
+					<div className="text-muted small">Phòng chat theo ID người dùng.</div>
 				</div>
 			</Modal.Header>
 			<Modal.Body className="p-0 d-flex flex-column" style={{ minHeight: "70vh" }}>
@@ -218,27 +143,23 @@ function ModalChat({
 						<Badge bg="secondary">{resolvedPartnerName}</Badge>
 					</div>
 					<div className="text-muted small">
-						{loadingRoom ? "Đang khởi tạo phòng..." : `Room: ${chatMeta.roomId ? `${chatMeta.roomId.slice(0, 12)}...` : "-"}`}
+						{missingIds ? "Thiếu ID người dùng" : `Room: ${resolvedRoomId ? `${resolvedRoomId.slice(0, 12)}...` : "-"}`}
 					</div>
 				</div>
 
-				{connectionError ? (
-					<Alert variant="warning" className="m-3 mb-0">
-						{connectionError}
-					</Alert>
+				{missingIds ? (
+					<Alert variant="warning" className="m-3 mb-0">Thiếu ID người dùng để kết nối phòng chat.</Alert>
 				) : null}
 
 				<div ref={scrollRef} className="flex-grow-1 overflow-auto p-3 bg-white">
-					{loadingRoom ? (
-						<div className="d-flex justify-content-center align-items-center h-100 py-5">
-							<Spinner animation="border" role="status" />
-						</div>
+					{missingIds ? (
+						<div className="text-center text-muted py-5">Thiếu ID người dùng để mở phòng chat.</div>
 					) : messages.length > 0 ? (
 						messages.map((message) => (
 							<MessageBubble
 								key={message.id}
 								message={message}
-								isOwn={String(message.senderId) === String(chatMeta.currentUserId)}
+								isOwn={String(message.senderId) === String(currentId)}
 							/>
 						))
 					) : (

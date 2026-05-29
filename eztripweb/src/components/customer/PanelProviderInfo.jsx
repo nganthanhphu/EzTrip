@@ -4,7 +4,7 @@ import AuthContext from "@contexts/AuthContext";
 import ModalChat from "@components/common/ModalChat";
 
 function PanelProviderInfo(props = {}) {
-	const { companyName, companyAvatar, companyAddress, companyPhone, companyEmail } = props;
+	const { companyId, companyName, companyAvatar, companyAddress, companyPhone, companyEmail } = props;
 	const { currentUser } = useContext(AuthContext);
 	const [showChatModal, setShowChatModal] = useState(false);
 
@@ -42,7 +42,7 @@ function PanelProviderInfo(props = {}) {
 				<div className="d-grid">
 					<Button
 						variant="primary"
-						disabled={!currentUser?.phoneNumber || !companyPhone}
+						disabled={!currentUser?.id || !companyId}
 						onClick={() => setShowChatModal(true)}
 					>
 						Chat ngay
@@ -52,8 +52,8 @@ function PanelProviderInfo(props = {}) {
 			<ModalChat
 				show={showChatModal}
 				onHide={() => setShowChatModal(false)}
-				currentPhoneNumber={currentUser?.phoneNumber || ""}
-				partnerPhoneNumber={companyPhone || ""}
+				currentUserId={currentUser?.id || ""}
+				partnerUserId={companyId || ""}
 				currentName={currentUser?.name || currentUser?.fullname || "Tôi"}
 				partnerName={companyName}
 				currentAvatar={currentUser?.avatar || ""}
