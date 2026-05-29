@@ -31,7 +31,6 @@ import com.hp.pojo.TypeOfService;
 import com.hp.pojo.TypeOfTransportation;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.TransportationSvcRepository;
-import com.hp.repositories.TypeOfTransportationRepository;
 import com.hp.security.MyUserDetails;
 import com.hp.services.TransportationSvcService;
 import com.hp.utils.UserUtils;
@@ -52,9 +51,6 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
 
     @Autowired
     private Cloudinary cloudinary;
-
-    @Autowired
-    private TypeOfTransportationRepository typeOfTransportationRepository;
 
     public List<TransportationListViewDTO> getTransportationServices(Map<String, String> params) {
         int providerId = 0;
@@ -78,12 +74,6 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
 
     @Override
     public void addTransportation(TransportationCreateDTO transportation) throws ParseException {
-        TypeOfTransportation typeOfTransportation = this.typeOfTransportationRepository
-                .getTypeOfTransportationByName(transportation.typeOfTransportation());
-        if (typeOfTransportation == null) {
-            throw new IllegalArgumentException("Loại phương tiện không hợp lệ!");
-        }
-
         BaseServiceCreateDTO baseInfo = transportation.baseInfo();
         Integer providerId = UserUtils.getCurrentUserDetails().getProviderId();
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
@@ -92,6 +82,22 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
         svc.setPrice(baseInfo.price());
         svc.setQuantity(baseInfo.quantity());
         svc.setIsActive(true);
+
+        svc.setProviderId(new ProviderProfile(providerId));
+        svc.setTypeOfServiceId(new TypeOfService(3));
+
+        ServiceTransportation additionalInfo = new ServiceTransportation();
+        additionalInfo.setArrivalLocation(transportation.arrivalLocation());
+        additionalInfo.setDepartureLocation(transportation.departureLocation());
+        additionalInfo.setArrivalTime(transportation.arrivalTime());
+        additionalInfo.setDepartureTime(transportation.departureTime());
+
+        Integer typeOfTransportationId = transportation.typeOfTransportation();
+        additionalInfo.setTypeOfTransportationId(new TypeOfTransportation(typeOfTransportationId));
+
+        additionalInfo.setServiceId(svc);
+        svc.setServiceTransportation(additionalInfo);
+
         Set<Image> images = new HashSet<>();
         if (baseInfo.imgFiles() != null) {
             for (MultipartFile img : baseInfo.imgFiles()) {
@@ -110,19 +116,6 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
             }
         }
         svc.setImageSet(images);
-
-        svc.setProviderId(new ProviderProfile(providerId));
-        svc.setTypeOfServiceId(new TypeOfService(3));
-
-        ServiceTransportation additionalInfo = new ServiceTransportation();
-        additionalInfo.setArrivalLocation(transportation.arrivalLocation());
-        additionalInfo.setDepartureLocation(transportation.departureLocation());
-        additionalInfo.setArrivalTime(transportation.arrivalTime());
-        additionalInfo.setDepartureTime(transportation.departureTime());
-        additionalInfo.setTypeOfTransportationId(typeOfTransportation);
-
-        additionalInfo.setServiceId(svc);
-        svc.setServiceTransportation(additionalInfo);
 
         this.baseServiceRepository.addOrUpdateService(svc);
     }

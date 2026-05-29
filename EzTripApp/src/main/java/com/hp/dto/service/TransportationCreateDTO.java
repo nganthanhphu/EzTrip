@@ -14,6 +14,6 @@ public record TransportationCreateDTO(
         String departureLocation,
         int arrivalTime,
         int departureTime,
-        String typeOfTransportation
+        Integer typeOfTransportation
 ) {
 }
