@@ -49,7 +49,7 @@ export async function createBooking(booking) {
 }
 
 export async function updateBooking(bookingId, booking) {
-	return axiosClient.put(`/api/secure/bookings/${bookingId}`, booking);
+	return axiosClient.patch(`/api/secure/bookings/${bookingId}`, booking);
 }
 
 //5. Nghiệp vụ đánh giá

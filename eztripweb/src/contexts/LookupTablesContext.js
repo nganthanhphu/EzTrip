@@ -2,6 +2,37 @@ import React, { createContext, useCallback, useContext, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchLookupTables } from "@services/lookupService";
 
+export const ROLE_ID_MAP = Object.freeze({
+	1: "ADMIN",
+	2: "CUSTOMER",
+	3: "PROVIDER",
+});
+
+export function normalizeRole(value) {
+	if (typeof value === "number" && ROLE_ID_MAP[value]) {
+		return ROLE_ID_MAP[value];
+	}
+
+	if (value && typeof value === "object") {
+		const nestedValue = value.name ?? value.roleName ?? value.role ?? value.id;
+		return normalizeRole(nestedValue);
+	}
+
+	const normalized = String(value || "").trim().toUpperCase();
+	if (!normalized) {
+		return "";
+	}
+
+	if (/^\d+$/.test(normalized)) {
+		const mappedRole = ROLE_ID_MAP[Number(normalized)];
+		if (mappedRole) {
+			return mappedRole;
+		}
+	}
+
+	return normalized.startsWith("ROLE_") ? normalized.replace("ROLE_", "") : normalized;
+}
+
 const DEFAULT_LABELS = {
 	genders: {
 		MALE: "Nam",

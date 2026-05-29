@@ -9,14 +9,6 @@ import MySpinner from "@components/common/MySpinner";
 import { getBookings } from "@services/customerService";
 import usePagedList from "@hooks/usePagedList";
 
-const handleChat = (item) => {
-    console.log("Chat for", item);
-};
-
-const handlePrimary = (item) => {
-    console.log("Primary action for", item);
-};
-
 function HistoryBookingList() {
     const [serviceType, setServiceType] = useState("");
     const [status, setStatus] = useState("");
@@ -119,7 +111,9 @@ function HistoryBookingList() {
                     <div className="d-flex flex-column gap-3">
                         {bookings.map((item) => (
                             <CardHistoryBookingItem
-                                key={item.id} {...item}
+                                key={item.id}
+                                {...item}
+                                onUpdated={() => loadPage(page)}
                             />
                         ))}
                     </div>

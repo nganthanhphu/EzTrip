@@ -1,15 +1,7 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@hooks/useAuth";
-
-function normalizeRole(value) {
-	const normalized = String(value || "").trim().toUpperCase();
-	if (!normalized) {
-		return "";
-	}
-
-	return normalized.startsWith("ROLE_") ? normalized.replace("ROLE_", "") : normalized;
-}
+import { normalizeRole } from "@contexts/LookupTablesContext";
 
 function resolveFallbackPathByRole(role) {
 	if (role === "PROVIDER") {
