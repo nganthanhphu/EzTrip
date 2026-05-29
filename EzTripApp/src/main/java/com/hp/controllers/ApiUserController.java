@@ -48,14 +48,26 @@ public class ApiUserController {
     public ResponseEntity<?> login(@RequestBody UserLoginDTO u) {
         BaseUser user = this.userService.authenticate(u.phoneNumber(), u.password());
         if (user != null) {
+            Integer customerId = null;
+            if (user.getCustomerProfile() != null) {
+                customerId = user.getCustomerProfile().getId();
+            }
+
+            Integer providerId = null;
+            if (user.getProviderProfile() != null) {
+                providerId = user.getProviderProfile().getId();
+            }
+
             try {
-                String token = this.jwtUtils.generateToken(user.getId(), user.getPhoneNumber(), user.getRoleId().getName());
+                String token = this.jwtUtils.generateToken(user.getId(), customerId, providerId, user.getPhoneNumber(),
+                        user.getRoleId().getName());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {
                 return ResponseEntity.status(500).body(Collections.singletonMap("error", "Lỗi khi tạo JWT"));
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("error", "Số điện thoại hoặc mật khẩu không đúng"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Collections.singletonMap("error", "Số điện thoại hoặc mật khẩu không đúng"));
     }
 
     @RequestMapping("/secure/profile")

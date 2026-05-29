@@ -64,10 +64,20 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("Người dùng không tồn tại!");
         }
 
+        Integer customerId = null;
+        if (user.getCustomerProfile() != null) {
+            customerId = user.getCustomerProfile().getId();
+        }
+
+        Integer providerId = null;
+        if (user.getProviderProfile() != null) {
+            providerId = user.getProviderProfile().getId();
+        }
+
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRoleId().getName()));
 
-        return new MyUserDetails(user.getId(), user.getPhoneNumber(), user.getPassword(), authorities);
+        return new MyUserDetails(user.getId(), customerId, providerId, user.getPhoneNumber(), user.getPassword(), authorities);
     }
 
     @Override

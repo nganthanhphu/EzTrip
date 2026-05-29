@@ -40,7 +40,7 @@ public class JwtUtils {
         this.EXPIRATION_MS = Long.parseLong(env.getProperty("JWT_EXPIRATION"));
     }
 
-    public String generateToken(int id, String username, String role) throws KeyLengthException, JOSEException {
+    public String generateToken(int id, Integer customerId, Integer providerId, String username, String role) throws KeyLengthException, JOSEException {
         JWSSigner signer = new MACSigner(SECRET);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
@@ -48,6 +48,8 @@ public class JwtUtils {
                 .expirationTime(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .issueTime(new Date())
                 .claim("id", id)
+                .claim("customerId", customerId)
+                .claim("providerId", providerId)
                 .claim("role", role)
                 .build();
 

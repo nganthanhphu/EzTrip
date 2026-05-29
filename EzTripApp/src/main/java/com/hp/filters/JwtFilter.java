@@ -62,10 +62,18 @@ public class JwtFilter implements Filter {
                 if (claimsSet != null) {
                     String username = claimsSet.getSubject();
                     Integer id = Integer.parseInt(claimsSet.getClaimAsString("id"));
+                    Integer customerId = null;
+                    if (claimsSet.getClaim("customerId") != null) {
+                        customerId = Integer.parseInt(claimsSet.getClaimAsString("customerId"));
+                    }
+                    Integer providerId = null;
+                    if (claimsSet.getClaim("providerId") != null) {
+                        providerId = Integer.parseInt(claimsSet.getClaimAsString("providerId"));
+                    }
                     String role = claimsSet.getClaimAsString("role");
                     Set<GrantedAuthority> authorities = new HashSet<>();
                     authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-                    UserDetails userDetails = new MyUserDetails(id, username, "", authorities);
+                    UserDetails userDetails = new MyUserDetails(id, customerId, providerId, username, "", authorities);
                     if (userDetails != null) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
