@@ -1,12 +1,12 @@
+import { useContext, useState } from "react";
 import { Button, Card, Image, ListGroup } from "react-bootstrap";
-import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
 import AuthContext from "@contexts/AuthContext";
+import ModalChat from "@components/common/ModalChat";
 
 function PanelProviderInfo(props = {}) {
-	const {companyId, companyName, companyAvatar, companyAddress, companyPhone, companyEmail} = props;
-	const nav = useNavigate();
+	const { companyName, companyAvatar, companyAddress, companyPhone, companyEmail } = props;
 	const { currentUser } = useContext(AuthContext);
+	const [showChatModal, setShowChatModal] = useState(false);
 
 	return (
 		<Card className="h-100 shadow-sm">
@@ -42,12 +42,23 @@ function PanelProviderInfo(props = {}) {
 				<div className="d-grid">
 					<Button
 						variant="primary"
-						onClick={() => nav(`chat/${currentUser?.id || ''}/${companyId}`)}
+						disabled={!currentUser?.phoneNumber || !companyPhone}
+						onClick={() => setShowChatModal(true)}
 					>
 						Chat ngay
 					</Button>
 				</div>
 			</Card.Body>
+			<ModalChat
+				show={showChatModal}
+				onHide={() => setShowChatModal(false)}
+				currentPhoneNumber={currentUser?.phoneNumber || ""}
+				partnerPhoneNumber={companyPhone || ""}
+				currentName={currentUser?.name || currentUser?.fullname || "Tôi"}
+				partnerName={companyName}
+				currentAvatar={currentUser?.avatar || ""}
+				partnerAvatar={companyAvatar}
+			/>
 		</Card>
 	);
 }

@@ -11,7 +11,6 @@ import HistoryBookingList from '@screens/customer/HistoryBookingList';
 import Dashboard from '@screens/provider/Dashboard';
 import ServiceList from '@screens/provider/ServiceList';
 import BookingList from '@screens/provider/BookingList';
-import Chat from '@screens/common/Chat';
 import Login from '@screens/auth/Login';
 import RegisterCustomer from '@screens/auth/RegisterCustomer';
 import RegisterProvider from '@screens/auth/RegisterProvider';
@@ -38,7 +37,6 @@ const AppRoutes = () => {
 
             <Route element={<PrivateRoute />}>
                   <Route path="/history" element={<HistoryBookingList />} />
-                  <Route path="/chat/:fromId/:toId" element={<Chat />} />
             </Route>
 
             <Route element={<RoleRoute role="PROVIDER" />}>
