@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Alert, Button, Form, Spinner } from "react-bootstrap";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Alert, Button, Form, Card } from "react-bootstrap";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
+import MySpinner from "@components/common/MySpinner";
 import { useAuth } from "@hooks/useAuth";
 
 function Login() {
@@ -74,42 +75,50 @@ function Login() {
 
     return (
         <CustomerLayout>
-            <div className="mx-auto" style={{ maxWidth: 420 }}>
-                <h2 className="text-center text-success mt-1 mb-4">
-                    ĐĂNG NHẬP NGƯỜI DÙNG
-                </h2>
+            <div className="mx-auto py-4 px-3" style={{ maxWidth: 640 }}>
+                <Card className="shadow-sm border-0">
+                    <Card.Body className="p-4 p-md-5">
+                        <div className="mb-4 text-center">
+                            <h1 className="h3 text-success mb-2">ĐĂNG NHẬP NGƯỜI DÙNG</h1>
+                            <p className="text-muted mb-0">Đăng nhập để sử dụng hệ thống EzTrip</p>
+                        </div>
 
-                {err && <Alert variant="danger">{err}</Alert>}
+                        {err && <Alert variant="danger">{err}</Alert>}
 
-                <Form onSubmit={handleSubmit}>
-                    {userInfo.map((field) => (
-                        <Form.Group key={field.field} className="mb-3" controlId={field.field}>
-                            <Form.Label>{field.title}</Form.Label>
-                            <Form.Control
-                                type={field.type}
-                                placeholder={field.title}
-                                autoComplete={field.autoComplete}
-                                value={user[field.field] || ""}
-                                onChange={(e) =>
-                                    setUser({
-                                        ...user,
-                                        [field.field]: e.target.value,
-                                    })
-                                }
-                            />
-                        </Form.Group>
-                    ))}
+                        <Form onSubmit={handleSubmit}>
+                            {userInfo.map((field) => (
+                                <Form.Group key={field.field} className="mb-3" controlId={field.field}>
+                                    <Form.Label>{field.title}</Form.Label>
+                                    <Form.Control
+                                        type={field.type}
+                                        placeholder={field.title}
+                                        autoComplete={field.autoComplete}
+                                        value={user[field.field] || ""}
+                                        onChange={(e) =>
+                                            setUser({
+                                                ...user,
+                                                [field.field]: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </Form.Group>
+                            ))}
 
-                    <Form.Group className="mb-3" controlId="button">
-                        {submitting || loading ? (
-                            <Spinner animation="border" role="status" />
-                        ) : (
-                            <Button variant="success" type="submit" className="w-100">
-                                Đăng nhập
-                            </Button>
-                        )}
-                    </Form.Group>
-                </Form>
+                            <div className="d-grid gap-2 mb-3">
+                                {submitting || loading ? (
+                                    <MySpinner />
+                                ) : (
+                                    <Button variant="success" type="submit">
+                                        Đăng nhập
+                                    </Button>
+                                )}
+                                <Button as={Link} to="/register" variant="outline-secondary">
+                                    Tạo tài khoản mới
+                                </Button>
+                            </div>
+                        </Form>
+                    </Card.Body>
+                </Card>
             </div>
         </CustomerLayout>
     );
