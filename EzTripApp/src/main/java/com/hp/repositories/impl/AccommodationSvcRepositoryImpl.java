@@ -110,6 +110,11 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
 
         if (params != null) {
 
+            String name = params.get("name");
+            if (name != null && !name.isEmpty()) {
+                predicates.add(b.like(root.get("name"), String.format("%%%s%%", name)));
+            }
+            
             String location = params.get("location");
             if (location != null && !location.isEmpty()) {
                 predicates.add(b.like(accommodation.get("location"), String.format("%%%s%%", location)));
@@ -143,9 +148,28 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
                 }
             }
 
-            String hot = params.get("hot");
-            if (hot != null && !hot.isEmpty() && Boolean.parseBoolean(hot)) {
-                q.orderBy(b.desc(b.countDistinct(booking.get("id"))));
+            String sortBy = params.get("sortBy");
+            String order = params.get("order");
+            if (sortBy != null && !sortBy.isEmpty()) {
+                if (sortBy.equals("price")) {
+                    if (order == null || order.isEmpty()) {
+                        order = "asc";
+                    }
+                    if (order.equals("asc")) {
+                        q.orderBy(b.asc(root.get("price")));
+                    } else {
+                        q.orderBy(b.desc(root.get("price")));
+                    }
+                } else if (sortBy.equals("hot")) {
+                    if (order == null || order.isEmpty()) {
+                        order = "desc";
+                    }
+                    if (order.equals("asc")) {
+                        q.orderBy(b.asc(b.countDistinct(booking.get("id"))));
+                    } else {
+                        q.orderBy(b.desc(b.countDistinct(booking.get("id"))));
+                    }
+                }
             }
 
         }
@@ -225,7 +249,8 @@ public class AccommodationSvcRepositoryImpl implements AccommodationSvcRepositor
         Query<AccommodationViewDTO> query = s.createQuery(q);
         AccommodationViewDTO result = query.uniqueResult();
         if (result != null) {
-            Query<ImageViewDTO> imageQuery = s.createQuery("SELECT new com.hp.dto.image.ImageViewDTO(i.id, i.url) FROM Image i WHERE i.serviceId.id = :serviceId",
+            Query<ImageViewDTO> imageQuery = s.createQuery(
+                    "SELECT new com.hp.dto.image.ImageViewDTO(i.id, i.url) FROM Image i WHERE i.serviceId.id = :serviceId",
                     ImageViewDTO.class);
             imageQuery.setParameter("serviceId", id);
             Set<ImageViewDTO> images = new HashSet<>(imageQuery.getResultList());

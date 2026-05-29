@@ -107,9 +107,25 @@ public class BookingRepositoryImpl implements BookingRepository {
                     
                 }
             }
+
+            String typeOfService = params.get("typeOfService");
+            if (typeOfService != null && !typeOfService.isEmpty()) {
+                try {
+                    predicates.add(b.equal(root.get("serviceId").get("typeOfServiceId").get("id"), Integer.parseInt(typeOfService)));
+                } catch (NumberFormatException e) {
+                    
+                }
+            }
+
+            String customerName = params.get("customerName");
+            if (customerName != null && !customerName.isEmpty()) {
+                predicates.add(b.like(root.get("customerId").get("userId").get("fullname"), String.format("%%%s%%", customerName)));
+            }
+
         }
 
         q.where(predicates.toArray(Predicate[]::new));
+        q.orderBy(b.desc(root.get("createdDate")));
 
         Query<Booking> query = s.createQuery(q);
 

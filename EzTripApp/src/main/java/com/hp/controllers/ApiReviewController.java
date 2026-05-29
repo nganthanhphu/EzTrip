@@ -32,7 +32,7 @@ public class ApiReviewController {
     @Autowired
     private ReviewService reviewService;
 
-    @GetMapping({"/accommodations/{serviceId}/reviews", "/tourisms/{serviceId}/reviews", "/transportations/{serviceId}/reviews"})
+    @GetMapping("/services/{serviceId}/reviews")
     public ResponseEntity<List<ReviewViewDTO>> getReviewsByService(@PathVariable(value = "serviceId") int serviceId, @RequestParam(name = "page", required = false) String page) {
         List<ReviewViewDTO> reviews = this.reviewService.getReviewsByServiceId(serviceId, page);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
