@@ -184,4 +184,11 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
         this.baseServiceRepository.addOrUpdateService(svc);
     }
 
+    @Override
+    public void deleteTransportation(Integer id) {
+        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+        svc.setIsActive(false);
+        this.baseServiceRepository.addOrUpdateService(svc);
+    }
+
 }

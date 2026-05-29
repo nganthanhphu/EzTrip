@@ -25,4 +25,6 @@ public interface AccommodationSvcService {
     void addAccommodation(AccommodationCreateDTO accommodation) throws ParseException;
 
     void updateAccommodation(Integer id, AccommodationUpdateDTO accommodation) throws ParseException;
+
+    void deleteAccommodation(Integer id);
 }

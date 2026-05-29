@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -67,5 +68,11 @@ public class ApiAccommodationController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateAccommodation(@PathVariable(value = "id") int id, @ModelAttribute AccommodationUpdateDTO accommodation) throws ParseException {
         this.accommodationService.updateAccommodation(id, accommodation);
+    }
+
+    @DeleteMapping("/secure/accommodations/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAccommodation(@PathVariable(value = "id") int id) {
+        this.accommodationService.deleteAccommodation(id);
     }
 }

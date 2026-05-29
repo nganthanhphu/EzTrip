@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -67,5 +68,11 @@ public class ApiTourismController {
     public void updateTourism(@PathVariable(value = "id") int id,
             @ModelAttribute TourismUpdateDTO tourism) throws ParseException {
         this.tourismService.updateTourism(id, tourism);
+    }
+
+    @DeleteMapping("/secure/tourisms/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteTourism(@PathVariable(value = "id") int id) {
+        this.tourismService.deleteTourism(id);
     }
 }

@@ -25,4 +25,6 @@ public interface TransportationSvcService {
     void addTransportation(TransportationCreateDTO transportation) throws ParseException;
 
     void updateTransportation(Integer id, TransportationUpdateDTO transportation) throws ParseException;
+
+    void deleteTransportation(Integer id);
 }

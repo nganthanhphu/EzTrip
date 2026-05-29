@@ -21,8 +21,10 @@ public interface TourismSvcService {
     List<TourismListViewDTO> getTourismServices(Map<String, String> params);
 
     TourismViewDTO getTourismById(Integer id);
-    
+
     void addTourism(TourismCreateDTO tourism) throws ParseException;
 
     void updateTourism(Integer id, TourismUpdateDTO tourism) throws ParseException;
+
+    void deleteTourism(Integer id);
 }

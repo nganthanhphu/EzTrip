@@ -170,4 +170,11 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     }
 
+    @Override
+    public void deleteTourism(Integer id) {
+        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+        svc.setIsActive(false);
+        this.baseServiceRepository.addOrUpdateService(svc);
+    }
+
 }
