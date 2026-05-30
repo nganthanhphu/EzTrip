@@ -132,6 +132,13 @@ export async function updateBooking(bookingId, booking) {
     return axiosClient.patch(`/api/secure/bookings/${bookingId}`, booking);
 }
 
+export async function getReviewsByServiceId(serviceId, params = {}) {
+    return requestList(`/services/{serviceId}/reviews`, {
+        ...params,
+        serviceId,
+    });
+}
+
 export default {
     getAccommodations,
     getAccommodationById,

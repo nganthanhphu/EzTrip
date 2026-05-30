@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { createBooking } from "@services/customerService";
 import { formatBookingDate, formatCurrency } from "@utils/formatters";
+import { openMomoPaymentForBooking } from "@utils/onlinePayment";
 
 const PAYMENT_METHODS = [
 	{ id: 1, label: "Tiền mặt" },
@@ -68,6 +69,18 @@ function ModalConfirmAccommodationBooking({ show, onHide, accommodation }) {
 				quantity,
 				note: bookingNote,
 			});
+
+			if (paymentMethodId === 2) {
+				await openMomoPaymentForBooking({
+					serviceName: accommodation?.baseInfo?.name,
+					bookingDay,
+					quantity,
+					note: bookingNote,
+					paymentMethodId,
+				});
+				return;
+			}
+
 			setSubmitSuccess("Đặt phòng thành công. Hệ thống đã ghi nhận yêu cầu của bạn.");
 			setTimeout(() => onHide?.(), 5000);
 		} catch (error) {

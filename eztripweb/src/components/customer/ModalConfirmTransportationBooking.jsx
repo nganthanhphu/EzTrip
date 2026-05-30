@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { formatCurrency, formatBookingDate} from "@utils/formatters";
 import { createBooking } from "@services/customerService";
+import { openMomoPaymentForBooking } from "@utils/onlinePayment";
 
 const PAYMENT_METHODS = [
 	{ id: 1, label: "Tiền mặt" },
@@ -79,6 +80,18 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 				quantity,
 				note: seatNote,
 			});
+
+			if (paymentMethodId === 2) {
+				await openMomoPaymentForBooking({
+					serviceName: transportation?.name,
+					bookingDay,
+					quantity,
+					note: seatNote,
+					paymentMethodId,
+				});
+				return;
+			}
+
 			setSubmitSuccess("Đặt vé thành công. Thông tin ghế của bạn đã được lưu.");
 			setTimeout(() => onHide?.(), 5000);
 		} catch (error) {

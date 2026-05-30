@@ -57,6 +57,11 @@ export async function createReview(bookingId, review) {
 	return requestJsonCreate(`/api/secure/bookings/${bookingId}/reviews`, review);
 }
 
+export async function payBooking(bookingId, paymentData) {
+	const response = await axiosClient.post(`/api/secure/bookings/${bookingId}/pay`, paymentData);
+	return response.data;
+}
+
 export default {
 	getAccommodations,
 	getAccommodationById,
@@ -66,5 +71,6 @@ export default {
 	getBookings,
 	createBooking,
 	updateBooking,
-	createReview
+	createReview,
+	payBooking,
 };
