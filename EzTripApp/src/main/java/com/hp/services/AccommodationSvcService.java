@@ -27,4 +27,6 @@ public interface AccommodationSvcService {
     void updateAccommodation(Integer id, AccommodationUpdateDTO accommodation) throws ParseException;
 
     void deleteAccommodation(Integer id);
+
+    String compareAccommodationServices(Integer svcId1, Integer svcId2, Integer svcId3);
 }

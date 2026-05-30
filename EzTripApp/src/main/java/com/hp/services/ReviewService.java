@@ -7,6 +7,7 @@ package com.hp.services;
 import com.hp.dto.review.ReviewCreateDTO;
 import com.hp.dto.review.ReviewViewDTO;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public interface ReviewService {
 
-    List<ReviewViewDTO> getReviewsByServiceId(int serviceId, String page);
+    List<ReviewViewDTO> getReviewsByServiceId(int serviceId, Map<String, String> params);
 
     void addReview(ReviewCreateDTO review, int bookingId);
 }

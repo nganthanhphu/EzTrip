@@ -16,6 +16,8 @@ public record ReviewViewDTO(
         Integer id,
         int rating,
         String comment,
-        @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm") Date reviewDate
+        @JsonFormat(timezone = "Asia/Ho_Chi_Minh", pattern = "dd/MM/yyyy HH:mm") Date reviewDate,
+        String reviewAvatar,
+        String reviewName
 ) {
 }

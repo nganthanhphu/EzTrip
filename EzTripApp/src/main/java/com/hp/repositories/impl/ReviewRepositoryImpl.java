@@ -6,7 +6,15 @@ package com.hp.repositories.impl;
 
 import com.hp.pojo.Review;
 import com.hp.repositories.ReviewRepository;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -34,20 +42,51 @@ public class ReviewRepositoryImpl implements ReviewRepository {
     private Environment env;
 
     @Override
-    public List<Review> getReviewsByServiceId(int serviceId, int page) {
+    public List<Review> getReviewsByServiceId(int serviceId, Map<String, String> params) {
         Session s = this.factory.getObject().getCurrentSession();
-        Query<Review> q = s.createQuery("FROM Review r WHERE r.bookingId.serviceId.id = :serviceId", Review.class);
-        q.setParameter("serviceId", serviceId);
+        CriteriaBuilder b = s.getCriteriaBuilder();
+        CriteriaQuery<Review> q = b.createQuery(Review.class);
+        Root<Review> root = q.from(Review.class);
 
-        if (page < 1) {
-            page = 1;
+        root.fetch("bookingId", JoinType.INNER).fetch("customerId", JoinType.INNER).fetch("userId", JoinType.INNER);
+
+        q.select(root);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(b.equal(root.get("bookingId").get("serviceId").get("id"), serviceId));
+
+        if (params != null) {
+
+            String rating = params.get("rating");
+            if (rating != null && !rating.isEmpty()) {
+                try {
+                    predicates.add(b.greaterThanOrEqualTo(root.get("rating"), Integer.parseInt(rating)));
+                } catch (NumberFormatException e) {
+
+                }
+            }
+
         }
-        int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
-        int start = (page - 1) * pageSize;
-        q.setFirstResult(start);
-        q.setMaxResults(pageSize);
 
-        return q.getResultList();
+        q.where(predicates.toArray(Predicate[]::new));
+
+        Query<Review> query = s.createQuery(q);
+
+        int pageSize = this.env.getProperty("PAGE_SIZE", Integer.class);
+        int page = 1;
+        if (params != null)
+            try {
+                page = Integer.parseInt(params.getOrDefault("page", "1"));
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+
+        int start = (page - 1) * pageSize;
+        query.setFirstResult(start);
+        query.setMaxResults(pageSize);
+
+        return query.getResultList();
     }
 
     @Override

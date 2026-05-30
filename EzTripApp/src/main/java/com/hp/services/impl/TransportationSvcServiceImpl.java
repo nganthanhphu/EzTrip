@@ -6,6 +6,7 @@ package com.hp.services.impl;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +14,17 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.dto.service.BaseServiceCreateDTO;
 import com.hp.dto.service.BaseServiceUpdateDTO;
 import com.hp.dto.service.TransportationCreateDTO;
@@ -53,6 +58,10 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
 
     @Autowired
     private Cloudinary cloudinary;
+
+    @Autowired
+    @Qualifier("GeminiChatClient")
+    private ChatClient chatClient;
 
     public List<TransportationListViewDTO> getTransportationServices(Map<String, String> params) {
         int providerId = 0;
@@ -189,6 +198,54 @@ public class TransportationSvcServiceImpl implements TransportationSvcService {
         com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
         svc.setIsActive(false);
         this.baseServiceRepository.addOrUpdateService(svc);
+    }
+
+    @Override
+    public String compareTransportationServices(Integer svcId1, Integer svcId2, Integer svcId3) {
+        List<TransportationViewDTO> transportationServices = new ArrayList<>();
+        if (svcId1 != null) {
+            TransportationViewDTO transportation1 = this.getTransportationById(svcId1);
+            if (transportation1 != null) {
+                transportationServices.add(transportation1);
+            }
+        }
+        if (svcId2 != null) {
+            TransportationViewDTO transportation2 = this.getTransportationById(svcId2);
+            if (transportation2 != null) {
+                transportationServices.add(transportation2);
+            }
+        }
+        if (svcId3 != null) {
+            TransportationViewDTO transportation3 = this.getTransportationById(svcId3);
+            if (transportation3 != null) {
+                transportationServices.add(transportation3);
+            }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String result = "Không đủ dữ liệu để so sánh! Vui lòng chọn ít nhất 2 dịch vụ trở lên.";
+
+        if (transportationServices.size() > 0) {
+            try {
+                String typeOfTransportationInfo = """
+                        Các loại hình vận chuyển tương ứng với giá trị typeOfTransportation như sau:
+                                1: Xe buýt,
+                                2: Máy bay,
+                                3: Tàu hỏa,
+                                4: Thuê xe
+                                 """;
+                String prompt = String.format("Thực hiện so sánh các loại dịch vụ vận chuyển sau: %s\nBiết rằng: %s",
+                        mapper.writeValueAsString(transportationServices), typeOfTransportationInfo);
+
+                result = this.chatClient.prompt().user(prompt).call().content();
+            } catch (JsonProcessingException e) {
+
+            }
+
+        }
+
+        return result;
     }
 
 }

@@ -38,7 +38,7 @@ public record BookingViewDTO(
                         String reviewComment, Date reviewDate) {
                 this(id, serviceName, serviceType, serviceImage, createdDate, bookingDay, quantity, totalAmount, note, status, customerId, customerName,
                                 customerPhone, customerAvatar, companyId, companyName, paymentMethod,
-                                reviewId != null ? new ReviewViewDTO(reviewId, reviewRating, reviewComment, reviewDate)
+                                reviewId != null ? new ReviewViewDTO(reviewId, reviewRating, reviewComment, reviewDate, customerAvatar, customerName)
                                                 : null);
         }
 }
