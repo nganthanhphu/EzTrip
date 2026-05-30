@@ -177,22 +177,13 @@ function getServiceCreator(serviceType) {
 	return creators[serviceType] || null;
 }
 
-function resolveServiceId(service) {
-	return service?.baseInfo?.id ?? service?.id ?? service?.serviceId ?? "";
-}
-
 function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
-	const resolvedServiceId = serviceId || resolveServiceId(service);
-	const isEditMode = Boolean(resolvedServiceId);
+	const isEditMode = Boolean(serviceId || service);
 	const { currentUser, loading: authLoading } = useAuth();
 	const { lookupTables } = useLookupTables();
 	const navigate = useNavigate();
 
-	const providerTypeId =
-		currentUser?.providerProfile?.typeOfProvider ??
-		currentUser?.typeOfProvider ??
-		currentUser?.providerTypeId ??
-		"";
+	const providerTypeId = currentUser?.providerProfile?.id ?? "";
 
 	const [serviceType, setServiceType] = useState("");
 	const [form, setForm] = useState(buildEmptyForm);
@@ -231,7 +222,7 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
 			setError("");
 
 			try {
-				if (service && !resolvedServiceId) {
+				if (service && !serviceId) {
 					const nextServiceType = normalizeServiceType(service.type || inferServiceType(service));
 
 					if (!nextServiceType) {
@@ -246,8 +237,8 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
 					return;
 				}
 
-				if (resolvedServiceId) {
-					const response = await getServiceById(resolvedServiceId);
+				if (serviceId) {
+					const response = await getServiceById(serviceId);
 
 					if (!response?.service) {
 						throw new Error("Không tìm thấy dịch vụ cần chỉnh sửa.");
@@ -274,12 +265,15 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
 				);
 
 				if (!nextServiceType) {
-					throw new Error("Không xác định được loại dịch vụ theo nhà cung cấp.");
-				}
-
-				if (!cancelled) {
-					setServiceType(nextServiceType);
-					setForm(buildEmptyForm());
+					if (!cancelled) {
+						setServiceType("");
+						setForm(buildEmptyForm());
+					}
+				} else {
+					if (!cancelled) {
+						setServiceType(nextServiceType);
+						setForm(buildEmptyForm());
+					}
 				}
 			} catch (loadError) {
 				if (!cancelled) {
@@ -308,7 +302,7 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
 		return () => {
 			cancelled = true;
 		};
-	}, [authLoading, navigate, onHide, providerTypeId, resolvedServiceId, service, show]);
+	}, [authLoading, navigate, onHide, providerTypeId, serviceId, service, show]);
 
 	const handleChange = (event) => {
 		const { name, value } = event.target;
@@ -396,7 +390,7 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
 
 		try {
 			const creator = isEditMode
-				? (payload) => updateServiceByType(serviceType, resolvedServiceId, payload)
+				? (payload) => updateServiceByType(serviceType, serviceId, payload)
 				: getServiceCreator(serviceType);
 
 			if (!creator) {
