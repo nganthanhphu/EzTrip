@@ -3,7 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import CardServiceItem from "@components/provider/CardServiceItem";
 import ModalServiceDetail from "@components/provider/ModalServiceDetail";
+import ModalCreateEditService from "@components/provider/ModalCreateEditService";
 import PaginationComponent from "@components/common/PaginationComponent";
+import { useAuth } from "@hooks/useAuth";
+import { useLookupTables } from "@contexts/LookupTablesContext";
 
 import ProviderLayout from "@layouts/ProviderLayout";
 import { getProviderServices } from "@services/providerService";
@@ -17,10 +20,23 @@ function ServiceList() {
     const [error, setError] = useState("");
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedService, setSelectedService] = useState(null);
+    const [showCreateEditModal, setShowCreateEditModal] = useState(false);
+    const [selectedEditServiceId, setSelectedEditServiceId] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const navigate = useNavigate();
+    const nav = useNavigate();
+    const { currentUser } = useAuth();
+    const { lookupTables } = useLookupTables();
     const pageSize = 5;
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
+
+    const providerTypeId =
+        currentUser?.providerProfile?.typeOfProvider ??
+        currentUser?.typeOfProvider ??
+        currentUser?.providerTypeId ??
+        "";
+    const providerTypeLabel = lookupTables.typeOfProviders.find(
+        (option) => String(option.value) === String(providerTypeId),
+    )?.label;
 
     useEffect(() => {
         const loadServices = async () => {
@@ -74,14 +90,19 @@ function ServiceList() {
         setShowDetailModal(true);
     }
 
+    function handleOpenCreate() {
+        setSelectedEditServiceId("");
+        setShowCreateEditModal(true);
+    }
+
+    function handleOpenEdit(serviceId) {
+        setSelectedEditServiceId(serviceId);
+        setShowCreateEditModal(true);
+    }
+
     return (
         <ProviderLayout>
             <Container className="py-4">
-                <div className="d-flex flex-column gap-2 mb-4">
-                    <h1 className="mb-0">Quản lý dịch vụ</h1>
-                    <div className="text-secondary">Tổng số dịch vụ: {services.length}</div>
-                </div>
-
                 <Form className="mb-3" onSubmit={handleSearch}>
                     <Row className="g-2 align-items-center">
                         <Col md={5}>
@@ -108,6 +129,13 @@ function ServiceList() {
                                 Tìm kiếm
                             </Button>
                         </Col>
+
+                        <Col md={3} className="d-grid">
+                            <Button variant="primary" onClick={handleOpenCreate}>
+                            Tạo dịch vụ
+                            </Button>
+                        </Col>
+                        
                     </Row>
                 </Form>
 
@@ -117,6 +145,7 @@ function ServiceList() {
                     {pagedServices.map((service) => (
                         <CardServiceItem
                             key={service.id} {...service}
+                            onEdit={() => handleOpenEdit(service.baseInfo?.id ?? service.id)}
                         />
                     ))}
 
@@ -142,6 +171,12 @@ function ServiceList() {
                     show={showDetailModal}
                     onHide={() => setShowDetailModal(false)}
                     service={selectedService}
+                />
+
+                <ModalCreateEditService
+                    show={showCreateEditModal}
+                    onHide={() => setShowCreateEditModal(false)}
+                    serviceId={selectedEditServiceId}
                 />
             </Container>
         </ProviderLayout>

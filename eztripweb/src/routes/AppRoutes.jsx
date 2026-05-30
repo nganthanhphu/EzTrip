@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
-import { normalizeRole } from '@contexts/LookupTablesContext';
 import Home from '@screens/customer/Home';
 import AccommodationList from "@screens/customer/AccommodationList";
 import AccommodationDetail from "@screens/customer/AccommodationDetail";

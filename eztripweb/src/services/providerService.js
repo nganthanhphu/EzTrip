@@ -5,16 +5,109 @@ const requestList = async (endpoint, params = {}) => {
     return response.data;
 };
 
+const requestById = async (endpoint, id) => {
+    const response = await axiosClient.get(`${endpoint}/${id}`);
+    return response.data;
+};
+
+const requestMultipartCreate = async (endpoint, payload) => {
+    return axiosClient.post(endpoint, payload, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};
+
+const requestMultipartUpdate = async (endpoint, id, payload) => {
+    return axiosClient.patch(`${endpoint}/${id}`, payload, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+};
+
 export async function getAccommodations(params = {}) {
     return requestList("/api/accommodations", params);
+}
+
+export async function createAccommodation(accommodation) {
+    return requestMultipartCreate("/api/secure/accommodations", accommodation);
+}
+
+export async function getAccommodationById(id) {
+    return requestById("/api/accommodations", id);
+}
+
+export async function updateAccommodation(id, accommodation) {
+    return requestMultipartUpdate("/api/secure/accommodations", id, accommodation);
 }
 
 export async function getTransportations(params = {}) {
     return requestList("/api/transportations", params);
 }
 
+export async function createTransportation(transportation) {
+    return requestMultipartCreate("/api/secure/transportations", transportation);
+}
+
+export async function getTransportationById(id) {
+    return requestById("/api/transportations", id);
+}
+
+export async function updateTransportation(id, transportation) {
+    return requestMultipartUpdate("/api/secure/transportations", id, transportation);
+}
+
 export async function getTourisms(params = {}) {
     return requestList("/api/tourisms", params);
+}
+
+export async function createTourism(tourism) {
+    return requestMultipartCreate("/api/secure/tourisms", tourism);
+}
+
+export async function getTourismById(id) {
+    return requestById("/api/tourisms", id);
+}
+
+export async function updateTourism(id, tourism) {
+    return requestMultipartUpdate("/api/secure/tourisms", id, tourism);
+}
+
+export async function getServiceById(id) {
+    const serviceFetchers = [
+        { type: "ACCOMMODATION", fetcher: getAccommodationById },
+        { type: "TRANSPORTATION", fetcher: getTransportationById },
+        { type: "TOURISM", fetcher: getTourismById },
+    ];
+
+    for (const item of serviceFetchers) {
+        try {
+            const service = await item.fetcher(id);
+            return { type: item.type, service };
+        } catch (error) {
+            if (error?.response?.status !== 404) {
+                throw error;
+            }
+        }
+    }
+
+    return null;
+}
+
+export async function updateServiceByType(serviceType, id, payload) {
+    const updates = {
+        ACCOMMODATION: updateAccommodation,
+        TRANSPORTATION: updateTransportation,
+        TOURISM: updateTourism,
+    };
+
+    const updater = updates[serviceType];
+    if (!updater) {
+        throw new Error("Loại dịch vụ không hợp lệ.");
+    }
+
+    return updater(id, payload);
 }
 
 export async function getProviderServices(params = {}) {
@@ -41,9 +134,17 @@ export async function updateBooking(bookingId, booking) {
 
 export default {
     getAccommodations,
+    getAccommodationById,
     getTransportations,
+    getTransportationById,
     getTourisms,
+    getTourismById,
     getProviderServices,
+    getServiceById,
+    updateAccommodation,
+    updateTransportation,
+    updateTourism,
+    updateServiceByType,
     getBookings,
     updateBooking,
 };
