@@ -88,9 +88,9 @@ function toOptionList(items, labelMap, valueSelector = (item) => item?.name || "
 
 function buildLookupOptions(rawTables) {
 	return {
-		genders: toOptionList(rawTables.genders, DEFAULT_LABELS.genders),
+		genders: toOptionList(rawTables.genders, DEFAULT_LABELS.genders, (item) => item?.id || ""),
 		roles: toOptionList(rawTables.roles, DEFAULT_LABELS.roles),
-		typeOfProviders: toOptionList(rawTables.typeOfProviders, DEFAULT_LABELS.typeOfProviders),
+		typeOfProviders: toOptionList(rawTables.typeOfProviders, DEFAULT_LABELS.typeOfProviders, (item) => item?.id || ""),
 		typeOfServices: toOptionList(
 			rawTables.typeOfServices,
 			DEFAULT_LABELS.typeOfServices,

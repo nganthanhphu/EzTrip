@@ -17,11 +17,7 @@ export async function fetchCurrentUser() {
 }
 
 export async function updateCurrentUserProfile(formData) {
-	const response = await axiosClient.patch(endpoints.profile, formData, {
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
-	});
+	const response = await axiosClient.patch(endpoints.users, formData);
 
 	return response.data;
 }

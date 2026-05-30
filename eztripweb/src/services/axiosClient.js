@@ -4,9 +4,6 @@ import { getStoredToken } from "@utils/authCookieHelper";
 
 const axiosClient = axios.create({
 	baseURL: SERVER_URL,
-	headers: {
-		"Content-Type": "application/json",
-	},
 });
 
 axiosClient.interceptors.request.use((config) => {

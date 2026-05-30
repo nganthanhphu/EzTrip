@@ -69,4 +69,20 @@ export function formatTimestamp(value) {
     }
 }
 
+export function backendDobToInput(value) {
+    if (!value) return "";
+    const iso = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+    const dmy = value.match(/^(\d{2})[-\/](\d{2})[-\/](\d{4})$/);
+    if (dmy) return `${dmy[3]}-${dmy[2]}-${dmy[1]}`;
+    const parsed = new Date(value);
+    if (!isNaN(parsed.getTime())) {
+        const y = parsed.getFullYear();
+        const m = String(parsed.getMonth() + 1).padStart(2, "0");
+        const d = String(parsed.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+    }
+    return "";
+}
+
 export default formatCurrency;

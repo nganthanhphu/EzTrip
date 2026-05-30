@@ -3,19 +3,7 @@ import { Alert, Badge, Button, Col, Form, Image, Modal, Row, Spinner } from "rea
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import { fetchCurrentUser, updateCurrentUserProfile } from "@services/authService";
 import { useAuth } from "@hooks/useAuth";
-
-function formatDateForInput(value) {
-	if (!value) {
-		return "";
-	}
-
-	const match = value.match(/^(\d{2})-(\d{2})-(\d{4})$/);
-	if (!match) {
-		return value;
-	}
-
-	return `${match[3]}-${match[2]}-${match[1]}`;
-}
+import { backendDobToInput } from "@utils/formatters";
 
 function ModalProfile({ show, onHide }) {
 	const { currentUser, syncCurrentUser } = useAuth();
@@ -32,8 +20,7 @@ function ModalProfile({ show, onHide }) {
 		dob: "",
 		gender: "",
 		companyName: "",
-		companyAddress: "",
-		typeOfProvider: "",
+		companyAddress: ""
 	});
 
 	const isCustomer = currentUser?.role === "CUSTOMER";
@@ -53,6 +40,10 @@ function ModalProfile({ show, onHide }) {
 			try {
 				const profile = await fetchCurrentUser();
 
+				if (!profile) {
+					throw new Error("Empty profile response");
+				}
+
 				if (!isMounted) {
 					return;
 				}
@@ -61,17 +52,18 @@ function ModalProfile({ show, onHide }) {
 					fullname: profile?.fullname || "",
 					email: profile?.email || "",
 					phoneNumber: profile?.phoneNumber || "",
-					dob: formatDateForInput(profile?.customerProfile?.dob || ""),
+					dob: backendDobToInput(profile?.customerProfile?.dob || ""),
 					gender: profile?.customerProfile?.gender || "",
 					companyName: profile?.providerProfile?.companyName || "",
-					companyAddress: profile?.providerProfile?.companyAddress || "",
-					typeOfProvider: profile?.providerProfile?.typeOfProvider || "",
+					companyAddress: profile?.providerProfile?.companyAddress || ""
 				});
 				setAvatarFile(null);
 				setAvatarPreview(profile?.avatar || "");
 			} catch (fetchError) {
+				console.error("Failed to fetch profile:", fetchError);
+
 				if (isMounted) {
-					setError(fetchError?.response?.data?.error || "Không thể tải profile.");
+					setError(fetchError?.response?.data?.error || fetchError?.message || "Không thể tải profile.");
 				}
 			} finally {
 				if (isMounted) {
@@ -86,6 +78,36 @@ function ModalProfile({ show, onHide }) {
 			isMounted = false;
 		};
 	}, [show]);
+
+	async function handleReload() {
+		setLoading(true);
+		setError("");
+
+		try {
+			const profile = await fetchCurrentUser();
+
+			if (!profile) {
+				throw new Error("Empty profile response");
+			}
+
+			setForm({
+				fullname: profile?.fullname || "",
+				email: profile?.email || "",
+				phoneNumber: profile?.phoneNumber || "",
+				dob: profile?.customerProfile?.dob || "",
+				gender: profile?.customerProfile?.gender || "",
+				companyName: profile?.providerProfile?.companyName || "",
+				companyAddress: profile?.providerProfile?.companyAddress || ""
+			});
+			setAvatarFile(null);
+			setAvatarPreview(profile?.avatar || "");
+		} catch (fetchError) {
+			console.error("Failed to fetch profile:", fetchError);
+			setError(fetchError?.response?.data?.error || fetchError?.message || "Không thể tải profile.");
+		} finally {
+			setLoading(false);
+		}
+	}
 
 	useEffect(() => {
 		if (!avatarFile) {
@@ -132,7 +154,6 @@ function ModalProfile({ show, onHide }) {
 			if (isProvider) {
 				payload.append("companyName", form.companyName || "");
 				payload.append("companyAddress", form.companyAddress || "");
-				payload.append("typeOfProvider", form.typeOfProvider || "");
 			}
 
 			if (avatarFile) {
@@ -149,7 +170,8 @@ function ModalProfile({ show, onHide }) {
 		}
 	};
 
-	const displayName = currentUser?.name || currentUser?.fullname || "Hồ sơ";
+	const displayName = currentUser?.fullname || currentUser?.name || "Hồ sơ";
+
 
 	return (
 		<Modal show={show} onHide={onHide} size="lg" centered scrollable backdrop="static">
@@ -163,7 +185,14 @@ function ModalProfile({ show, onHide }) {
 					</div>
 				) : (
 					<Form onSubmit={handleSubmit}>
-						{error ? <Alert variant="danger">{error}</Alert> : null}
+						{error ? (
+							<Alert variant="danger">
+								{error}
+								<div className="mt-2">
+									<Button size="sm" onClick={handleReload}>Thử lại</Button>
+								</div>
+							</Alert>
+						) : null}
 						<Row className="g-4">
 							<Col xs={12} md={4}>
 								<div className="text-center border rounded-4 p-4 h-100 bg-light">
@@ -225,7 +254,7 @@ function ModalProfile({ show, onHide }) {
 													<Form.Label>Giới tính</Form.Label>
 													<Form.Select name="gender" value={form.gender} onChange={handleChange}>
 														<option value="">Chọn giới tính</option>
-														{lookupTables.genders.map((gender) => (
+														{(lookupTables?.genders || []).map((gender) => (
 															<option key={gender.value} value={gender.value}>{gender.label}</option>
 														))}
 													</Form.Select>
@@ -235,21 +264,10 @@ function ModalProfile({ show, onHide }) {
 									) : null}
 									{isProvider ? (
 										<>
-											<Col xs={12} md={6}>
+											<Col xs={12}>
 												<Form.Group controlId="profileCompanyName">
 													<Form.Label>Tên công ty</Form.Label>
 													<Form.Control name="companyName" value={form.companyName} onChange={handleChange} placeholder="Nhập tên công ty" />
-												</Form.Group>
-											</Col>
-											<Col xs={12} md={6}>
-												<Form.Group controlId="profileTypeOfProvider">
-													<Form.Label>Loại nhà cung cấp</Form.Label>
-													<Form.Select name="typeOfProvider" value={form.typeOfProvider} onChange={handleChange}>
-														<option value="">Chọn loại nhà cung cấp</option>
-														{lookupTables.typeOfProviders.map((type) => (
-															<option key={type.value} value={type.value}>{type.label}</option>
-														))}
-													</Form.Select>
 												</Form.Group>
 											</Col>
 											<Col xs={12}>

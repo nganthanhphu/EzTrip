@@ -7,6 +7,7 @@ export const endpoints = {
     login: "/api/login",
     register: "/api/users",
     profile: "/api/secure/profile",
+    users: "/api/secure/users",
 };
 
 export const authApis = () => {

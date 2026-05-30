@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import MyUserReducer from "@reducers/MyUserReducer";
 import { fetchCurrentUser, loginWithPassword } from "@services/authService";
+import { normalizeRole } from "@contexts/LookupTablesContext";
 import {
 	clearStoredAuth,
 	getStoredToken,
@@ -15,9 +16,15 @@ function normalizeUser(user) {
 		return null;
 	}
 
-	return {
-		...user
+	const normalized = {
+		...user,
 	};
+
+	if (normalized.role !== undefined && normalized.role !== null) {
+		normalized.role = normalizeRole(normalized.role);
+	}
+
+	return normalized;
 }
 
 export default AuthContext;

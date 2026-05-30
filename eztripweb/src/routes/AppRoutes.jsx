@@ -27,7 +27,7 @@ function RootRedirect() {
 
       if (loading) return null;
 
-      const currentRole = currentUser.role;
+      const currentRole = currentUser?.role;
 
       if (currentRole === 3) {
             return <Navigate to="/provider" replace />;

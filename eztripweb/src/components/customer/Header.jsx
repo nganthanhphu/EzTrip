@@ -28,7 +28,7 @@ function Header() {
                     {currentUser ? (
                         <>
                                 <Button variant="link" className="nav-link p-0 text-decoration-none" onClick={() => setShowProfileModal(true)}>
-                                    {currentUser.name}
+                                    {currentUser.fullname}
                                 </Button>
                             <Link className="nav-link" to="/logout">Đăng xuất</Link>
                         </>
