@@ -5,6 +5,7 @@
 package com.hp.controllers;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,4 +76,16 @@ public class ApiTourismController {
     public void deleteTourism(@PathVariable(value = "id") int id) {
         this.tourismService.deleteTourism(id);
     }
+
+    @GetMapping("/tourisms/compare")
+    public ResponseEntity<Map<String, String>> compareTourismServices(
+            @RequestParam(value = "svcId1") Integer svcId1,
+            @RequestParam(value = "svcId2") Integer svcId2,
+            @RequestParam(value = "svcId3", required = false) Integer svcId3) {
+        String result = this.tourismService.compareTourismServices(svcId1, svcId2, svcId3);
+        Map<String, String> response = new HashMap<>();
+        response.put("result", result);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 }

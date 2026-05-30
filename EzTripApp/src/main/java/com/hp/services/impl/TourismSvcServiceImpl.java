@@ -6,6 +6,7 @@ package com.hp.services.impl;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +14,17 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.dto.service.BaseServiceCreateDTO;
 import com.hp.dto.service.BaseServiceUpdateDTO;
 import com.hp.dto.service.TourismCreateDTO;
@@ -52,6 +57,10 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Autowired
     private Cloudinary cloudinary;
+
+    @Autowired
+    @Qualifier("GeminiChatClient")
+    private ChatClient chatClient;
 
     @Override
     public List<TourismListViewDTO> getTourismServices(Map<String, String> params) {
@@ -175,6 +184,45 @@ public class TourismSvcServiceImpl implements TourismSvcService {
         com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
         svc.setIsActive(false);
         this.baseServiceRepository.addOrUpdateService(svc);
+    }
+
+    @Override
+    public String compareTourismServices(Integer svcId1, Integer svcId2, Integer svcId3) {
+        List<TourismViewDTO> tourismServices = new ArrayList<>();
+        if (svcId1 != null) {
+            TourismViewDTO tourism1 = this.getTourismById(svcId1);
+            if (tourism1 != null) {
+                tourismServices.add(tourism1);
+            }
+        }
+        if (svcId2 != null) {
+            TourismViewDTO tourism2 = this.getTourismById(svcId2);
+            if (tourism2 != null) {
+                tourismServices.add(tourism2);
+            }
+        }
+        if (svcId3 != null) {
+            TourismViewDTO tourism3 = this.getTourismById(svcId3);
+            if (tourism3 != null) {
+                tourismServices.add(tourism3);
+            }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String result = "Không đủ dữ liệu để so sánh! Vui lòng chọn ít nhất 2 dịch vụ trở lên.";
+
+        if (tourismServices.size() > 0) {
+            try {
+                String prompt = String.format("Thực hiện so sánh các loại dịch vụ du lịch sau: %s",
+                        mapper.writeValueAsString(tourismServices));
+                result = this.chatClient.prompt().user(prompt).call().content();
+            } catch (JsonProcessingException e) {
+
+            }
+        }
+
+        return result;
     }
 
 }

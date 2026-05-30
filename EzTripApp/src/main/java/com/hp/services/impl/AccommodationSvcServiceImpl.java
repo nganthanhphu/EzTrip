@@ -6,19 +6,25 @@ package com.hp.services.impl;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hp.dto.service.AccommodationCreateDTO;
 import com.hp.dto.service.AccommodationListViewDTO;
 import com.hp.dto.service.AccommodationUpdateDTO;
@@ -51,6 +57,10 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Autowired
     private Cloudinary cloudinary;
+
+    @Autowired
+    @Qualifier("GeminiChatClient")
+    private ChatClient chatClient;
 
     @Override
     public List<AccommodationListViewDTO> getAccommodationServices(Map<String, String> params) {
@@ -178,6 +188,47 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
         com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
         svc.setIsActive(false);
         this.baseServiceRepository.addOrUpdateService(svc);
+    }
+
+    @Override
+    public String compareAccommodationServices(Integer svcId1, Integer svcId2, Integer svcId3) {
+        List<AccommodationViewDTO> accommodations = new ArrayList<>();
+        if (svcId1 != null) {
+            AccommodationViewDTO accommodation1 = this.getAccommodationById(svcId1);
+            if (accommodation1 != null) {
+                accommodations.add(accommodation1);
+            }
+        }
+        if (svcId2 != null) {
+            AccommodationViewDTO accommodation2 = this.getAccommodationById(svcId2);
+            if (accommodation2 != null) {
+                accommodations.add(accommodation2);
+            }
+        }
+        if (svcId3 != null) {
+            AccommodationViewDTO accommodation3 = this.getAccommodationById(svcId3);
+            if (accommodation3 != null) {
+                accommodations.add(accommodation3);
+            }
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        String result = "Không đủ dữ liệu để so sánh! Vui lòng chọn ít nhất 2 dịch vụ trở lên.";
+
+        if (accommodations.size() > 0) {
+            try {
+            String prompt = String.format("Thực hiện so sánh các loại dịch vụ lưu trú sau: %s", mapper.writeValueAsString(accommodations));
+
+            result  = this.chatClient.prompt().user(prompt).call().content();
+            }
+            catch (JsonProcessingException e) {
+
+            }
+
+        }
+
+        return result;
     }
 
 }

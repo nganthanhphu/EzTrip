@@ -27,4 +27,7 @@ public interface TourismSvcService {
     void updateTourism(Integer id, TourismUpdateDTO tourism) throws ParseException;
 
     void deleteTourism(Integer id);
+
+    String compareTourismServices(Integer svcId1, Integer svcId2, Integer svcId3);
+
 }

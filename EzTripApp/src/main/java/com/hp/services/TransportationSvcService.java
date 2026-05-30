@@ -27,4 +27,7 @@ public interface TransportationSvcService {
     void updateTransportation(Integer id, TransportationUpdateDTO transportation) throws ParseException;
 
     void deleteTransportation(Integer id);
+ 
+    String compareTransportationServices(Integer svcId1, Integer svcId2, Integer svcId3);
+
 }
