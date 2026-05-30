@@ -9,7 +9,7 @@ function CardTourItem(props) {
     const nav = useNavigate();
 
     return (
-        <Card className="w-100 border border-dark-subtle rounded-0 shadow-none mb-3 overflow-hidden" onClick={() => nav(`/tours/${id}`)} style={{ cursor: "pointer" }}>
+        <Card className="w-100 border border-dark-subtle rounded-0 shadow-none mb-3 overflow-hidden">
             <Card.Body className="p-0">
                 <Row className="g-0 align-items-stretch">
                     <Col

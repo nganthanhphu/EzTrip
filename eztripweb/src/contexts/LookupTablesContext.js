@@ -99,6 +99,7 @@ function buildLookupOptions(rawTables) {
 		typeOfTransportations: toOptionList(
 			rawTables.typeOfTransportations,
 			DEFAULT_LABELS.typeOfTransportations,
+			(item) => item?.id || "",
 		),
 		bookingStatuses: toOptionList(rawTables.bookingStatuses, DEFAULT_LABELS.bookingStatuses),
 	};
