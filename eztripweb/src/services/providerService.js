@@ -31,3 +31,20 @@ export async function getProviderServices(params = {}) {
     ];
 }
 
+export async function getBookings(params = {}) {
+    return requestList("/api/secure/bookings", params);
+}
+
+export async function updateBooking(bookingId, booking) {
+    return axiosClient.patch(`/api/secure/bookings/${bookingId}`, booking);
+}
+
+export default {
+    getAccommodations,
+    getTransportations,
+    getTourisms,
+    getProviderServices,
+    getBookings,
+    updateBooking,
+};
+

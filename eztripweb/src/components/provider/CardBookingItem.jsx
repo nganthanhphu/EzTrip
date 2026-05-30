@@ -1,59 +1,107 @@
+import { useState } from "react";
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
 import defaultImage from "../../assets/images/default_accommodation_item.jpg";
+import { formatCurrency, formatDateTime } from "@utils/formatters";
+import ModalChat from "@components/common/ModalChat";
+import { useAuth } from "@hooks/useAuth";
+import { updateBooking } from "@services/providerService";
 
-function CardBookingItem({
-	customer_name = "Khach hang",
-	customer_phone = "0123 456 789",
-	customer_email = "customer@email.com",
-	customer_dob = "01/01/2000",
-	customer_gender = "Nam",
-	customer_avatar = defaultImage,
-	created_date = "25/05/2026",
-	booking_day = "26/05/2026",
-	payment_method = "Momo",
-	quantity = 1,
-	total_amount = "150.000 VNĐ",
-	status = "Pending",
-	onChat,
-	onConfirm,
-	onCancel,
-	onComplete,
-}) {
-	const isPending = status === "Pending";
-	const isConfirmed = status === "Confirmed";
-	const isCompleted = status === "Completed";
+const STATUS_META = {
+	1: { key: "PENDING", label: "Đang chờ", badge: "warning" },
+	2: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
+	3: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
+	4: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
+	PENDING: { key: "PENDING", label: "Đang chờ", badge: "warning" },
+	CONFIRMED: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
+	COMPLETED: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
+	CANCELLED: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
+};
 
-	const statusVariant = isPending
-		? "warning"
-		: isConfirmed
-		? "primary"
-		: isCompleted
-		? "success"
-		: "secondary";
+const PAYMENT_METHOD_LABELS = {
+	1: "Tiền mặt",
+	2: "Momo",
+	3: "Chuyển khoản",
+	CASH: "Tiền mặt",
+	MOMO: "Momo",
+	BANK_TRANSFER: "Chuyển khoản",
+};
 
-	const statusLabel = isPending
-		? "Pending"
-		: isConfirmed
-		? "Confirmed"
-		: isCompleted
-		? "Completed"
-		: status;
+function resolveStatusMeta(status) {
+	return STATUS_META[status] || STATUS_META[String(status).toUpperCase()] || {
+		key: String(status || ""),
+		label: status || "Trạng thái",
+		badge: "secondary",
+	};
+}
+
+function resolvePaymentMethodLabel(paymentMethod) {
+	return PAYMENT_METHOD_LABELS[paymentMethod] || PAYMENT_METHOD_LABELS[String(paymentMethod).toUpperCase()] || paymentMethod || "-";
+}
+
+function resolveText(value, fallback = "-") {
+	return value || fallback;
+}
+
+function CardBookingItem(props) {
+	const { currentUser } = useAuth();
+	const [showChatModal, setShowChatModal] = useState(false);
+	const [savingStatus, setSavingStatus] = useState(false);
+	const [actionError, setActionError] = useState("");
+	const {
+		id,
+		customerId,
+		customerName,
+		customerPhone,
+		customerAvatar,
+		createdDate,
+		bookingDay,
+		quantity,
+		totalAmount,
+		status,
+		paymentMethod,
+	} = props;
+
+	const statusMeta = resolveStatusMeta(status);
+	const createdDateLabel = formatDateTime(createdDate) || createdDate || "-";
+	const bookingDayLabel = formatDateTime(bookingDay) || bookingDay || "-";
+	const paymentMethodLabel = resolvePaymentMethodLabel(paymentMethod);
+	const formattedAmount = Number.isFinite(Number(totalAmount))
+		? formatCurrency(Number(totalAmount))
+		: totalAmount || "-";
+
+	const isPending = statusMeta.key === "PENDING";
+	const isConfirmed = statusMeta.key === "CONFIRMED";
+	const canChat = Boolean(currentUser?.id && customerId);
+
+	const handleUpdateStatus = async (nextStatus) => {
+		setSavingStatus(true);
+		setActionError("");
+
+		try {
+			await updateBooking(id, { status: nextStatus });
+			props.onUpdated?.();
+		} catch (error) {
+			setActionError(error?.response?.data?.error || "Không thể cập nhật trạng thái booking.");
+		} finally {
+			setSavingStatus(false);
+		}
+	};
 
 	return (
-		<Card className="w-100 border-dark-subtle rounded-0">
+		<Card className="w-100 border border-dark-subtle rounded-0 shadow-none overflow-hidden">
 			<Card.Body className="p-0">
 				<Row className="g-0 align-items-stretch">
 					<Col
 						xs={12}
-						md={2}
-						className="border-end border-dark-subtle d-flex align-items-stretch bg-light p-0"
+						md={3}
+						className="border-end border-dark-subtle bg-light d-flex align-items-stretch"
 					>
-						<div className="w-100 h-100 d-flex align-items-center justify-content-center p-3">
+						<div className="w-100" style={{ minHeight: 170 }}>
 							<Image
-								src={customer_avatar || defaultImage}
-								alt={customer_name}
-								roundedCircle
-								style={{ width: 110, height: 110, objectFit: "cover" }}
+								src={customerAvatar || defaultImage}
+								alt={customerName}
+								className="w-100 h-100"
+								style={{ objectFit: "cover" }}
 							/>
 						</div>
 					</Col>
@@ -61,83 +109,87 @@ function CardBookingItem({
 					<Col
 						xs={12}
 						md={4}
-						className="border-end border-dark-subtle p-3 p-md-4 d-flex flex-column justify-content-between"
+						className="border-end border-dark-subtle p-2 p-md-3 d-flex flex-column justify-content-between"
 					>
-						<div className="d-flex flex-column gap-2">
-							<div className="d-flex align-items-center gap-2 flex-wrap">
-								<h2 className="mb-0 fw-semibold fs-4 text-truncate">
-									{customer_name}
-								</h2>
-								<Badge bg="secondary" className="text-uppercase">
-									{customer_gender}
-								</Badge>
+						<div className="d-flex flex-column gap-1">
+							<h5 className="mb-0 fw-semibold text-truncate">{customerName}</h5>
+							<div className="d-flex flex-wrap gap-2 align-items-center">
+								<Badge bg="dark" className="rounded-0">Khách hàng</Badge>
+								<span className="text-secondary text-truncate">{resolveText(customerPhone)}</span>
 							</div>
-							<div className="text-secondary">{customer_phone}</div>
-							<div className="text-secondary text-break">{customer_email}</div>
-							<div className="text-secondary">{customer_dob}</div>
 						</div>
 
 						<div className="mt-3 d-flex justify-content-start">
-							<Button variant="outline-secondary" onClick={onChat}>
+							<Button variant="outline-secondary" onClick={() => setShowChatModal(true)} disabled={!canChat}>
 								Chat ngay
 							</Button>
 						</div>
+						{actionError ? <div className="mt-2 small text-danger">{actionError}</div> : null}
 					</Col>
 
 					<Col
 						xs={12}
-						md={4}
-						className="border-end border-dark-subtle p-3 p-md-4 d-flex flex-column justify-content-between"
+						md={3}
+						className="border-end border-dark-subtle p-2 p-md-3 d-flex flex-column justify-content-between"
 					>
-						<div className="d-flex flex-column gap-2">
-							<div>Ngày xuất hóa đơn: {created_date}</div>
-							<div>Ngày sử dụng dịch vụ: {booking_day}</div>
-							<div>Phương thức thanh toán: {payment_method}</div>
-							<div>Số lượng đặt: {quantity}</div>
+						<div className="d-flex flex-column gap-1 small">
+							<div>Ngày đặt: {createdDateLabel}</div>
+							<div>Ngày sử dụng: {bookingDayLabel}</div>
+							<div>Số lượng: {quantity}</div>
+							<div>Phương thức thanh toán: {paymentMethodLabel}</div>
 						</div>
 
-						<div className="mt-3 fs-4 fw-semibold text-nowrap">{total_amount}</div>
+						<div className="mt-2 fs-5 fw-semibold text-nowrap">{formattedAmount}</div>
 					</Col>
 
 					<Col
 						xs={12}
 						md={2}
-						className="p-3 p-md-4 d-flex flex-column justify-content-between"
+						className="p-2 p-md-3 d-flex flex-column justify-content-between"
 					>
-						<div className="d-flex flex-column align-items-md-end align-items-start gap-3">
+						<div className="d-flex flex-column align-items-md-end align-items-start gap-2">
 							<Badge
-								bg={statusVariant}
-								className="px-3 py-2 rounded-2 fs-6 text-uppercase align-self-md-end"
+								bg={statusMeta.badge}
+								className="px-3 py-2 rounded-0 fs-6 text-uppercase align-self-md-end"
 							>
-								{statusLabel}
+								{statusMeta.label}
 							</Badge>
 
-							{isPending && (
-								<div className="d-flex gap-2 w-100 justify-content-md-end">
-									<Button variant="primary" onClick={onConfirm} className="flex-fill flex-md-grow-0">
-										Confirm
-									</Button>
-									<Button variant="danger" onClick={onCancel} className="flex-fill flex-md-grow-0">
-										Cancel
-									</Button>
-								</div>
-							)}
-
-							{isConfirmed && (
-								<Button variant="success" onClick={onComplete} className="w-100">
-									Complete
+							{isPending ? (
+								<Button
+									variant="primary"
+									onClick={() => void handleUpdateStatus("CONFIRMED")}
+									className="w-100 rounded-0"
+									disabled={savingStatus}
+								>
+									{savingStatus ? "Đang xử lý" : "Xác nhận"}
 								</Button>
-							)}
+							) : null}
 
-							{!isPending && !isConfirmed && !isCompleted && (
-								<Button variant="secondary" className="w-100" disabled>
-									No action
+							{isConfirmed ? (
+								<Button
+									variant="success"
+									onClick={() => void handleUpdateStatus("COMPLETED")}
+									className="w-100 rounded-0"
+									disabled={savingStatus}
+								>
+									{savingStatus ? "Đang xử lý" : "Hoàn thành"}
 								</Button>
-							)}
+							) : null}
 						</div>
 					</Col>
 				</Row>
 			</Card.Body>
+			<ModalChat
+				show={showChatModal}
+				onHide={() => setShowChatModal(false)}
+				currentUserId={currentUser?.id || ""}
+				partnerUserId={customerId || ""}
+				currentName={currentUser?.name || currentUser?.fullname || "Tôi"}
+				partnerName={customerName || "Khách hàng"}
+				currentAvatar={currentUser?.avatar || ""}
+				partnerAvatar={customerAvatar || ""}
+			/>
 		</Card>
 	);
 }

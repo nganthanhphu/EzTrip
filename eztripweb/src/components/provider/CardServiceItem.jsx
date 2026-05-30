@@ -1,10 +1,12 @@
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
 import defaultImage from "../../assets/images/default_tour_item.jpg";
 import { formatCurrency } from "@utils/formatters";
+import { useNavigate } from "react-router-dom";
 
 function CardServiceItem(props) {
     const baseInfo = props.baseInfo || {};
     const { id, name, price, image, quantity, remainingQuantity, avgRating, reviewCount, bookingCount, companyName } = baseInfo;
+    const nav = useNavigate();
 
 	return (
         <Card className="w-100 border border-dark-subtle rounded-0 shadow-none overflow-hidden mb-3">
@@ -80,12 +82,14 @@ function CardServiceItem(props) {
                             <Button
                                 variant="outline-primary"
                                 className="rounded-0 w-100"
+                                onClick={() => nav(`/provider/services/${id}/edit`)}
                             >
                                 Chỉnh sửa
                             </Button>
                             <Button
                                 variant="primary"
                                 className="rounded-0 w-100"
+                                onClick={() => nav(`/provider/services/${id}/bookings`)}
                             >
                                 Danh sách booking
                             </Button>

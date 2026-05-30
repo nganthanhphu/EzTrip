@@ -60,7 +60,7 @@ const AppRoutes = () => {
                   <Route path="/provider" element={<HomeProvider />} />
                   <Route path="/provider/dashboard" element={<Dashboard />} />
                   <Route path="/provider/services" element={<ServiceList />} />
-                  <Route path="/provider/services/:id/BookingList" element={<BookingList />} />
+                  <Route path="/provider/services/:id/bookings" element={<BookingList />} />
                   <Route path="/provider/chats" element={<ChatList />} />
             </Route>
       </Routes>
