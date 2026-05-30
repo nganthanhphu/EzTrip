@@ -8,7 +8,7 @@ import { useAuth } from "@hooks/useAuth";
 function Login() {
     const nav = useNavigate();
     const [q] = useSearchParams();
-    const { login, loading, isAuthenticated } = useAuth();
+    const { login, loading, isAuthenticated, currentUser } = useAuth();
 
     const userInfo = [
         {
@@ -30,11 +30,16 @@ function Login() {
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            const next = q.get("next");
-            nav(next || "/");
+        // wait until authentication finished loading and we have auth state
+        if (!isAuthenticated || loading) return;
+
+        if (currentUser?.providerProfile) {
+            nav("/provider");
+            return;
         }
-    }, [isAuthenticated, nav, q]);
+
+        nav("/");
+    }, [isAuthenticated, loading, currentUser, nav, q]);
 
     const validate = () => {
         for (const field of userInfo) {
