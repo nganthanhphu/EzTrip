@@ -70,6 +70,9 @@ public class ReviewServiceImpl implements ReviewService {
                 review.getId(),
                 review.getRating(),
                 review.getComment(),
-                review.getReviewDate());
+                review.getReviewDate(),
+                review.getBookingId().getCustomerId().getUserId().getAvatar(),
+                review.getBookingId().getCustomerId().getUserId().getFullname()
+            );
     }
 }

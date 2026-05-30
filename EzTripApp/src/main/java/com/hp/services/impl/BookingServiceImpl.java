@@ -118,7 +118,10 @@ public class BookingServiceImpl implements BookingService {
                     review.getId(),
                     review.getRating(),
                     review.getComment(),
-                    review.getReviewDate());
+                    review.getReviewDate(),
+                    booking.getCustomerId().getUserId().getAvatar(),
+                    booking.getCustomerId().getUserId().getFullname()
+            );
         }
 
         return new BookingViewDTO(
