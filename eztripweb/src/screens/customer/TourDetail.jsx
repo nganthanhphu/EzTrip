@@ -8,7 +8,7 @@ import ReviewPanel from "@components/customer/PanelReview";
 import ComparePanel from "@components/customer/PanelCompare";
 import ModalConfirmTourBooking from "@components/customer/ModalConfirmTourBooking";
 import MySpinner from "@components/common/MySpinner";
-import { getTourismById } from "@services/customerService";
+import { getReviewsByServiceId, getTourismById } from "@services/customerService";
 
 function formatCurrency(value) {
 	return new Intl.NumberFormat("vi-VN", {
@@ -24,6 +24,7 @@ function TourDetail() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 	const [tourDetail, setTourDetail] = useState(null);
+	const [reviews, setReviews] = useState([]);
 
 	const loadTourDetail = async (tourismId) => {
 		try {
@@ -31,6 +32,10 @@ function TourDetail() {
 			setLoading(true);
 			const response = await getTourismById(tourismId);
 			setTourDetail(response);
+
+			const serviceId = response?.baseInfo?.id ?? tourismId;
+			const reviewResponse = await getReviewsByServiceId(serviceId).catch(() => []);
+			setReviews(Array.isArray(reviewResponse) ? reviewResponse : reviewResponse?.content ?? []);
 		} catch (requestError) {
 			console.error("Error fetching tours:", requestError);
 			setError("Không thể tải thông tin tour. Vui lòng thử lại sau.");
@@ -67,7 +72,7 @@ function TourDetail() {
 
 	const { baseInfo, location, tourDuration } = tourDetail;
 	const bookingTour = {
-        id: baseInfo?.id,
+		id: baseInfo?.id,
 		name: baseInfo?.name,
 		location,
 		pricePerTicket: baseInfo?.price,
@@ -77,112 +82,86 @@ function TourDetail() {
 		duration: tourDuration,
 	};
 	const compareServices = [];
-	const reviews = [];
 
 	return (
-        <CustomerLayout>
-            <Container className="py-4">
-                <Row className="g-4 mb-4 align-items-stretch">
-                    <Col xs={12} lg={4}>
-                        <AlbumPanel images={baseInfo?.images} />
-                    </Col>
+		<CustomerLayout>
+			<Container className="py-4">
+				<Row className="g-4 mb-4 align-items-stretch">
+					<Col xs={12} lg={4}>
+						<AlbumPanel images={baseInfo?.images} />
+					</Col>
 
-                    <Col xs={12} lg={5}>
-                        <Card className="h-100 shadow-sm">
-                            <Card.Header className="bg-white fw-semibold">
-                                Thông tin dịch vụ
-                            </Card.Header>
-                            <Card.Body className="d-flex flex-column justify-content-between gap-3">
-                                <div>
-                                    <h1 className="h3 fw-semibold mb-2">
-                                        {baseInfo?.name}
-                                    </h1>
-                                    <div className="text-body-secondary mb-3">
-                                        {location}
-                                    </div>
+					<Col xs={12} lg={5}>
+						<Card className="h-100 shadow-sm">
+							<Card.Header className="bg-white fw-semibold">
+								Thông tin dịch vụ
+							</Card.Header>
+							<Card.Body className="d-flex flex-column justify-content-between gap-3">
+								<div>
+									<h1 className="h3 fw-semibold mb-2">{baseInfo?.name}</h1>
+									<div className="text-body-secondary mb-3">{location}</div>
 
-                                    <ListGroup variant="flush" className="mb-3">
-                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-                                            <span>Thời lượng</span>
-                                            <Badge bg="secondary">
-                                                {tourDuration} ngày
-                                            </Badge>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-                                            <span>Tổng số lượng</span>
-                                            <Badge bg="secondary">
-                                                {baseInfo?.quantity}
-                                            </Badge>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-                                            <span>Số chỗ còn lại</span>
-                                            <Badge bg="secondary">
-                                                {baseInfo?.remainingQuantity}
-                                            </Badge>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-                                            <span>Giá</span>
-                                            <Badge bg="success">
-                                                {formatCurrency(
-                                                    baseInfo?.price,
-                                                )}
-                                            </Badge>
-                                        </ListGroup.Item>
-                                    </ListGroup>
-                                </div>
+									<ListGroup variant="flush" className="mb-3">
+										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+											<span>Thời lượng</span>
+											<Badge bg="secondary">{tourDuration} ngày</Badge>
+										</ListGroup.Item>
+										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+											<span>Tổng số lượng</span>
+											<Badge bg="secondary">{baseInfo?.quantity}</Badge>
+										</ListGroup.Item>
+										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+											<span>Số chỗ còn lại</span>
+											<Badge bg="secondary">{baseInfo?.remainingQuantity}</Badge>
+										</ListGroup.Item>
+										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+											<span>Giá</span>
+											<Badge bg="success">{formatCurrency(baseInfo?.price)}</Badge>
+										</ListGroup.Item>
+									</ListGroup>
+								</div>
 
-                                <div className="d-grid">
-                                    <Button
-                                        variant="primary"
-                                        size="lg"
-                                        onClick={() =>
-                                            setShowBookingModal(true)
-                                        }
-                                    >
-                                        Book ngay!!!
-                                    </Button>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
+								<div className="d-grid">
+									<Button variant="primary" size="lg" onClick={() => setShowBookingModal(true)}>
+										Book ngay!!!
+									</Button>
+								</div>
+							</Card.Body>
+						</Card>
+					</Col>
 
-                    <Col xs={12} lg={3}>
-                        <PanelProviderInfo
-                            key={tourDetail.id}
-                            {...tourDetail.baseInfo?.providerInfo}
-                        />
-                    </Col>
-                </Row>
+					<Col xs={12} lg={3}>
+						<PanelProviderInfo key={tourDetail.id} {...tourDetail.baseInfo?.providerInfo} />
+					</Col>
+				</Row>
 
-                <Row className="g-4 align-items-stretch">
-                    <Col xs={12} lg={4}>
-                        <ReviewPanel reviews={reviews} />
-                    </Col>
+				<Row className="g-4 align-items-stretch">
+					<Col xs={12} lg={4}>
+						<ReviewPanel reviews={reviews} />
+					</Col>
 
-                    <Col xs={12} lg={5}>
-                        <Card className="h-100 shadow-sm">
-                            <Card.Header className="bg-white fw-semibold">
-                                Mô tả dịch vụ
-                            </Card.Header>
-                            <Card.Body>
-                                <p className="mb-0">{baseInfo?.description}</p>
-                            </Card.Body>
-                        </Card>
-                    </Col>
+					<Col xs={12} lg={5}>
+						<Card className="h-100 shadow-sm">
+							<Card.Header className="bg-white fw-semibold">Mô tả dịch vụ</Card.Header>
+							<Card.Body>
+								<p className="mb-0">{baseInfo?.description}</p>
+							</Card.Body>
+						</Card>
+					</Col>
 
-                    <Col xs={12} lg={3}>
-                        <ComparePanel services={compareServices} />
-                    </Col>
-                </Row>
+					<Col xs={12} lg={3}>
+						<ComparePanel services={compareServices} />
+					</Col>
+				</Row>
 
-                <ModalConfirmTourBooking
-                    show={showBookingModal}
-                    onHide={() => setShowBookingModal(false)}
-                    tour={bookingTour}
-                />
-            </Container>
-        </CustomerLayout>
-    );
+				<ModalConfirmTourBooking
+					show={showBookingModal}
+					onHide={() => setShowBookingModal(false)}
+					tour={bookingTour}
+				/>
+			</Container>
+		</CustomerLayout>
+	);
 }
 
 export default TourDetail;

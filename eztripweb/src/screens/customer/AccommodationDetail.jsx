@@ -9,6 +9,7 @@ import PanelCompare from "@components/customer/PanelCompare";
 import ModalConfirmAccommodationBooking from "@components/customer/ModalConfirmAccommodationBooking";
 import MySpinner from "@components/common/MySpinner";
 import { getAccommodationById } from "@services/customerService";
+import { getReviewsByServiceId } from "@services/customerService";
 import { formatCurrency } from "@utils/formatters";
 
 function AccommodationDetail() {
@@ -17,6 +18,7 @@ function AccommodationDetail() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 	const [accommodationDetail, setAccommodationDetail] = useState(null);
+	const [reviews, setReviews] = useState([]);
 
 	const loadAccommodationDetail = async (id) => {
 		try {
@@ -25,6 +27,10 @@ function AccommodationDetail() {
 			const response = await getAccommodationById(id);
 			console.log("Accommodation detail:", response);
 			setAccommodationDetail(response);
+
+			const serviceId = response?.baseInfo?.id ?? id;
+			const reviewResponse = await getReviewsByServiceId(serviceId).catch(() => []);
+			setReviews(Array.isArray(reviewResponse) ? reviewResponse : reviewResponse?.content ?? []);
 		} catch (error) {
 			console.error("Error fetching accommodations:", error);
 			setError("Không thể tải thông tin chỗ nghỉ. Vui lòng thử lại sau.");
@@ -113,7 +119,7 @@ function AccommodationDetail() {
 
 				<Row className="g-4 align-items-stretch">
 					<Col xs={12} lg={4}>
-						<PanelReview reviews={accommodationDetail.baseInfo.id} />
+						<PanelReview reviews={reviews} />
 					</Col>
 
 					<Col xs={12} lg={5}>
