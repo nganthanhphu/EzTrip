@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.hp.services.ReviewService;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,8 +35,8 @@ public class ApiReviewController {
     private ReviewService reviewService;
 
     @GetMapping("/services/{serviceId}/reviews")
-    public ResponseEntity<List<ReviewViewDTO>> getReviewsByService(@PathVariable(value = "serviceId") int serviceId, @RequestParam(name = "page", required = false) String page) {
-        List<ReviewViewDTO> reviews = this.reviewService.getReviewsByServiceId(serviceId, page);
+    public ResponseEntity<List<ReviewViewDTO>> getReviewsByService(@PathVariable(value = "serviceId") int serviceId, @RequestParam Map<String, String> params) {
+        List<ReviewViewDTO> reviews = this.reviewService.getReviewsByServiceId(serviceId, params);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 

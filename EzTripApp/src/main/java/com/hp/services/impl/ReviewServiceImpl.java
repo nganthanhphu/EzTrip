@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,15 +36,9 @@ public class ReviewServiceImpl implements ReviewService {
     private BookingRepository bookingRepository;
 
     @Override
-    public List<ReviewViewDTO> getReviewsByServiceId(int serviceId, String page) {
-        int pageNumber = 1;
-        try {
-            pageNumber = Integer.parseInt(page);
-        } catch (NumberFormatException e) {
-            pageNumber = 1;
-        }
+    public List<ReviewViewDTO> getReviewsByServiceId(int serviceId, Map<String, String> params) {
 
-        List<Review> reviews = this.reviewRepository.getReviewsByServiceId(serviceId, pageNumber);
+        List<Review> reviews = this.reviewRepository.getReviewsByServiceId(serviceId, params);
         return reviews.stream().map(this::toReviewViewDTO).toList();
     }
 

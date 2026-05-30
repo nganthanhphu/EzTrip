@@ -6,12 +6,13 @@ package com.hp.repositories;
 
 import com.hp.pojo.Review;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Joon
  */
 public interface ReviewRepository {
-    List<Review> getReviewsByServiceId(int serviceId, int page);
+    List<Review> getReviewsByServiceId(int serviceId, Map<String, String> params);
     void addReview(Review review);
 }
