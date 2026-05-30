@@ -4,6 +4,7 @@
  */
 package com.hp.controllers;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,12 @@ public class ApiPayController {
     private PaymentService paymentService;
 
     @PostMapping("/secure/bookings/{id}/pay")
-    public ResponseEntity<String> payBookingOnline(@PathVariable(value = "id") int bookingId, @RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> payBookingOnline(@PathVariable(value = "id") int bookingId, @RequestBody Map<String, String> request) {
         String redirectUrl = request.get("redirectUrl");
         String paymentUrl = this.paymentService.createPaymentLink(bookingId, redirectUrl);
-        return new ResponseEntity<>(paymentUrl, HttpStatus.OK);
+        Map<String, String> response = new HashMap<>();
+        response.put("paymentUrl", paymentUrl);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/momo/ipn")
