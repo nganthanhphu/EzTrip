@@ -25,6 +25,10 @@ export async function getAccommodationById(id) {
 	return requestById("/api/accommodations", id);
 }
 
+export async function compareAccommodations(params = {}) {
+	return requestList("/api/accommodations/compare", params);
+}
+
 //2. Nghiệp vụ tour du lịch
 export async function getTourisms(params = {}) {
 	return requestList("/api/tourisms", params);
@@ -32,6 +36,10 @@ export async function getTourisms(params = {}) {
 
 export async function getTourismById(id) {
 	return requestById("/api/tourisms", id);
+}
+
+export async function compareTourisms(params = {}) {
+    return requestList("/api/tourisms/compare", params);
 }
 
 //3. Nghiệp vụ phương tiện vận chuyển
@@ -67,15 +75,17 @@ export async function payBooking(bookingId, paymentData) {
 }
 
 export default {
-	getAccommodations,
-	getAccommodationById,
-	getTourisms,
-	getTourismById,
-	getTransportations,
-	getBookings,
-	createBooking,
-	updateBooking,
-	createReview,
-	getReviewsByServiceId,
-	payBooking,
+    getAccommodations,
+    getAccommodationById,
+    compareAccommodations,
+    getTourisms,
+    getTourismById,
+    compareTourisms,
+    getTransportations,
+    getBookings,
+    createBooking,
+    updateBooking,
+    createReview,
+    getReviewsByServiceId,
+    payBooking,
 };

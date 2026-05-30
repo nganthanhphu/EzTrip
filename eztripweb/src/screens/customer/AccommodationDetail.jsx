@@ -66,86 +66,112 @@ function AccommodationDetail() {
 	}
 
 	return (
-		<CustomerLayout>
-			<Container className="py-4">
-				<Row className="g-4 mb-4 align-items-stretch">
-					<Col xs={12} lg={4}>
-						<PanelAlbum images={accommodationDetail.baseInfo.images} />
-					</Col>
+        <CustomerLayout>
+            <Container className="py-4">
+                <Row className="g-4 mb-4 align-items-stretch">
+                    <Col xs={12} lg={4}>
+                        <PanelAlbum
+                            images={accommodationDetail.baseInfo.images}
+                        />
+                    </Col>
 
-					<Col xs={12} lg={5}>
-						<Card className="h-100 shadow-sm">
-							<Card.Header className="bg-white fw-semibold">
-								Thông tin dịch vụ
-							</Card.Header>
-							<Card.Body className="d-flex flex-column justify-content-between gap-3">
-								<div>
-									<h1 className="h3 fw-semibold mb-2">{accommodationDetail.baseInfo.name}</h1>
-									<div className="text-body-secondary mb-3">
-										{accommodationDetail.location}
-									</div>
+                    <Col xs={12} lg={5}>
+                        <Card className="h-100 shadow-sm">
+                            <Card.Header className="bg-white fw-semibold">
+                                Thông tin dịch vụ
+                            </Card.Header>
+                            <Card.Body className="d-flex flex-column justify-content-between gap-3">
+                                <div>
+                                    <h1 className="h3 fw-semibold mb-2">
+                                        {accommodationDetail.baseInfo.name}
+                                    </h1>
+                                    <div className="text-body-secondary mb-3">
+                                        {accommodationDetail.location}
+                                    </div>
 
-									<ListGroup variant="flush" className="mb-3">
-										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-											<span>Số giường</span>
-											<Badge bg="secondary">{accommodationDetail.quantityOfBed}</Badge>
-										</ListGroup.Item>
-										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-											<span>Diện tích</span>
-											<Badge bg="secondary">{accommodationDetail.area} m²</Badge>
-										</ListGroup.Item>
-										<ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-											<span>Giá</span>
-											<Badge bg="success">{formatCurrency(accommodationDetail.baseInfo.price)}</Badge>
-										</ListGroup.Item>
-									</ListGroup>
-								</div>
+                                    <ListGroup variant="flush" className="mb-3">
+                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+                                            <span>Số giường</span>
+                                            <Badge bg="secondary">
+                                                {
+                                                    accommodationDetail.quantityOfBed
+                                                }
+                                            </Badge>
+                                        </ListGroup.Item>
+                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+                                            <span>Diện tích</span>
+                                            <Badge bg="secondary">
+                                                {accommodationDetail.area} m²
+                                            </Badge>
+                                        </ListGroup.Item>
+                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+                                            <span>Giá</span>
+                                            <Badge bg="success">
+                                                {formatCurrency(
+                                                    accommodationDetail.baseInfo
+                                                        .price,
+                                                )}
+                                            </Badge>
+                                        </ListGroup.Item>
+                                    </ListGroup>
+                                </div>
 
-								<div className="d-grid">
-									<Button variant="primary" size="lg" onClick={() => setShowBookingModal(true)}>
-										Book ngay!!!
-									</Button>
-								</div>
-							</Card.Body>
-						</Card>
-					</Col>
+                                <div className="d-grid">
+                                    <Button
+                                        variant="primary"
+                                        size="lg"
+                                        onClick={() =>
+                                            setShowBookingModal(true)
+                                        }
+                                    >
+                                        Book ngay!!!
+                                    </Button>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
 
-					<Col xs={12} lg={3}>
-						<PanelProviderInfo
-							key={accommodationDetail.id} {...accommodationDetail.baseInfo?.providerInfo}
+                    <Col xs={12} lg={3}>
+                        <PanelProviderInfo
+                            key={accommodationDetail.id}
+                            {...accommodationDetail.baseInfo?.providerInfo}
+                        />
+                    </Col>
+                </Row>
+
+                <Row className="g-4 align-items-stretch">
+                    <Col xs={12} lg={4}>
+						<PanelCompare
+							currentService={accommodationDetail}
+							serviceType="accommodation"
 						/>
 					</Col>
-				</Row>
+                    <Col xs={12} lg={5}>
+                        <Card className="h-100 shadow-sm">
+                            <Card.Header className="bg-white fw-semibold">
+                                Mô tả dịch vụ
+                            </Card.Header>
+                            <Card.Body>
+                                <p className="mb-0">
+                                    {accommodationDetail.baseInfo.description}
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
 
-				<Row className="g-4 align-items-stretch">
-					<Col xs={12} lg={4}>
-						<PanelReview reviews={reviews} />
-					</Col>
+                    <Col xs={12} lg={3}>
+                        <PanelReview reviews={reviews} />
+                    </Col>
+                </Row>
 
-					<Col xs={12} lg={5}>
-						<Card className="h-100 shadow-sm">
-							<Card.Header className="bg-white fw-semibold">
-								Mô tả dịch vụ
-							</Card.Header>
-							<Card.Body>
-								<p className="mb-0">{accommodationDetail.baseInfo.description}</p>
-							</Card.Body>
-						</Card>
-					</Col>
-
-					<Col xs={12} lg={3}>
-						<PanelCompare services={accommodationDetail.AccommodationDetail} />
-					</Col>
-				</Row>
-
-					<ModalConfirmAccommodationBooking
-						show={showBookingModal}
-						onHide={() => setShowBookingModal(false)}
-						accommodation={accommodationDetail}
-					/>
-			</Container>
-		</CustomerLayout>
-	);
+                <ModalConfirmAccommodationBooking
+                    show={showBookingModal}
+                    onHide={() => setShowBookingModal(false)}
+                    accommodation={accommodationDetail}
+                />
+            </Container>
+        </CustomerLayout>
+    );
 }
 
 export default AccommodationDetail;
