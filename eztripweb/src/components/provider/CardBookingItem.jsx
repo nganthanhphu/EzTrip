@@ -38,10 +38,6 @@ function resolvePaymentMethodLabel(paymentMethod) {
 	return PAYMENT_METHOD_LABELS[paymentMethod] || PAYMENT_METHOD_LABELS[String(paymentMethod).toUpperCase()] || paymentMethod || "-";
 }
 
-function resolveText(value, fallback = "-") {
-	return value || fallback;
-}
-
 function CardBookingItem(props) {
 	const { currentUser } = useAuth();
 	const [showChatModal, setShowChatModal] = useState(false);
@@ -122,10 +118,8 @@ function CardBookingItem(props) {
                                 <Badge bg="dark" className="rounded-0">
                                     Khách hàng
                                 </Badge>
-                                <span className="text-secondary text-truncate">
-                                    {resolveText(customerPhone)}
-                                </span>
-                            </div>
+							</div>
+							<div className="small text-muted">📞 Số điện thoại: {customerPhone || "Không có số điện thoại"}</div>
                         </div>
 
                         <div className="mt-3 d-flex justify-content-start">
