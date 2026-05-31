@@ -35,7 +35,10 @@ function CardAccommodationItem(props) {
                         <div className="d-flex flex-column gap-1">
                             <div className="d-flex align-items-start justify-content-between gap-2">
                                 <div className="min-w-0">
-                                    <h5 className="mb-1 fw-bold text-truncate">
+                                    <h5
+                                        className="mb-1 fw-bold text-wrap"
+                                        style={{ wordBreak: "break-word" }}
+                                    >
                                         {name}
                                     </h5>
                                     <div className="text-muted small text-truncate">
@@ -68,7 +71,8 @@ function CardAccommodationItem(props) {
                                     📅 <b>Số lượt đặt:</b> {bookingCount}
                                 </div>
                                 <div className="small text-muted">
-                                    ⏳ <b>Phòng trống:</b> {remainingQuantity} / {quantity} phòng
+                                    ⏳ <b>Phòng trống:</b> {remainingQuantity} /{" "}
+                                    {quantity} phòng
                                 </div>
                             </div>
                         </div>

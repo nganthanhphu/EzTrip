@@ -49,7 +49,7 @@ function CardTransportationItem(props) {
                         <div className="d-flex flex-column gap-1">
                             <div className="d-flex align-items-start justify-content-between gap-2">
                                 <div className="min-w-0">
-                                    <h5 className="mb-1 fw-bold text-truncate">
+                                    <h5 className="mb-1 fw-bold text-wrap" style={{ wordBreak: "break-word" }}>
                                         {departureLocation} - {arrivalLocation}
                                     </h5>
                                     <div className="d-flex flex-wrap gap-1 mt-1">

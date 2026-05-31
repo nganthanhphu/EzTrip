@@ -88,110 +88,137 @@ function CardBookingItem(props) {
 	};
 
 	return (
-		<Card className="w-100 border border-dark-subtle rounded-0 shadow-none overflow-hidden">
-			<Card.Body className="p-0">
-				<Row className="g-0 align-items-stretch">
-					<Col
-						xs={12}
-						md={3}
-						className="border-end border-dark-subtle bg-light d-flex align-items-stretch"
-					>
-						<div className="w-100" style={{ minHeight: 170 }}>
-							<Image
-								src={customerAvatar || defaultImage}
-								alt={customerName}
-								className="w-100 h-100"
-								style={{ objectFit: "cover" }}
-							/>
-						</div>
-					</Col>
+        <Card className="w-100 border border-dark-subtle rounded-0 shadow-none overflow-hidden">
+            <Card.Body className="p-0">
+                <Row className="g-0 align-items-stretch">
+                    <Col
+                        xs={12}
+                        md={3}
+                        className="border-end border-dark-subtle bg-light d-flex align-items-stretch"
+                    >
+                        <div className="w-100" style={{ minHeight: 170 }}>
+                            <Image
+                                src={customerAvatar || defaultImage}
+                                alt={customerName}
+                                className="w-100 h-100"
+                                style={{ objectFit: "cover" }}
+                            />
+                        </div>
+                    </Col>
 
-					<Col
-						xs={12}
-						md={4}
-						className="border-end border-dark-subtle p-2 p-md-3 d-flex flex-column justify-content-between"
-					>
-						<div className="d-flex flex-column gap-1">
-							<h5 className="mb-0 fw-semibold text-truncate">{customerName}</h5>
-							<div className="d-flex flex-wrap gap-2 align-items-center">
-								<Badge bg="dark" className="rounded-0">Khách hàng</Badge>
-								<span className="text-secondary text-truncate">{resolveText(customerPhone)}</span>
-							</div>
-						</div>
+                    <Col
+                        xs={12}
+                        md={4}
+                        className="border-end border-dark-subtle p-2 p-md-3 d-flex flex-column justify-content-between"
+                    >
+                        <div className="d-flex flex-column gap-1">
+                            <h5
+                                className="mb-0 fw-semibold text-wrap"
+                                style={{ wordBreak: "break-word" }}
+                            >
+                                {customerName}
+                            </h5>
+                            <div className="d-flex flex-wrap gap-2 align-items-center">
+                                <Badge bg="dark" className="rounded-0">
+                                    Khách hàng
+                                </Badge>
+                                <span className="text-secondary text-truncate">
+                                    {resolveText(customerPhone)}
+                                </span>
+                            </div>
+                        </div>
 
-						<div className="mt-3 d-flex justify-content-start">
-							<Button variant="outline-secondary" onClick={() => setShowChatModal(true)} disabled={!canChat}>
-								Chat ngay
-							</Button>
-						</div>
-						{actionError ? <div className="mt-2 small text-danger">{actionError}</div> : null}
-					</Col>
+                        <div className="mt-3 d-flex justify-content-start">
+                            <Button
+                                variant="outline-secondary"
+                                onClick={() => setShowChatModal(true)}
+                                disabled={!canChat}
+                            >
+                                Chat ngay
+                            </Button>
+                        </div>
+                        {actionError ? (
+                            <div className="mt-2 small text-danger">
+                                {actionError}
+                            </div>
+                        ) : null}
+                    </Col>
 
-					<Col
-						xs={12}
-						md={3}
-						className="border-end border-dark-subtle p-2 p-md-3 d-flex flex-column justify-content-between"
-					>
-						<div className="d-flex flex-column gap-1 small">
-							<div>Ngày đặt: {createdDateLabel}</div>
-							<div>Ngày sử dụng: {bookingDayLabel}</div>
-							<div>Số lượng: {quantity}</div>
-							<div>Phương thức thanh toán: {paymentMethodLabel}</div>
-						</div>
+                    <Col
+                        xs={12}
+                        md={3}
+                        className="border-end border-dark-subtle p-2 p-md-3 d-flex flex-column justify-content-between"
+                    >
+                        <div className="d-flex flex-column gap-1 small">
+                            <div>Ngày đặt: {createdDateLabel}</div>
+                            <div>Ngày sử dụng: {bookingDayLabel}</div>
+                            <div>Số lượng: {quantity}</div>
+                            <div>
+                                Phương thức thanh toán: {paymentMethodLabel}
+                            </div>
+                        </div>
 
-						<div className="mt-2 fs-5 fw-semibold text-nowrap">{formattedAmount}</div>
-					</Col>
+                        <div className="mt-2 fs-5 fw-semibold text-nowrap">
+                            {formattedAmount}
+                        </div>
+                    </Col>
 
-					<Col
-						xs={12}
-						md={2}
-						className="p-2 p-md-3 d-flex flex-column justify-content-between"
-					>
-						<div className="d-flex flex-column align-items-md-end align-items-start gap-2">
-							<Badge
-								bg={statusMeta.badge}
-								className="px-3 py-2 rounded-0 fs-6 text-uppercase align-self-md-end"
-							>
-								{statusMeta.label}
-							</Badge>
+                    <Col
+                        xs={12}
+                        md={2}
+                        className="p-2 p-md-3 d-flex flex-column justify-content-between"
+                    >
+                        <div className="d-flex flex-column align-items-md-end align-items-start gap-2">
+                            <Badge
+                                bg={statusMeta.badge}
+                                className="w-100 px-3 py-2 rounded-0 fs-6 text-uppercase text-center"
+                            >
+                                {statusMeta.label}
+                            </Badge>
 
-							{isPending ? (
-								<Button
-									variant="primary"
-									onClick={() => void handleUpdateStatus("CONFIRMED")}
-									className="w-100 rounded-0"
-									disabled={savingStatus}
-								>
-									{savingStatus ? "Đang xử lý" : "Xác nhận"}
-								</Button>
-							) : null}
+                            {isPending ? (
+                                <Button
+                                    variant="primary"
+                                    onClick={() =>
+                                        void handleUpdateStatus("CONFIRMED")
+                                    }
+                                    className="w-100 rounded-0"
+                                    disabled={savingStatus}
+                                >
+                                    {savingStatus ? "Đang xử lý" : "Xác nhận"}
+                                </Button>
+                            ) : null}
 
-							{isConfirmed ? (
-								<Button
-									variant="success"
-									onClick={() => void handleUpdateStatus("COMPLETED")}
-									className="w-100 rounded-0"
-									disabled={savingStatus}
-								>
-									{savingStatus ? "Đang xử lý" : "Hoàn thành"}
-								</Button>
-							) : null}
-						</div>
-					</Col>
-				</Row>
-			</Card.Body>
-			<ModalChat
-				show={showChatModal}
-				onHide={() => setShowChatModal(false)}
-				currentUserId={currentUser?.id || ""}
-				partnerUserId={customerId || ""}
-				currentName={currentUser?.name || currentUser?.fullname || "Tôi"}
-				partnerName={customerName || "Khách hàng"}
-				currentAvatar={currentUser?.avatar || ""}
-				partnerAvatar={customerAvatar || ""}
-			/>
-		</Card>
-	);
+                            {isConfirmed ? (
+                                <Button
+                                    variant="success"
+                                    onClick={() =>
+                                        void handleUpdateStatus("COMPLETED")
+                                    }
+                                    className="w-100 rounded-0"
+                                    disabled={savingStatus}
+                                >
+                                    {savingStatus ? "Đang xử lý" : "Hoàn thành"}
+                                </Button>
+                            ) : null}
+                        </div>
+                    </Col>
+                </Row>
+            </Card.Body>
+            <ModalChat
+                show={showChatModal}
+                onHide={() => setShowChatModal(false)}
+                currentUserId={currentUser?.id || ""}
+                partnerUserId={customerId || ""}
+                currentName={
+                    currentUser?.name || currentUser?.fullname || "Tôi"
+                }
+                partnerName={customerName || "Khách hàng"}
+                currentAvatar={currentUser?.avatar || ""}
+                partnerAvatar={customerAvatar || ""}
+            />
+        </Card>
+    );
 }
 
 export default CardBookingItem;

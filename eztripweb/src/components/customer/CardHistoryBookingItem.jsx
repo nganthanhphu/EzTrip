@@ -33,14 +33,6 @@ const PAYMENT_METHOD_LABELS = {
 	BANK_TRANSFER: "Chuyển khoản",
 };
 
-const STATUS_TRANSITIONS = {
-	PENDING: [
-		{ value: "CONFIRMED", label: "Xác nhận" },
-		{ value: "CANCELLED", label: "Hủy" },
-	],
-	CONFIRMED: [{ value: "COMPLETED", label: "Hoàn thành" }],
-};
-
 function resolveStatusMeta(status) {
 	return STATUS_META[status] || STATUS_META[String(status).toUpperCase()] || {
 		key: String(status || ""),
@@ -193,7 +185,7 @@ function CardHistoryBookingItem(props) {
 						<div className="d-flex flex-column align-items-md-end align-items-start gap-2">
 							<Badge
 								bg={statusMeta.badge}
-								className="px-3 py-2 rounded-0 fs-6 text-uppercase align-self-md-end"
+								className="w-100 px-3 py-2 rounded-0 fs-6 text-uppercase text-center"
 							>
 								{statusMeta.label}
 							</Badge>

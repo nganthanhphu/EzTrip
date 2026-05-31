@@ -36,7 +36,10 @@ function CardServiceItem(props) {
                         <div className="d-flex flex-column gap-1">
                             <div className="d-flex align-items-start justify-content-between gap-2">
                                 <div className="min-w-0">
-                                    <h5 className="mb-1 fw-bold text-truncate">
+                                    <h5
+                                        className="mb-1 fw-bold text-wrap"
+                                        style={{ wordBreak: "break-word" }}
+                                    >
                                         {name}
                                     </h5>
                                     <div className="text-muted small text-truncate">
@@ -90,7 +93,9 @@ function CardServiceItem(props) {
                             <Button
                                 variant="primary"
                                 className="rounded-0 w-100"
-                                onClick={() => nav(`/provider/services/${id}/bookings`)}
+                                onClick={() =>
+                                    nav(`/provider/services/${id}/bookings`)
+                                }
                             >
                                 Danh sách booking
                             </Button>
