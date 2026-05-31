@@ -161,7 +161,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
             String typeOfTransportation = params.get("type");
             if (typeOfTransportation != null && !typeOfTransportation.isEmpty()) {
-                predicates.add(b.equal(type.get("name"), typeOfTransportation));
+                predicates.add(b.equal(type.get("id"), typeOfTransportation));
             }
 
             String rating = params.get("rating");
