@@ -45,7 +45,10 @@ public class BaseServiceRepositoryImpl implements BaseServiceRepository {
 
         Expression<Integer> confirmedCount = b.sum(
                 b.<Integer>selectCase()
-                        .when(b.equal(bookingStatus.get("name"), "CONFIRMED"), 1)
+                        .when(
+                                b.or(b.equal(bookingStatus.get("name"), "CONFIRMED"),
+                                        b.equal(bookingStatus.get("name"), "PENDING")),
+                                booking.get("quantity"))
                         .otherwise(0));
 
         Expression<Integer> remainingQuantity = b.diff(
