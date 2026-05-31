@@ -161,7 +161,11 @@ function ModalProfile({ show, onHide }) {
 			}
 
 			const updatedProfile = await updateCurrentUserProfile(payload);
-			syncCurrentUser(updatedProfile);
+
+			if (!isProvider) {
+				syncCurrentUser(updatedProfile);
+			}
+
 			onHide();
 		} catch (submitError) {
 			setError(submitError?.response?.data?.error || "Không thể cập nhật profile.");
@@ -185,6 +189,9 @@ function ModalProfile({ show, onHide }) {
 					</div>
 				) : (
 					<Form onSubmit={handleSubmit}>
+						{isProvider ? (
+							<Alert variant="warning">Nhà cung cấp lưu ý: Khi thay đổi thông tin của mình, thay đổi sẽ được gửi để chờ Admin chấp nhận và sẽ không có hiệu lực ngay lập tức.</Alert>
+						) : null}
 						{error ? (
 							<Alert variant="danger">
 								{error}
@@ -216,7 +223,7 @@ function ModalProfile({ show, onHide }) {
 									<Badge bg="secondary" className="mb-3">{currentUser?.email || "Chưa có email"}</Badge>
 									<Form.Group controlId="profileAvatar" className="text-start">
 										<Form.Label>Ảnh đại diện</Form.Label>
-										<Form.Control name="avatar" type="file" accept="image/*" onChange={handleChange} />
+												<Form.Control name="avatar" type="file" accept="image/*" onChange={handleChange} disabled={saving} />
 									</Form.Group>
 								</div>
 							</Col>
@@ -225,13 +232,13 @@ function ModalProfile({ show, onHide }) {
 									<Col xs={12} md={6}>
 										<Form.Group controlId="profileFullname">
 											<Form.Label>Họ và tên</Form.Label>
-											<Form.Control name="fullname" value={form.fullname} onChange={handleChange} placeholder="Nhập họ và tên" />
+												<Form.Control name="fullname" value={form.fullname} onChange={handleChange} placeholder="Nhập họ và tên" disabled={saving} />
 										</Form.Group>
 									</Col>
 									<Col xs={12} md={6}>
 										<Form.Group controlId="profileEmail">
 											<Form.Label>Email</Form.Label>
-											<Form.Control name="email" type="email" value={form.email} onChange={handleChange} placeholder="Nhập email" />
+												<Form.Control name="email" type="email" value={form.email} onChange={handleChange} placeholder="Nhập email" disabled={saving} />
 										</Form.Group>
 									</Col>
 									<Col xs={12}>
@@ -246,13 +253,13 @@ function ModalProfile({ show, onHide }) {
 											<Col xs={12} md={6}>
 												<Form.Group controlId="profileDob">
 													<Form.Label>Ngày sinh</Form.Label>
-													<Form.Control name="dob" type="date" value={form.dob} onChange={handleChange} />
+													<Form.Control name="dob" type="date" value={form.dob} onChange={handleChange} disabled={saving} />
 												</Form.Group>
 											</Col>
 											<Col xs={12} md={6}>
 												<Form.Group controlId="profileGender">
 													<Form.Label>Giới tính</Form.Label>
-													<Form.Select name="gender" value={form.gender} onChange={handleChange}>
+													<Form.Select name="gender" value={form.gender} onChange={handleChange} disabled={saving}>
 														<option value="">Chọn giới tính</option>
 														{(lookupTables?.genders || []).map((gender) => (
 															<option key={gender.value} value={gender.value}>{gender.label}</option>
@@ -267,13 +274,13 @@ function ModalProfile({ show, onHide }) {
 											<Col xs={12}>
 												<Form.Group controlId="profileCompanyName">
 													<Form.Label>Tên công ty</Form.Label>
-													<Form.Control name="companyName" value={form.companyName} onChange={handleChange} placeholder="Nhập tên công ty" />
+													<Form.Control name="companyName" value={form.companyName} onChange={handleChange} placeholder="Nhập tên công ty" disabled={saving} />
 												</Form.Group>
 											</Col>
 											<Col xs={12}>
 												<Form.Group controlId="profileCompanyAddress">
 													<Form.Label>Địa chỉ công ty</Form.Label>
-													<Form.Control name="companyAddress" value={form.companyAddress} onChange={handleChange} placeholder="Nhập địa chỉ công ty" />
+													<Form.Control name="companyAddress" value={form.companyAddress} onChange={handleChange} placeholder="Nhập địa chỉ công ty" disabled={saving} />
 												</Form.Group>
 											</Col>
 										</>
