@@ -30,16 +30,20 @@ export async function getAccommodations(params = {}) {
     return requestList("/api/accommodations", params);
 }
 
+export async function getAccommodationById(id) {
+    return requestById(`/api/accommodations/${id}`);
+}  
+
 export async function createAccommodation(accommodation) {
     return requestMultipartCreate("/api/secure/accommodations", accommodation);
 }
 
-export async function getAccommodationById(id) {
-    return requestById("/api/accommodations", id);
-}
-
 export async function updateAccommodation(id, accommodation) {
     return requestMultipartUpdate("/api/secure/accommodations", id, accommodation);
+}
+
+export async function deleteAccommodation(id) {
+    return axiosClient.delete(`/api/secure/accommodations/${id}`);
 }
 
 export async function getTransportations(params = {}) {
@@ -58,6 +62,10 @@ export async function updateTransportation(id, transportation) {
     return requestMultipartUpdate("/api/secure/transportations", id, transportation);
 }
 
+export async function deleteTransportation(id) {
+    return axiosClient.delete(`/api/secure/transportations/${id}`);
+}
+
 export async function getTourisms(params = {}) {
     return requestList("/api/tourisms", params);
 }
@@ -72,6 +80,25 @@ export async function getTourismById(id) {
 
 export async function updateTourism(id, tourism) {
     return requestMultipartUpdate("/api/secure/tourisms", id, tourism);
+}
+
+export async function deleteTourism(id) {
+    return axiosClient.delete(`/api/secure/tourisms/${id}`);
+}
+
+export async function deleteServiceByType(serviceType, id) {
+    const deletions = {
+        ACCOMMODATION: deleteAccommodation,
+        TRANSPORTATION: deleteTransportation,
+        TOURISM: deleteTourism,
+    };
+
+    const deleter = deletions[serviceType];
+    if (!deleter) {
+        throw new Error("Loại dịch vụ không hợp lệ.");
+    }
+
+    return deleter(id);
 }
 
 export async function getServiceById(id) {
@@ -124,6 +151,10 @@ export async function getProviderServices(params = {}) {
     ];
 }
 
+export async function deleteImage(id) {
+    return axiosClient.delete(`/api/secure/images/${id}`);
+}
+
 export async function getBookings(params = {}) {
     return requestList("/api/secure/bookings", params);
 }
@@ -133,7 +164,7 @@ export async function updateBooking(bookingId, booking) {
 }
 
 export async function getReviewsByServiceId(serviceId, params = {}) {
-    return requestList(`/services/{serviceId}/reviews`, {
+    return requestList(`/services/${serviceId}/reviews`, {
         ...params,
         serviceId,
     });
@@ -142,16 +173,27 @@ export async function getReviewsByServiceId(serviceId, params = {}) {
 export default {
     getAccommodations,
     getAccommodationById,
+    createAccommodation,
+    updateAccommodation,
+    deleteAccommodation,
     getTransportations,
     getTransportationById,
+    createTransportation,
+    updateTransportation,
+    deleteTransportation,
     getTourisms,
     getTourismById,
+    createTourism,
+    updateTourism,
+    deleteTourism,
+    deleteServiceByType,
     getProviderServices,
     getServiceById,
     updateAccommodation,
     updateTransportation,
     updateTourism,
     updateServiceByType,
+    deleteImage,
     getBookings,
     updateBooking,
 };
