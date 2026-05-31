@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TourItem from "@components/customer/CardTourItem";
@@ -20,7 +20,7 @@ function TourList() {
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
     const pageSize = 5;
-    const { items: tourList, loading, page, totalPages, loadPage } = usePagedList(
+    const fetchPage = useCallback(
         (nextPage) =>
             getTourisms({
                 name,
@@ -34,8 +34,10 @@ function TourList() {
                 page: nextPage,
                 size: pageSize,
             }),
-        pageSize
+        [name, location, tourDuration, fromPrice, toPrice, rating, sortBy, order, pageSize]
     );
+
+    const { items: tourList, loading, page, totalPages, loadPage } = usePagedList(fetchPage, pageSize);
 
     const handleSearch = (event) => {
         event.preventDefault();

@@ -1,5 +1,5 @@
 import { Card, Carousel, Image } from "react-bootstrap";
-import defaultAccommodationImage from "../../assets/images/default_accommodation_item.jpg";
+import defaultAccommodationImage from "@assets/images/default_accommodation_item.jpg";
 
 function PanelAlbum({ images = [], urls = [], image = [] }) {
 	const sourceImages = images.length > 0 ? images : urls.length > 0 ? urls : image;

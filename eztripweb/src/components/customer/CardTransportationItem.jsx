@@ -1,5 +1,5 @@
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
-import defaultImage from "../../assets/images/default_transportation_item.jpg";
+import defaultImage from "@assets/images/default_transportation_item.jpg";
 import { formatCurrency, formatHour } from "@utils/formatters";
 
 function CardTransportationItem(props) {
@@ -106,7 +106,7 @@ function CardTransportationItem(props) {
                                 className="rounded-0 w-100"
                                 onClick={onSelect}
                             >
-                                Đặt vé
+                                Đặt vé 
                             </Button>
                         </div>
                     </Col>

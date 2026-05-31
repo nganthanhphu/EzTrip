@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Alert, Container } from "react-bootstrap";
 import ProviderLayout from "@layouts/ProviderLayout";
@@ -6,34 +6,26 @@ import CardBookingItem from "@components/provider/CardBookingItem";
 import MySpinner from "@components/common/MySpinner";
 import { getBookings } from "@services/providerService";
 
-function normalizeListResponse(response) {
-    if (Array.isArray(response)) {
-        return response;
-    }
-
-    return response?.content || response?.items || response?.results || [];
-}
-
 function BookingList() {
     const { id } = useParams();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const loadBookings = async () => {
+    const loadBookings = useCallback(async () => {
         setLoading(true);
         setError("");
 
         try {
             const response = await getBookings({ serviceId: id });
-            setBookings(normalizeListResponse(response));
+            setBookings(response || []);
         } catch (requestError) {
             setBookings([]);
             setError(requestError?.response?.data?.error || "Không thể tải danh sách booking.");
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
     useEffect(() => {
         if (id) {
@@ -42,7 +34,7 @@ function BookingList() {
             setBookings([]);
             setLoading(false);
         }
-    }, [id]);
+    }, [id, loadBookings]);
 
     return (
         <ProviderLayout>

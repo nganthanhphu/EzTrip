@@ -1,6 +1,6 @@
 import React from "react";
-import Header from "../components/provider/Header";
-import Footer from "../components/provider/Footer";
+import Header from "@components/provider/Header";
+import Footer from "@components/provider/Footer";
 
 const ProviderLayout = ({ children }) => {
     return (

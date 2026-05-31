@@ -1,22 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Badge, Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { createReview } from "@services/customerService";
 import {formatDateTime} from "@utils/formatters";
 
-function normalizeReview(review) {
-	if (!review) {
-		return null;
-	}
-
-	return {
-		rating: Number(review.rating || 0),
-		comment: review.comment || "",
-		reviewDate: review.reviewDate || review.date || "",
-	};
-}
-
 function ModalReview({ show, onHide, bookingId, serviceName, review, onSaved }) {
-	const initialReview = useMemo(() => normalizeReview(review), [review]);
+	const initialReview = review ?? null;
 	const [draft, setDraft] = useState({ rating: 10, comment: "" });
 	const [currentReview, setCurrentReview] = useState(initialReview);
 	const [saving, setSaving] = useState(false);
@@ -29,8 +17,8 @@ function ModalReview({ show, onHide, bookingId, serviceName, review, onSaved }) 
 
 		setCurrentReview(initialReview);
 		setDraft({
-			rating: initialReview?.rating || 10,
-			comment: initialReview?.comment || "",
+			rating: initialReview?.rating ?? 10,
+			comment: initialReview?.comment ?? "",
 		});
 		setError("");
 	}, [show, initialReview]);

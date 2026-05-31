@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
-import defaultImage from "../../assets/images/default_accommodation_item.jpg";
+import defaultImage from "@assets/images/default_accommodation_item.jpg";
 import { formatCurrency, formatDateTime } from "@utils/formatters";
 import ModalChat from "@components/common/ModalChat";
 import { useAuth } from "@hooks/useAuth";

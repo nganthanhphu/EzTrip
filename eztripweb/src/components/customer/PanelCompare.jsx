@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, Card, Col, Form, Image, InputGroup, Row, Stack } from "react-bootstrap";
 import ModalResultCompare from "@components/customer/ModalResultCompare";
 import { getAccommodations, getTourisms } from "@services/customerService";
-import defaultAccommodationImage from "../../assets/images/default_accommodation_item.jpg";
-import defaultTourImage from "../../assets/images/default_tour_item.jpg";
+import defaultAccommodationImage from "@assets/images/default_accommodation_item.jpg";
+import defaultTourImage from "@assets/images/default_tour_item.jpg";
 import { formatCurrency } from "@utils/formatters";
 
 const SERVICE_CONFIG = {

@@ -3,8 +3,9 @@ import { Alert, Button, Card, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
-import Apis, { endpoints } from "../../configs/Apis";
-import { useLookupTables } from "../../contexts/LookupTablesContext";
+import Apis, { endpoints } from "@configs/Apis";
+import { useLookupTables } from "@contexts/LookupTablesContext";
+import { validatePasswordConfirmation, validateRequiredFields } from "@utils/validators";
 
 const providerFields = [
 	{
@@ -55,20 +56,26 @@ const RegisterProvider = () => {
 	const providerTypeOptions = [{ value: "", label: "Chọn loại nhà cung cấp" }, ...lookupTables.typeOfProviders];
 
 	const validate = () => {
-		for (const field of providerFields) {
-			if (!user[field.field]) {
-				setErr(`Vui lòng nhập ${field.title}!`);
-				return false;
-			}
-		}
+		const requiredValidation = validateRequiredFields(user, [
+			...providerFields.map((field) => ({
+				name: field.field,
+				label: field.title,
+			})),
+			{ name: "typeOfProvider", label: "loại nhà cung cấp" },
+		]);
 
-		if (!user.typeOfProvider) {
-			setErr("Vui lòng chọn loại nhà cung cấp!");
+		if (!requiredValidation.valid) {
+			setErr(requiredValidation.message);
 			return false;
 		}
 
-		if (user.password !== user.confirmPassword) {
-			setErr("Mật khẩu KHÔNG khớp!");
+		const passwordValidation = validatePasswordConfirmation(
+			user.password,
+			user.confirmPassword,
+		);
+
+		if (!passwordValidation.valid) {
+			setErr(passwordValidation.message);
 			return false;
 		}
 

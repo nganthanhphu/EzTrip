@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Alert, Badge, Modal } from "react-bootstrap";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getDatabase, onValue, push, ref } from "firebase/database";
-import FirebaseConfigs from "../../configs/FirebaseConfigs";
+import FirebaseConfigs from "@configs/FirebaseConfigs";
 import defaultAvatar from "@assets/images/default_avatar.jpg";
 import { MessageBubble, ChatInput } from "@components/common/ChatComponents";
 import { useAuth } from "@hooks/useAuth";

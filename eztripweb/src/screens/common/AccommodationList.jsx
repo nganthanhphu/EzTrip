@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
-import CardAccomodationItem from "@components/customer/CardAccomodationItem";
+import CardAccommodationItem from "@components/customer/CardAccommodationItem";
 import PaginationComponent from "@components/common/PaginationComponent";
 import { getAccommodations } from "@services/customerService";
 import usePagedList from "@hooks/usePagedList";
@@ -19,7 +19,7 @@ function AccommodationList() {
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
     const pageSize = 5;
-    const { items: accommodationList, loading, page, totalPages, loadPage } = usePagedList(
+    const fetchPage = useCallback(
         (nextPage) =>
             getAccommodations({
                 name,
@@ -32,8 +32,10 @@ function AccommodationList() {
                 page: nextPage,
                 size: pageSize,
             }),
-        pageSize
+        [name, location, fromPrice, toPrice, rating, sortBy, order, pageSize]
     );
+
+    const { items: accommodationList, loading, page, totalPages, loadPage } = usePagedList(fetchPage, pageSize);
 
 
     const handleSearch = (event) => {
@@ -129,7 +131,7 @@ function AccommodationList() {
 
                 <div md={12} className="h-50 d-flex flex-column gap-3">
                     {accommodationList.map((accommodation) => (
-                        <CardAccomodationItem
+                        <CardAccommodationItem
                             key={accommodation.id}
                             {...accommodation}
                         />

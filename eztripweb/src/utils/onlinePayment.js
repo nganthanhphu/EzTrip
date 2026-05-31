@@ -2,12 +2,6 @@ import { getBookings, payBooking } from "@services/customerService";
 
 const MOMO_PAYMENT_METHOD_ID = 2;
 
-function normalizeText(value) {
-	return String(value ?? "")
-		.trim()
-		.toLowerCase();
-}
-
 function isMatchingBooking(booking, expected) {
 	if (!booking || !expected) {
 		return false;
@@ -17,9 +11,9 @@ function isMatchingBooking(booking, expected) {
 	const bookingQuantity = Number(booking.quantity);
 	const expectedQuantity = Number(expected.quantity);
 
-	return normalizeText(booking.serviceName) === normalizeText(expected.serviceName)
-		&& normalizeText(booking.bookingDay) === normalizeText(expected.bookingDay)
-		&& normalizeText(booking.note) === normalizeText(expected.note)
+	return booking.serviceName === expected.serviceName
+		&& booking.bookingDay === expected.bookingDay
+		&& booking.note === expected.note
 		&& bookingPaymentMethod === Number(expected.paymentMethodId ?? MOMO_PAYMENT_METHOD_ID)
 		&& bookingQuantity === expectedQuantity;
 }
@@ -30,7 +24,7 @@ export function buildMomoRedirectUrl() {
 
 export async function openMomoPaymentForBooking(expectedBooking) {
 	const response = await getBookings({ page: 1 });
-	const bookings = Array.isArray(response) ? response : response?.content || response?.items || response?.results || [];
+	const bookings = response || [];
 	const booking = bookings.find((item) => isMatchingBooking(item, expectedBooking));
 
 	if (!booking?.id) {

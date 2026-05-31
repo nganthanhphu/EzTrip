@@ -1,12 +1,12 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
-import Home from '@screens/customer/Home';
-import AccommodationList from "@screens/customer/AccommodationList";
-import AccommodationDetail from "@screens/customer/AccommodationDetail";
-import TransportationList from '@screens/customer/TransportationList';
-import TourList from '@screens/customer/TourList';
-import TourDetail from '@screens/customer/TourDetail';
+import Home from '@screens/common/Home';
+import AccommodationList from "@screens/common/AccommodationList";
+import AccommodationDetail from "@screens/common/AccommodationDetail";
+import TransportationList from '@screens/common/TransportationList';
+import TourList from '@screens/common/TourList';
+import TourDetail from '@screens/common/TourDetail';
 import HistoryBookingList from '@screens/customer/HistoryBookingList';
 
 import HomeProvider from '@screens/provider/Home';
@@ -38,7 +38,7 @@ function RootRedirect() {
 const AppRoutes = () => {
       return (
       <Routes>
-                  <Route path="/" element={<RootRedirect />} />
+            <Route path="/" element={<RootRedirect />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<RegisterCustomer />} />
             <Route path="/register/provider" element={<RegisterProvider />} />
@@ -46,12 +46,13 @@ const AppRoutes = () => {
             <Route path="/logout" element={<Logout />} />
             <Route path="/provider/logout" element={<Logout />} />
 
+            <Route path="/accommodation" element={<AccommodationList />} />
+            <Route path="/accommodation/:id" element={<AccommodationDetail />} />
+            <Route path="/transportation" element={<TransportationList />} />
+            <Route path="/tours" element={<TourList />} />
+            <Route path="/tours/:id" element={<TourDetail />} />
+
             <Route element={<RoleRoute role="CUSTOMER" />}>
-                  <Route path="/accommodation" element={<AccommodationList />} />
-                  <Route path="/accommodation/:id" element={<AccommodationDetail />} />
-                  <Route path="/transportation" element={<TransportationList />} />
-                  <Route path="/tours" element={<TourList />} />
-                  <Route path="/tours/:id" element={<TourDetail />} />
                   <Route path="/history" element={<HistoryBookingList />} />
             </Route>
 

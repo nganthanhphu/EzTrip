@@ -135,19 +135,25 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 							<Form.Control
 								type="number"
 								min="1"
-								max={transportation?.availableSeats ?? transportation?.avaibility_count ?? undefined}
+								max={
+									transportation?.availableSeats ??
+									transportation?.availability_count ??
+									undefined
+								}
 								value={quantity}
 								onChange={(event) =>
 									setQuantity(
 										Math.min(
 											Math.max(1, Number(event.target.value) || 1),
-											transportation?.availableSeats ?? transportation?.avaibility_count ?? Number.POSITIVE_INFINITY,
+											transportation?.availableSeats ??
+											transportation?.availability_count ??
+											Number.POSITIVE_INFINITY,
 										),
 									)
 								}
 							/>
 							<div className="text-body-secondary small mt-1">
-								Còn lại {transportation?.availableSeats ?? transportation?.avaibility_count ?? 0} chỗ
+								Còn lại {transportation?.availableSeats ?? transportation?.availability_count ?? 0} chỗ
 							</div>
 						</Col>
 

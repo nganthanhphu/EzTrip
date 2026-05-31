@@ -1,5 +1,5 @@
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
-import defaultImage from "../../assets/images/default_tour_item.jpg";
+import defaultImage from "@assets/images/default_tour_item.jpg";
 import { formatCurrency } from "@utils/formatters";
 import { useNavigate } from "react-router-dom";
 

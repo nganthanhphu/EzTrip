@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
 import { useAuth } from "@hooks/useAuth";
+import { validateRequiredFields } from "@utils/validators";
 
 function Login() {
     const nav = useNavigate();
@@ -42,11 +43,14 @@ function Login() {
     }, [isAuthenticated, loading, currentUser, nav, q]);
 
     const validate = () => {
-        for (const field of userInfo) {
-            if (!(field.field in user) || !user[field.field]) {
-                setErr(`Vui lòng nhập ${field.title}!`);
-                return false;
-            }
+        const validation = validateRequiredFields(user, userInfo.map((field) => ({
+            name: field.field,
+            label: field.title,
+        })));
+
+        if (!validation.valid) {
+            setErr(validation.message);
+            return false;
         }
 
         return true;

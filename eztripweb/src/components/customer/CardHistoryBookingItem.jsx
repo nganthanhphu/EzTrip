@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
-import defaultImage from "../../assets/images/default_accommodation_item.jpg";
+import defaultImage from "@assets/images/default_accommodation_item.jpg";
 import { formatCurrency, formatDateTime } from "@utils/formatters";
 import ModalReview from "@components/customer/ModalReview";
 import ModalChat from "@components/common/ModalChat";
@@ -74,7 +74,10 @@ function CardHistoryBookingItem(props) {
 		totalAmount,
 		note,
 		status,
+		customerId,
 		customerName,
+		customerPhone,
+		customerAvatar,
 		companyId,
 		companyName,
 		paymentMethod,
@@ -90,7 +93,8 @@ function CardHistoryBookingItem(props) {
 	const paymentMethodLabel = resolvePaymentMethodLabel(paymentMethod);
 	const createdDateLabel = formatDateTime(createdDate) || createdDate || "-";
 	const bookingDayLabel = formatDateTime(bookingDay) || bookingDay || "-";
-	const canChat = Boolean(currentUser?.id && companyId);
+	const isProviderViewing = Boolean(currentUser?.id && String(currentUser.id) === String(companyId));
+	const canChat = Boolean(currentUser?.id && (isProviderViewing ? customerId : companyId));
 
 	const handleCancelBooking = async () => {
 		setSavingStatus(true);
@@ -212,11 +216,11 @@ function CardHistoryBookingItem(props) {
 				show={showChatModal}
 				onHide={() => setShowChatModal(false)}
 				currentUserId={currentUser?.id || ""}
-				partnerUserId={companyId || ""}
+				partnerUserId={isProviderViewing ? (customerId || "") : (companyId || "")}
 				currentName={currentUser?.name || currentUser?.fullname || "Tôi"}
-				partnerName={companyName || "Nhà cung cấp"}
+				partnerName={isProviderViewing ? (customerName || "Khách hàng") : (companyName || "Nhà cung cấp")}
 				currentAvatar={currentUser?.avatar || ""}
-				partnerAvatar={props.companyAvatar || ""}
+				partnerAvatar={isProviderViewing ? (customerAvatar || "") : (props.companyAvatar || "")}
 			/>
 			<ModalReview
 				show={showReviewModal}

@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import MySpinner from "@components/common/MySpinner";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import { useAuth } from "@hooks/useAuth";
+import { validateRequiredFields } from "@utils/validators";
 import {
     deleteImage,
     deleteServiceByType,
@@ -434,6 +435,7 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
         serviceId,
         service,
         show,
+        isEditMode,
     ]);
 
     const handleFileChange = (event) => {
@@ -519,20 +521,20 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
     };
 
     const validate = () => {
-        const requiredFields = ["name", "description", "price", "quantity"];
+        const requiredValidation = validateRequiredFields(form, [
+            { name: "name", label: "name" },
+            { name: "description", label: "description" },
+            { name: "price", label: "price" },
+            { name: "quantity", label: "quantity" },
+            ...serviceFactory.childFields.filter((field) => field.required),
+        ], {
+            messagePrefix: "Vui lòng nhập",
+            messageSuffix: ".",
+        });
 
-        for (const field of requiredFields) {
-            if (!form[field]) {
-                setError(`Vui lòng nhập ${field}.`);
-                return false;
-            }
-        }
-
-        for (const field of serviceFactory.childFields) {
-            if (field.required && !form[field.name]) {
-                setError(`Vui lòng nhập ${field.label}.`);
-                return false;
-            }
+        if (!requiredValidation.valid) {
+            setError(requiredValidation.message);
+            return false;
         }
 
         return true;

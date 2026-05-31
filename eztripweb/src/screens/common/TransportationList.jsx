@@ -5,9 +5,12 @@ import CustomerLayout from "@layouts/CustomerLayout";
 import TransportationItem from "@components/customer/CardTransportationItem";
 import ModalConfirmTransportationBooking from "@components/customer/ModalConfirmTransportationBooking";
 import PaginationComponent from "@components/common/PaginationComponent";
-import { useLookupTables } from "../../contexts/LookupTablesContext";
+import { useLookupTables } from "@contexts/LookupTablesContext";
 import MySpinner from "@components/common/MySpinner";
 import { getTransportations } from "@services/customerService";
+
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@hooks/useAuth";
 
 function TransportationList() {
     const [loading, setLoading] = useState(false);
@@ -97,7 +100,16 @@ function TransportationList() {
 
     const totalPages = hasNextPage ? page + 1 : page;
 
+    const { currentUser } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
     function handleSelectTransportation(option) {
+        if (!currentUser) {
+            navigate("/login", { state: { from: location.pathname } });
+            return;
+        }
+
         setSelectedTransportation(buildBookingTransportation(option));
         setShowBookingModal(true);
     }

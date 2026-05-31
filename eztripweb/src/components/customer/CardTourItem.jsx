@@ -1,6 +1,6 @@
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import defaultImage from "../../assets/images/default_tour_item.jpg";
+import defaultImage from "@assets/images/default_tour_item.jpg";
 import { formatCurrency } from "@utils/formatters";
 
 function CardTourItem(props) {
@@ -65,8 +65,8 @@ function CardTourItem(props) {
                                 {formatCurrency(Number(price || 0))}
                             </div>
 
-                            <Button variant="primary" size="sm" onClick={() => nav(`/tours/${id}?action=book`)} className="rounded-0 w-100">
-                                Đặt tour
+                            <Button variant="primary" size="sm" onClick={() => nav(`/tours/${id}`)} className="rounded-0 w-100">
+                                Xem chi tiết
                             </Button>
                         </div>
                     </Col>

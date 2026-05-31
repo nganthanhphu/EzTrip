@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Form } from 'react-bootstrap';
+import { formatTimestamp } from '@utils/formatters';
 
 export function MessageBubble({ message, isOwn }) {
     const alignClass = isOwn ? 'text-end' : 'text-start';
@@ -40,7 +41,7 @@ export function MessageBubble({ message, isOwn }) {
                     <div>{message.text}</div>
                 </div>
                 <div className="text-muted small mt-1" style={{ fontSize: 11 }}>
-                    {new Date(message.timestamp || message.createdAt || Date.now()).toLocaleString()}
+                    {formatTimestamp(message.timestamp || message.createdAt || Date.now())}
                 </div>
             </div>
 

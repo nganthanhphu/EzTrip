@@ -1,24 +1,21 @@
-import { useEffect, useState } from "react";
-
-function normalizeListResponse(response) {
-    if (Array.isArray(response)) {
-        return response;
-    }
-
-    return response?.content || response?.items || response?.results || [];
-}
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function usePagedList(fetchPage, pageSize = 5) {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    
+    const fetchPageRef = useRef(fetchPage);
+    useEffect(() => {
+        fetchPageRef.current = fetchPage;
+    }, [fetchPage]);
 
-    const loadPage = async (nextPage = page, params = {}) => {
+    const loadPage = useCallback(async (nextPage = 1, params = {}) => {
         try {
             setLoading(true);
-            const response = await fetchPage(nextPage, params);
-            const nextItems = normalizeListResponse(response);
+            const response = await fetchPageRef.current(nextPage, params);
+            const nextItems = response || [];
 
             setItems(nextItems);
             setPage(nextPage);
@@ -30,7 +27,7 @@ function usePagedList(fetchPage, pageSize = 5) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [pageSize]);
 
     useEffect(() => {
         const loadInitialPage = async () => {
@@ -42,8 +39,7 @@ function usePagedList(fetchPage, pageSize = 5) {
         };
 
         loadInitialPage();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [loadPage]);
 
     return {
         items,

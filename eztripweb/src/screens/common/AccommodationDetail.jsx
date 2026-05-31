@@ -1,51 +1,51 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@hooks/useAuth";
 import { Alert, Badge, Button, Card, Col, Container, ListGroup, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
-import AlbumPanel from "@components/customer/PanelAlbum";
+import PanelAlbum from "@components/customer/PanelAlbum";
 import PanelProviderInfo from "@components/customer/PanelProviderInfo";
-import ReviewPanel from "@components/customer/PanelReview";
+import PanelReview from "@components/customer/PanelReview";
 import PanelCompare from "@components/customer/PanelCompare";
-import ModalConfirmTourBooking from "@components/customer/ModalConfirmTourBooking";
+import ModalConfirmAccommodationBooking from "@components/customer/ModalConfirmAccommodationBooking";
 import MySpinner from "@components/common/MySpinner";
-import { getReviewsByServiceId, getTourismById } from "@services/customerService";
+import { getAccommodationById } from "@services/customerService";
+import { getReviewsByServiceId } from "@services/customerService";
+import { formatCurrency } from "@utils/formatters";
 
-function formatCurrency(value) {
-	return new Intl.NumberFormat("vi-VN", {
-		style: "currency",
-		currency: "VND",
-		maximumFractionDigits: 0,
-	}).format(value ?? 0);
-}
-
-function TourDetail() {
-	const [showBookingModal, setShowBookingModal] = useState(false);
+function AccommodationDetail() {
+    const [showBookingModal, setShowBookingModal] = useState(false);
 	const { id } = useParams();
+    const { currentUser } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
-	const [tourDetail, setTourDetail] = useState(null);
+	const [accommodationDetail, setAccommodationDetail] = useState(null);
 	const [reviews, setReviews] = useState([]);
 
-	const loadTourDetail = async (tourismId) => {
+	const loadAccommodationDetail = async (id) => {
 		try {
 			setError("");
 			setLoading(true);
-			const response = await getTourismById(tourismId);
-			setTourDetail(response);
+			const response = await getAccommodationById(id);
+			console.log("Accommodation detail:", response);
+			setAccommodationDetail(response);
 
-			const serviceId = response?.baseInfo?.id ?? tourismId;
+			const serviceId = response?.baseInfo?.id ?? id;
 			const reviewResponse = await getReviewsByServiceId(serviceId).catch(() => []);
 			setReviews(Array.isArray(reviewResponse) ? reviewResponse : reviewResponse?.content ?? []);
-		} catch (requestError) {
-			console.error("Error fetching tours:", requestError);
-			setError("Không thể tải thông tin tour. Vui lòng thử lại sau.");
+		} catch (error) {
+			console.error("Error fetching accommodations:", error);
+			setError("Không thể tải thông tin chỗ nghỉ. Vui lòng thử lại sau.");
 		} finally {
 			setLoading(false);
 		}
-	};
+	}
 
 	useEffect(() => {
-		loadTourDetail(id);
+		loadAccommodationDetail(id);
 	}, [id]);
 
 	if (loading) {
@@ -58,36 +58,26 @@ function TourDetail() {
 		);
 	}
 
-	if (error || !tourDetail) {
+	if (error || !accommodationDetail) {
 		return (
 			<CustomerLayout>
 				<Container className="py-4">
 					<Alert variant="warning" className="mb-0">
-						{error || "Không tìm thấy thông tin tour."}
+						{error || "Không tìm thấy thông tin chỗ nghỉ."}
 					</Alert>
 				</Container>
 			</CustomerLayout>
 		);
 	}
 
-	const { baseInfo, location, tourDuration } = tourDetail;
-	const bookingTour = {
-		id: baseInfo?.id,
-		name: baseInfo?.name,
-		location,
-		pricePerTicket: baseInfo?.price,
-		availableSeats: baseInfo?.remainingQuantity,
-		images: baseInfo?.images,
-		description: baseInfo?.description,
-		duration: tourDuration,
-	};
-
 	return (
         <CustomerLayout>
             <Container className="py-4">
                 <Row className="g-4 mb-4 align-items-stretch">
                     <Col xs={12} lg={4}>
-                        <AlbumPanel images={baseInfo?.images} />
+                        <PanelAlbum
+                            images={accommodationDetail.baseInfo.images}
+                        />
                     </Col>
 
                     <Col xs={12} lg={5}>
@@ -98,36 +88,33 @@ function TourDetail() {
                             <Card.Body className="d-flex flex-column justify-content-between gap-3">
                                 <div>
                                     <h1 className="h3 fw-semibold mb-2">
-                                        {baseInfo?.name}
+                                        {accommodationDetail.baseInfo.name}
                                     </h1>
                                     <div className="text-body-secondary mb-3">
-                                        {location}
+                                        {accommodationDetail.location}
                                     </div>
 
                                     <ListGroup variant="flush" className="mb-3">
                                         <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-                                            <span>Thời lượng</span>
+                                            <span>Số giường</span>
                                             <Badge bg="secondary">
-                                                {tourDuration} ngày
+                                                {
+                                                    accommodationDetail.quantityOfBed
+                                                }
                                             </Badge>
                                         </ListGroup.Item>
                                         <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-                                            <span>Tổng số lượng</span>
+                                            <span>Diện tích</span>
                                             <Badge bg="secondary">
-                                                {baseInfo?.quantity}
-                                            </Badge>
-                                        </ListGroup.Item>
-                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
-                                            <span>Số chỗ còn lại</span>
-                                            <Badge bg="secondary">
-                                                {baseInfo?.remainingQuantity}
+                                                {accommodationDetail.area} m²
                                             </Badge>
                                         </ListGroup.Item>
                                         <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
                                             <span>Giá</span>
                                             <Badge bg="success">
                                                 {formatCurrency(
-                                                    baseInfo?.price,
+                                                    accommodationDetail.baseInfo
+                                                        .price,
                                                 )}
                                             </Badge>
                                         </ListGroup.Item>
@@ -138,9 +125,14 @@ function TourDetail() {
                                     <Button
                                         variant="primary"
                                         size="lg"
-                                        onClick={() =>
-                                            setShowBookingModal(true)
-                                        }
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                navigate("/login", { state: { from: location.pathname } });
+                                                return;
+                                            }
+
+                                            setShowBookingModal(true);
+                                        }}
                                     >
                                         Book ngay!!!
                                     </Button>
@@ -151,43 +143,45 @@ function TourDetail() {
 
                     <Col xs={12} lg={3}>
                         <PanelProviderInfo
-                            key={tourDetail.id}
-                            {...tourDetail.baseInfo?.providerInfo}
+                            key={accommodationDetail.id}
+                            {...accommodationDetail.baseInfo?.providerInfo}
                         />
                     </Col>
                 </Row>
 
                 <Row className="g-4 align-items-stretch">
                     <Col xs={12} lg={4}>
-                        <PanelCompare
-                            currentService={tourDetail}
-                            serviceType="tourism"
-                        />
-                    </Col>
+						<PanelCompare
+							currentService={accommodationDetail}
+							serviceType="accommodation"
+						/>
+					</Col>
                     <Col xs={12} lg={5}>
                         <Card className="h-100 shadow-sm">
                             <Card.Header className="bg-white fw-semibold">
                                 Mô tả dịch vụ
                             </Card.Header>
                             <Card.Body>
-                                <p className="mb-0">{baseInfo?.description}</p>
+                                <p className="mb-0">
+                                    {accommodationDetail.baseInfo.description}
+                                </p>
                             </Card.Body>
                         </Card>
                     </Col>
 
                     <Col xs={12} lg={3}>
-                        <ReviewPanel reviews={reviews} />
+                        <PanelReview reviews={reviews} />
                     </Col>
                 </Row>
 
-                <ModalConfirmTourBooking
+                <ModalConfirmAccommodationBooking
                     show={showBookingModal}
                     onHide={() => setShowBookingModal(false)}
-                    tour={bookingTour}
+                    accommodation={accommodationDetail}
                 />
             </Container>
         </CustomerLayout>
     );
 }
 
-export default TourDetail;
+export default AccommodationDetail;

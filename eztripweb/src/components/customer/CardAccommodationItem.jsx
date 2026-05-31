@@ -1,6 +1,5 @@
 import { Badge, Button, Card, Col, Image, Row } from "react-bootstrap";
 import defaultImage from "@assets/images/default_accommodation_item.jpg";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { formatCurrency } from "@utils/formatters";
 
@@ -90,7 +89,7 @@ function CardAccommodationItem(props) {
                                 onClick={() => nav(`/accommodation/${id}`)}
                                 className="rounded-0 w-100"
                             >
-                                Chọn phòng
+                                Xem chi tiết
                             </Button>
                         </div>
                     </Col>

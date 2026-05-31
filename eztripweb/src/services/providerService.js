@@ -1,12 +1,8 @@
 import axiosClient from "@services/axiosClient";
+import commonService from "@services/commonService";
 
 const requestList = async (endpoint, params = {}) => {
     const response = await axiosClient.get(endpoint, { params });
-    return response.data;
-};
-
-const requestById = async (endpoint, id) => {
-    const response = await axiosClient.get(`${endpoint}/${id}`);
     return response.data;
 };
 
@@ -27,12 +23,12 @@ const requestMultipartUpdate = async (endpoint, id, payload) => {
 };
 
 export async function getAccommodations(params = {}) {
-    return requestList("/api/accommodations", params);
+    return commonService.getAccommodations(params);
 }
 
 export async function getAccommodationById(id) {
-    return requestById(`/api/accommodations/${id}`);
-}  
+    return commonService.getAccommodationById(id);
+}
 
 export async function createAccommodation(accommodation) {
     return requestMultipartCreate("/api/secure/accommodations", accommodation);
@@ -47,7 +43,7 @@ export async function deleteAccommodation(id) {
 }
 
 export async function getTransportations(params = {}) {
-    return requestList("/api/transportations", params);
+    return commonService.getTransportations(params);
 }
 
 export async function createTransportation(transportation) {
@@ -55,7 +51,7 @@ export async function createTransportation(transportation) {
 }
 
 export async function getTransportationById(id) {
-    return requestById("/api/transportations", id);
+    return commonService.getTransportationById(id);
 }
 
 export async function updateTransportation(id, transportation) {
@@ -67,7 +63,7 @@ export async function deleteTransportation(id) {
 }
 
 export async function getTourisms(params = {}) {
-    return requestList("/api/tourisms", params);
+    return commonService.getTourisms(params);
 }
 
 export async function createTourism(tourism) {
@@ -75,7 +71,7 @@ export async function createTourism(tourism) {
 }
 
 export async function getTourismById(id) {
-    return requestById("/api/tourisms", id);
+    return commonService.getTourismById(id);
 }
 
 export async function updateTourism(id, tourism) {
@@ -164,13 +160,10 @@ export async function updateBooking(bookingId, booking) {
 }
 
 export async function getReviewsByServiceId(serviceId, params = {}) {
-    return requestList(`/services/${serviceId}/reviews`, {
-        ...params,
-        serviceId,
-    });
+    return commonService.getReviewsByServiceId(serviceId, params);
 }
 
-export default {
+const providerService = {
     getAccommodations,
     getAccommodationById,
     createAccommodation,
@@ -189,12 +182,11 @@ export default {
     deleteServiceByType,
     getProviderServices,
     getServiceById,
-    updateAccommodation,
-    updateTransportation,
-    updateTourism,
     updateServiceByType,
     deleteImage,
     getBookings,
     updateBooking,
 };
+
+export default providerService;
 

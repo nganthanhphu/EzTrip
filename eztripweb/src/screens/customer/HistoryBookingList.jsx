@@ -16,7 +16,8 @@ function HistoryBookingList() {
     const { lookupTables } = useLookupTables();
     const typeOfServiceOptions = lookupTables.typeOfServices || [];
     const pageSize = 5;
-    const { items: bookings, loading, page, totalPages, loadPage } = usePagedList(
+
+    const fetchBookings = React.useCallback(
         (nextPage) => {
             const params = {
                 page: nextPage,
@@ -35,10 +36,15 @@ function HistoryBookingList() {
                 params.serviceId = Number(serviceId);
             }
 
-            return getBookings(params);
+            return getBookings(params).then((response) => {
+                if (Array.isArray(response)) return response;
+                return response?.content || response?.items || response?.results || [];
+            });
         },
-        pageSize
+        [serviceType, status, serviceId, pageSize]
     );
+
+    const { items: bookings, loading, page, totalPages, loadPage } = usePagedList(fetchBookings, pageSize);
 
     const handleSearch = (event) => {
         event.preventDefault();
@@ -77,7 +83,7 @@ function HistoryBookingList() {
                                 onChange={(e) => setStatus(e.target.value)}
                             >
                                 <option value="">Trạng thái</option>
-                                {lookupTables.bookingStatuses.map((option) => (
+                                {(lookupTables.bookingStatuses || []).map((option) => (
                                     <option key={option.value} value={option.value}>
                                         {option.label}
                                     </option>

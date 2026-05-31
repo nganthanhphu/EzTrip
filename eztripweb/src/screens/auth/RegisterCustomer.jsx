@@ -5,6 +5,7 @@ import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
 import Apis, { endpoints } from "@configs/Apis";
 import { useLookupTables } from "@contexts/LookupTablesContext";
+import { validatePasswordConfirmation, validateRequiredFields } from "@utils/validators";
 
 const customerFields = [
 	{
@@ -49,25 +50,27 @@ const RegisterCustomer = () => {
 	const genderOptions = [{ value: "", label: "Chọn giới tính" }, ...lookupTables.genders];
 
 	const validate = () => {
-		for (const field of customerFields) {
-			if (!user[field.field]) {
-				setErr(`Vui lòng nhập ${field.title}!`);
-				return false;
-			}
-		}
+		const requiredValidation = validateRequiredFields(user, [
+			...customerFields.map((field) => ({
+				name: field.field,
+				label: field.title,
+			})),
+			{ name: "gender", label: "giới tính" },
+			{ name: "dob", label: "ngày sinh" },
+		]);
 
-		if (!user.gender) {
-			setErr("Vui lòng chọn giới tính!");
+		if (!requiredValidation.valid) {
+			setErr(requiredValidation.message);
 			return false;
 		}
 
-		if (!user.dob) {
-			setErr("Vui lòng chọn ngày sinh!");
-			return false;
-		}
+		const passwordValidation = validatePasswordConfirmation(
+			user.password,
+			user.confirmPassword,
+		);
 
-		if (user.password !== user.confirmPassword) {
-			setErr("Mật khẩu KHÔNG khớp!");
+		if (!passwordValidation.valid) {
+			setErr(passwordValidation.message);
 			return false;
 		}
 
