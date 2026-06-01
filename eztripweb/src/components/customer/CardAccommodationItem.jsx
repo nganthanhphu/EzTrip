@@ -90,7 +90,7 @@ function CardAccommodationItem(props) {
                             <Button
                                 variant="primary"
                                 size="sm"
-                                onClick={() => nav(`/accommodation/${id}`)}
+                                onClick={() => nav(`/accommodations/${id}`)}
                                 className="rounded-0 w-100"
                             >
                                 Xem chi tiết

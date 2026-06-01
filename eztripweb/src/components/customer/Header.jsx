@@ -19,10 +19,10 @@ function Header() {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Link className="nav-link" to="/accommodation">
+                        <Link className="nav-link" to="/accommodations">
                             Lưu trú
                         </Link>
-                        <Link className="nav-link" to="/transportation">
+                        <Link className="nav-link" to="/transportations">
                             Di chuyển
                         </Link>
                         <Link className="nav-link" to="/tours">

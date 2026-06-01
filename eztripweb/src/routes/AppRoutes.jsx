@@ -46,9 +46,9 @@ const AppRoutes = () => {
             <Route path="/logout" element={<Logout />} />
             <Route path="/provider/logout" element={<Logout />} />
 
-            <Route path="/accommodation" element={<AccommodationList />} />
-            <Route path="/accommodation/:id" element={<AccommodationDetail />} />
-            <Route path="/transportation" element={<TransportationList />} />
+            <Route path="/accommodations" element={<AccommodationList />} />
+            <Route path="/accommodations/:id" element={<AccommodationDetail />} />
+            <Route path="/transportations" element={<TransportationList />} />
             <Route path="/tours" element={<TourList />} />
             <Route path="/tours/:id" element={<TourDetail />} />
 
