@@ -15,13 +15,13 @@ function CardTourItem(props) {
                     <Col
                         xs={12}
                         md={4}
-                        className="border-end border-dark-subtle bg-light d-flex align-items-stretch"
+                        className="border-end border-dark-subtle bg-light p-0"
                     >
-                        <div className="w-100" style={{ minHeight: 170 }}>
+                        <div className="w-100 h-100 position-relative" style={{ minHeight: 170 }}>
                             <Image
                                 src={image || defaultImage}
                                 alt={name}
-                                className="w-100 h-100"
+                                className="w-100 h-100 position-absolute top-0 start-0"
                                 style={{ objectFit: "cover" }}
                             />
                         </div>
