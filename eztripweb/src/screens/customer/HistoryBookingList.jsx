@@ -13,10 +13,10 @@ import useDebounce from "@hooks/useDebounce";
 function HistoryBookingList() {
     const [serviceType, setServiceType] = useState("");
     const [status, setStatus] = useState("");
-    const [serviceId, setServiceId] = useState("");
+    const [serviceName, setServiceName] = useState("");
     const debouncedServiceType = useDebounce(serviceType);
     const debouncedStatus = useDebounce(status);
-    const debouncedServiceId = useDebounce(serviceId);
+    const debouncedServiceName = useDebounce(serviceName);
     const { lookupTables } = useLookupTables();
     const typeOfServiceOptions = lookupTables.typeOfServices || [];
     const pageSize = 5;
@@ -29,15 +29,15 @@ function HistoryBookingList() {
             };
 
             if (debouncedServiceType) {
-                params.typeOfService = Number(debouncedServiceType);
+                params.serviceType = Number(debouncedServiceType);
             }
 
             if (debouncedStatus) {
                 params.status = debouncedStatus;
             }
 
-            if (debouncedServiceId) {
-                params.serviceId = Number(debouncedServiceId);
+            if (debouncedServiceName) {
+                params.serviceName = debouncedServiceName;
             }
 
             return getBookings(params).then((response) => {
@@ -45,7 +45,7 @@ function HistoryBookingList() {
                 return response?.content || response?.items || response?.results || [];
             });
         },
-        [debouncedServiceType, debouncedStatus, debouncedServiceId, pageSize]
+        [debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize]
     );
 
     const {
@@ -56,7 +56,7 @@ function HistoryBookingList() {
         loadMore,
         refetch,
     } = useInfiniteScrollList({
-        queryKey: ["bookings", debouncedServiceType, debouncedStatus, debouncedServiceId, pageSize],
+        queryKey: ["bookings", debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize],
         fetchPage: fetchBookings,
         pageSize,
     });
@@ -65,37 +65,45 @@ function HistoryBookingList() {
     const searchParamsString = searchParams.toString();
 
     useEffect(() => {
-        const t = searchParams.get("type") || "";
+        const t = searchParams.get("serviceType") || "";
         const s = searchParams.get("status") || "";
-        const sid = searchParams.get("serviceId") || "";
+        const n = searchParams.get("serviceName") || "";
 
         if (t !== serviceType) setServiceType(t);
         if (s !== status) setStatus(s);
-        if (sid !== serviceId) setServiceId(sid);
+        if (n !== serviceName) setServiceName(n);
     }, [searchParams.toString()]);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParamsString);
         const nextServiceType = debouncedServiceType.trim();
         const nextStatus = debouncedStatus.trim();
-        const nextServiceId = debouncedServiceId.trim();
+        const nextServiceName = debouncedServiceName.trim();
 
-        if (nextServiceType) params.set("type", nextServiceType); else params.delete("type");
+        if (nextServiceType) params.set("serviceType", nextServiceType); else params.delete("serviceType");
         if (nextStatus) params.set("status", nextStatus); else params.delete("status");
-        if (nextServiceId) params.set("serviceId", nextServiceId); else params.delete("serviceId");
+        if (nextServiceName) params.set("serviceName", nextServiceName); else params.delete("serviceName");
         params.delete("page");
 
         const nextSearch = params.toString();
         if (nextSearch !== searchParamsString) {
             nav({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
         }
-    }, [debouncedServiceType, debouncedStatus, debouncedServiceId, searchParamsString, nav]);
+    }, [debouncedServiceType, debouncedStatus, debouncedServiceName, searchParamsString, nav]);
 
     return (
         <CustomerLayout>
             <Container className="p-4">
                 <Form className="mb-3">
                     <Row className="g-2 align-items-center">
+                        <Col md={4}>
+                            <Form.Control
+                                type="text"
+                                placeholder="Tên dịch vụ"
+                                value={serviceName}
+                                onChange={(e) => setServiceName(e.target.value)}
+                            />
+                        </Col>
                         <Col md={4}>
                             <Form.Select
                                 value={serviceType}
@@ -119,24 +127,18 @@ function HistoryBookingList() {
                                 onChange={(e) => setStatus(e.target.value)}
                             >
                                 <option value="">Trạng thái</option>
-                                {(lookupTables.bookingStatuses || []).map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
+                                {(lookupTables.bookingStatuses || []).map(
+                                    (option) => (
+                                        <option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.label}
+                                        </option>
+                                    ),
+                                )}
                             </Form.Select>
                         </Col>
-
-                        <Col md={4}>
-                            <Form.Control
-                                type="number"
-                                min="1"
-                                placeholder="Mã dịch vụ"
-                                value={serviceId}
-                                onChange={(e) => setServiceId(e.target.value)}
-                            />
-                        </Col>
-
                     </Row>
                 </Form>
 

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState, useRef, useMemo } from "react";
-import { useParams } from "react-router-dom";
-import { Alert, Container, Row, Col, Card, Form, Badge, ProgressBar } from "react-bootstrap";
+import React, { useCallback, useEffect, useState, useRef, useMemo } from "react";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { Alert, Container, Row, Col, Form, Badge, ProgressBar } from "react-bootstrap";
+import InfiniteScroll from "react-infinite-scroller";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -18,52 +19,86 @@ import CardBookingItem from "@components/provider/CardBookingItem";
 import MySpinner from "@components/common/MySpinner";
 import { getBookings, getStatistics } from "@services/providerService";
 import { formatCurrency } from "@utils/formatters";
+import useDebounce from "@hooks/useDebounce";
+import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
+import { useLookupTables } from "@contexts/LookupTablesContext";
 
 ChartJS.register(LineController, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 function BookingList() {
     const { id } = useParams();
-
-    const [bookings, setBookings] = useState([]);
-    const [loadingBookings, setLoadingBookings] = useState(false);
-    const [errorBookings, setErrorBookings] = useState("");
+    const nav = useNavigate();
+    const [searchParams] = useSearchParams();
+    const searchParamsString = searchParams.toString();
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
-    
     const [statType, setStatType] = useState("MONTH");
     const [year, setYear] = useState(currentYear);
     const [month, setMonth] = useState(currentMonth);
-    
     const [statsData, setStatsData] = useState(null);
     const [loadingStats, setLoadingStats] = useState(false);
     const [errorStats, setErrorStats] = useState("");
-
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
-    const loadBookings = useCallback(async () => {
-        setLoadingBookings(true);
-        setErrorBookings("");
-        try {
-            const response = await getBookings({ serviceId: id });
-            setBookings(response || []);
-        } catch (requestError) {
-            setBookings([]);
-            setErrorBookings(requestError?.response?.data?.error || "Không thể tải danh sách booking.");
-        } finally {
-            setLoadingBookings(false);
-        }
-    }, [id]);
+    const [customerName, setCustomerName] = useState(searchParams.get("customerName") || "");
+    const [status, setStatus] = useState(searchParams.get("status") || "");
 
+    const debouncedCustomerName = useDebounce(customerName);
+    const debouncedStatus = useDebounce(status);
+    
+    const { lookupTables } = useLookupTables();
+    const statusOptions = lookupTables.bookingStatuses || [];
+    const pageSize = 5;
+
+    // --- Cập nhật URL Query Parameters (Tham số truy vấn) khi filter thay đổi ---
     useEffect(() => {
-        if (id) {
-            void loadBookings();
-        } else {
-            setBookings([]);
-            setLoadingBookings(false);
+        const params = new URLSearchParams(searchParamsString);
+        const nextCustomerName = debouncedCustomerName.trim();
+        const nextStatus = debouncedStatus.trim();
+
+        if (nextCustomerName) params.set("customerName", nextCustomerName); else params.delete("customerName");
+        if (nextStatus) params.set("status", nextStatus); else params.delete("status");
+        params.delete("page");
+
+        const nextSearch = params.toString();
+        if (nextSearch !== searchParamsString) {
+            nav({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
         }
-    }, [id, loadBookings]);
+    }, [debouncedCustomerName, debouncedStatus, searchParamsString, nav]);
+
+    const fetchBookings = useCallback(
+        (nextPage) => {
+            const params = {
+                serviceId: id,
+                page: nextPage,
+                size: pageSize,
+            };
+
+            if (debouncedCustomerName) params.customerName = debouncedCustomerName;
+            if (debouncedStatus) params.status = debouncedStatus;
+
+            return getBookings(params).then((response) => {
+                if (Array.isArray(response)) return response;
+                return response?.content || response?.items || response?.results || [];
+            });
+        },
+        [id, debouncedCustomerName, debouncedStatus, pageSize]
+    );
+
+    const {
+        items: bookings,
+        loading: loadingBookings,
+        loadingMore,
+        hasMore,
+        loadMore,
+        refetch,
+    } = useInfiniteScrollList({
+        queryKey: ["providerBookings", id, debouncedCustomerName, debouncedStatus, pageSize],
+        fetchPage: fetchBookings,
+        pageSize,
+    });
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -82,7 +117,6 @@ function BookingList() {
                 setLoadingStats(false);
             }
         };
-
         void fetchStats();
     }, [id, statType, year, month]);
 
@@ -108,10 +142,7 @@ function BookingList() {
     useEffect(() => {
         const canvas = chartRef.current;
         if (!canvas || loadingStats) return;
-
-        if (chartInstance.current) {
-            chartInstance.current.destroy();
-        }
+        if (chartInstance.current) chartInstance.current.destroy();
 
         chartInstance.current = new ChartJS(canvas, {
             type: "line",
@@ -229,28 +260,69 @@ function BookingList() {
                 </div>
 
                 <h4 className="fw-bold mb-3">Danh sách Booking chi tiết</h4>
-                {loadingBookings ? (
+                <Form className="mb-4">
+                    <Row className="g-3 align-items-center">
+                        <Col md={4}>
+                            <Form.Control
+                                type="text"
+                                placeholder="Tên khách hàng"
+                                value={customerName}
+                                onChange={(e) => setCustomerName(e.target.value)}
+                            />
+                        </Col>
+                        <Col md={4}>
+                            <Form.Select
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                <option value="">Tất cả trạng thái</option>
+                                {statusOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                    </Row>
+                </Form>
+
+                {loadingBookings && !bookings.length ? (
                     <div className="py-5 d-flex justify-content-center">
                         <MySpinner />
                     </div>
-                ) : errorBookings ? (
-                    <Alert variant="danger" className="mb-0">
-                        {errorBookings}
-                    </Alert>
-                ) : bookings.length > 0 ? (
-                    <div className="d-flex flex-column gap-3">
-                        {bookings.map((item) => (
-                            <CardBookingItem
-                                key={item.id}
-                                {...item}
-                                onUpdated={loadBookings}
-                            />
-                        ))}
-                    </div>
                 ) : (
-                    <div className="py-5 text-center text-secondary bg-light rounded border-dashed">
-                        Chưa có booking nào cho service này.
-                    </div>
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={loadMore}
+                        hasMore={hasMore}
+                        initialLoad={false}
+                        threshold={250}
+                    >
+                        <div className="d-flex flex-column gap-3">
+                            {bookings.map((item) => (
+                                <CardBookingItem
+                                    key={item.id}
+                                    {...item}
+                                    onUpdated={() => refetch()} 
+                                />
+                            ))}
+                        </div>
+                        
+                        {!loadingBookings && bookings.length === 0 && (
+                            <div className="py-5 text-center text-secondary bg-light rounded border-dashed mt-3">
+                                Chưa có booking nào phù hợp với tìm kiếm.
+                            </div>
+                        )}
+
+                        {loadingMore && (
+                            <div className="py-4 d-flex justify-content-center">
+                                <MySpinner />
+                            </div>
+                        )}
+                    </InfiniteScroll>
                 )}
             </Container>
         </ProviderLayout>
