@@ -1,14 +1,13 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@hooks/useAuth";
-import { normalizeRole } from "@contexts/LookupTablesContext";
 
 function resolveFallbackPathByRole(role) {
-	if (role === "PROVIDER") {
+	if (role === 3) {
 		return "/provider";
 	}
 
-	if (role === "CUSTOMER") {
+	if (role === 2) {
 		return "/";
 	}
 
@@ -27,12 +26,10 @@ function RoleRoute({ role, children }) {
 		return <Navigate to={`/login?next=${encodeURIComponent(location.pathname + location.search)}`} replace />;
 	}
 
-	const currentRole = currentUser?.role || currentUser?.roleId || currentUser?.roleName;
-	const normalizedCurrentRole = normalizeRole(currentRole);
-	const normalizedRequiredRole = normalizeRole(role);
+	const currentRole = currentUser?.role;
 
-	if (normalizedRequiredRole && normalizedCurrentRole !== normalizedRequiredRole) {
-		return <Navigate to={resolveFallbackPathByRole(normalizedCurrentRole)} replace />;
+	if (role && currentRole !== role) {
+		return <Navigate to={resolveFallbackPathByRole(currentRole)} replace />;
 	}
 
 	return children || <Outlet />;

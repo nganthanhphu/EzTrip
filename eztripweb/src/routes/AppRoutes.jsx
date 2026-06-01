@@ -52,11 +52,11 @@ const AppRoutes = () => {
             <Route path="/tours" element={<TourList />} />
             <Route path="/tours/:id" element={<TourDetail />} />
 
-            <Route element={<RoleRoute role="CUSTOMER" />}>
+            <Route element={<RoleRoute role={2} />}>
                   <Route path="/history" element={<HistoryBookingList />} />
             </Route>
 
-            <Route element={<RoleRoute role="PROVIDER" />}>
+            <Route element={<RoleRoute role={3} />}>
                   <Route path="/provider" element={<HomeProvider />} />
                   <Route path="/provider/dashboard" element={<Dashboard />} />
                   <Route path="/provider/services" element={<ServiceList />} />
