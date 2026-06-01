@@ -118,7 +118,7 @@ function CardBookingItem(props) {
                                 <Badge bg="dark" className="rounded-0">
                                     Khách hàng
                                 </Badge>
-							</div>
+                            </div>
 							<div className="small text-muted">📞 Số điện thoại: {customerPhone || "Không có số điện thoại"}</div>
                         </div>
 
@@ -171,16 +171,33 @@ function CardBookingItem(props) {
                             </Badge>
 
                             {isPending ? (
-                                <Button
-                                    variant="primary"
-                                    onClick={() =>
-                                        void handleUpdateStatus("CONFIRMED")
-                                    }
-                                    className="w-100 rounded-0"
-                                    disabled={savingStatus}
-                                >
-                                    {savingStatus ? "Đang xử lý" : "Xác nhận"}
-                                </Button>
+                                <>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() =>
+                                            void handleUpdateStatus("CONFIRMED")
+                                        }
+                                        className="w-100 rounded-0"
+                                        disabled={savingStatus}
+                                    >
+                                        {savingStatus
+                                            ? "Đang xử lý"
+                                            : "Xác nhận"}
+                                    </Button>
+
+                                    <Button
+                                        variant="danger"
+                                        onClick={() =>
+                                            void handleUpdateStatus("CANCELLED")
+                                        }
+                                        className="w-100 rounded-0"
+                                        disabled={savingStatus}
+                                    >
+                                        {savingStatus
+                                            ? "Đang xử lý"
+                                            : "Hủy bỏ"}
+                                    </Button>
+                                </>
                             ) : null}
 
                             {isConfirmed ? (

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { formatCurrency, formatBookingDate} from "@utils/formatters";
 import { createBooking } from "@services/customerService";
@@ -26,6 +27,7 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 	const [submitError, setSubmitError] = useState("");
 	const [submitSuccess, setSubmitSuccess] = useState("");
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		if (!show) {
@@ -97,8 +99,9 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 			setSubmitSuccess("Đặt vé thành công. Thông tin ghế của bạn đã được lưu.");
 			setTimeout(() => {
 				onHide?.();
+				queryClient.invalidateQueries({ queryKey: ["bookings"] });
 				navigate("/history");
-			}, 5000);
+			}, 1000);
 		} catch (error) {
 			setSubmitError(error?.response?.data?.message || "Không thể tạo booking, vui lòng thử lại.");
 		} finally {

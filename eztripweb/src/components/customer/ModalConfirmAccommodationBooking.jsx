@@ -4,6 +4,7 @@ import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { createBooking } from "@services/customerService";
 import { formatBookingDate, formatCurrency } from "@utils/formatters";
 import { openMomoPaymentForBooking } from "@utils/onlinePayment";
+import {useQueryClient} from "@tanstack/react-query";
 
 const PAYMENT_METHODS = [
 	{ id: 1, label: "Tiền mặt" },
@@ -27,6 +28,7 @@ function ModalConfirmAccommodationBooking({ show, onHide, accommodation }) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [submitError, setSubmitError] = useState("");
 	const [submitSuccess, setSubmitSuccess] = useState("");
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -86,8 +88,9 @@ function ModalConfirmAccommodationBooking({ show, onHide, accommodation }) {
 			setSubmitSuccess("Đặt phòng thành công. Hệ thống đã ghi nhận yêu cầu của bạn.");
 			setTimeout(() => {
 				onHide?.();
+				queryClient.invalidateQueries({ queryKey: ["bookings"]});
 				navigate("/history");
-			}, 5000);
+			}, 1000);
 		} catch (error) {
 			setSubmitError(error?.response?.data?.message || "Không thể tạo booking, vui lòng thử lại.");
 		} finally {
