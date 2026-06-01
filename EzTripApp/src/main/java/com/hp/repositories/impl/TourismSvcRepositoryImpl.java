@@ -106,7 +106,6 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
         List<Predicate> havingPredicates = new ArrayList<>();
 
         predicates.add(b.equal(root.get("isActive"), true));
-        havingPredicates.add(b.greaterThan(remainingQuantity, 0));
 
         if (params != null) {
 
@@ -186,6 +185,7 @@ public class TourismSvcRepositoryImpl implements TourismSvcRepository {
         } else {
             Join<ProviderProfile, BaseUser> providerUser = providerProfile.join("userId", JoinType.INNER);
             predicates.add(b.equal(providerUser.get("isActive"), true));
+            havingPredicates.add(b.greaterThan(remainingQuantity, 0));
         }
 
         q.where(predicates.toArray(Predicate[]::new));
