@@ -11,13 +11,15 @@ import useDebounce from "@hooks/useDebounce";
 import ProviderLayout from "@layouts/ProviderLayout";
 import { getProviderServices } from "@services/providerService";
 
+import { useQueryClient } from "@tanstack/react-query"; 
+
 function ServiceList() {
     const [searchText, setSearchText] = useState("");
     const [sortOption, setSortOption] = useState("");
     const [showCreateEditModal, setShowCreateEditModal] = useState(false);
     const [selectedEditServiceId, setSelectedEditServiceId] = useState("");
 
-    const [refreshKey, setRefreshKey] = useState(0);
+    const queryClient = useQueryClient(); 
 
     const debouncedSearchText = useDebounce(searchText);
     const nav = useNavigate();
@@ -29,7 +31,7 @@ function ServiceList() {
     const serviceCacheKeyRef = useRef("");
 
     const fetchServices = async (pageNumber = 1) => {
-        const cacheKey = [debouncedSearchText, sortBy, order, refreshKey].join("|");
+        const cacheKey = [debouncedSearchText, sortBy, order].join("|");
 
         if (serviceCacheKeyRef.current !== cacheKey) {
             serviceCacheKeyRef.current = cacheKey;
@@ -69,7 +71,6 @@ function ServiceList() {
             sortBy,
             order,
             pageSize,
-            refreshKey,
         ],
         fetchPage: fetchServices,
         pageSize,
@@ -122,7 +123,11 @@ function ServiceList() {
 
     function handleSuccess() {
         setShowCreateEditModal(false);
-        setRefreshKey((prev) => prev + 1);
+        
+        serviceCacheRef.current = [];
+        serviceCacheKeyRef.current = "";
+
+        queryClient.invalidateQueries({ queryKey: ["provider-services"] });
     }
 
     return (
