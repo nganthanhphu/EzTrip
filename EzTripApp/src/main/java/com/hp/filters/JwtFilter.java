@@ -70,10 +70,11 @@ public class JwtFilter implements Filter {
                     if (claimsSet.getClaim("providerId") != null) {
                         providerId = Integer.parseInt(claimsSet.getClaimAsString("providerId"));
                     }
+                    String providerType = claimsSet.getClaimAsString("providerType");
                     String role = claimsSet.getClaimAsString("role");
                     Set<GrantedAuthority> authorities = new HashSet<>();
                     authorities.add(new SimpleGrantedAuthority("ROLE_" + role));
-                    UserDetails userDetails = new MyUserDetails(id, customerId, providerId, username, "", authorities);
+                    UserDetails userDetails = new MyUserDetails(id, customerId, providerId, providerType, username, "", authorities);
                     if (userDetails != null) {
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());

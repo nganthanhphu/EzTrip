@@ -72,14 +72,16 @@ public class UserServiceImpl implements UserService {
         }
 
         Integer providerId = null;
+        String providerType = null;
         if (user.getProviderProfile() != null) {
             providerId = user.getProviderProfile().getId();
+            providerType = user.getProviderProfile().getTypeOfProviderId().getName();
         }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRoleId().getName()));
 
-        return new MyUserDetails(user.getId(), customerId, providerId, user.getPhoneNumber(), user.getPassword(),
+        return new MyUserDetails(user.getId(), customerId, providerId, providerType, user.getPhoneNumber(), user.getPassword(),
                 authorities);
     }
 
