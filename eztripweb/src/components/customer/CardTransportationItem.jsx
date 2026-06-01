@@ -29,13 +29,16 @@ function CardTransportationItem(props) {
                     <Col
                         xs={12}
                         md={4}
-                        className="border-end border-dark-subtle bg-light d-flex align-items-stretch"
+                        className="border-end border-dark-subtle bg-light p-0"
                     >
-                        <div className="w-100" style={{ minHeight: 170 }}>
+                        <div
+                            className="w-100 h-100 position-relative"
+                            style={{ minHeight: 170 }}
+                        >
                             <Image
                                 src={image || defaultImage}
-                                alt={departureLocation}
-                                className="w-100 h-100"
+                                alt={departureLocation + " - " + arrivalLocation}
+                                className="w-100 h-100 position-absolute top-0 start-0"
                                 style={{ objectFit: "cover" }}
                             />
                         </div>
@@ -49,14 +52,26 @@ function CardTransportationItem(props) {
                         <div className="d-flex flex-column gap-1">
                             <div className="d-flex align-items-start justify-content-between gap-2">
                                 <div className="min-w-0">
-                                    <h5 className="mb-1 fw-bold text-wrap" style={{ wordBreak: "break-word" }}>
+                                    <h5
+                                        className="mb-1 fw-bold text-wrap"
+                                        style={{ wordBreak: "break-word" }}
+                                    >
                                         {departureLocation} - {arrivalLocation}
                                     </h5>
                                     <div className="d-flex flex-wrap gap-1 mt-1">
-                                        <Badge bg="primary" text="light" className="rounded-0">
-                                            Khởi hành: {formatHour(departureTime)}
+                                        <Badge
+                                            bg="primary"
+                                            text="light"
+                                            className="rounded-0"
+                                        >
+                                            Khởi hành:{" "}
+                                            {formatHour(departureTime)}
                                         </Badge>
-                                        <Badge bg="primary" text="light" className="rounded-0">
+                                        <Badge
+                                            bg="primary"
+                                            text="light"
+                                            className="rounded-0"
+                                        >
                                             Đến nơi: {formatHour(arrivalTime)}
                                         </Badge>
                                     </div>
@@ -86,7 +101,8 @@ function CardTransportationItem(props) {
                                     📅 <b>Số lượt đặt:</b> {bookingCount}
                                 </div>
                                 <div className="small text-muted">
-                                    ⏳ <b>Chỗ còn trống:</b> {remainingQuantity} / {quantity} chỗ
+                                    ⏳ <b>Chỗ còn trống:</b> {remainingQuantity}{" "}
+                                    / {quantity} chỗ
                                 </div>
                             </div>
                         </div>
@@ -106,7 +122,7 @@ function CardTransportationItem(props) {
                                 className="rounded-0 w-100"
                                 onClick={onSelect}
                             >
-                                Đặt vé 
+                                Đặt vé
                             </Button>
                         </div>
                     </Col>
