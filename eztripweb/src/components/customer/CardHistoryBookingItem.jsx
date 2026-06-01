@@ -234,10 +234,10 @@ function CardHistoryBookingItem(props) {
                 onHide={() => setShowChatModal(false)}
                 currentUserId={currentUser?.id || ""}
                 partnerUserId={
-                    isProviderViewing ? customerId || "" : companyId || ""
+                    isProviderViewing ? companyId : ""
                 }
                 currentName={
-                    currentUser?.name || currentUser?.fullname || "Tôi"
+                    currentUser?.fullname || "Tôi"
                 }
                 partnerName={
                     isProviderViewing

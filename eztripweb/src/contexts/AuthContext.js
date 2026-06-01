@@ -1,7 +1,6 @@
 import React, { createContext, useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import MyUserReducer from "@reducers/MyUserReducer";
 import { fetchCurrentUser, loginWithPassword } from "@services/authService";
-import { normalizeRole } from "@contexts/LookupTablesContext";
 import {
 	clearStoredAuth,
 	getStoredToken,
@@ -11,27 +10,11 @@ import {
 
 const AuthContext = createContext(null);
 
-function normalizeUser(user) {
-	if (!user) {
-		return null;
-	}
-
-	const normalized = {
-		...user,
-	};
-
-	if (normalized.role !== undefined && normalized.role !== null) {
-		normalized.role = normalizeRole(normalized.role);
-	}
-
-	return normalized;
-}
-
 export default AuthContext;
 
 export function AuthContextProvider({ children }) {
 	const [token, setToken] = useState(() => getStoredToken());
-	const [currentUser, dispatch] = useReducer(MyUserReducer, normalizeUser(getStoredUser()));
+	const [currentUser, dispatch] = useReducer(MyUserReducer, getStoredUser());
 	const [loading, setLoading] = useState(Boolean(getStoredToken()) && !getStoredUser());
 
 	useEffect(() => {
@@ -44,7 +27,7 @@ export function AuthContextProvider({ children }) {
 			}
 
 			try {
-				const user = normalizeUser(await fetchCurrentUser());
+				const user = await fetchCurrentUser();
 
 				if (cancelled) {
 					return;
@@ -87,7 +70,7 @@ export function AuthContextProvider({ children }) {
 			setToken(nextToken);
 			setStoredAuth(nextToken, null);
 
-			const user = normalizeUser(await fetchCurrentUser());
+			const user = await fetchCurrentUser();
 			setStoredAuth(nextToken, user);
 			dispatch({ type: "LOGIN", payload: user });
 
@@ -103,17 +86,15 @@ export function AuthContextProvider({ children }) {
 	}, []);
 
 	const syncCurrentUser = useCallback((user) => {
-		const normalizedUser = normalizeUser(user);
-
-		if (!normalizedUser) {
+		if (!user) {
 			return;
 		}
 
 		if (token) {
-			setStoredAuth(token, normalizedUser);
+			setStoredAuth(token, user);
 		}
 
-		dispatch({ type: "LOGIN", payload: normalizedUser });
+		dispatch({ type: "LOGIN", payload: user });
 	}, [token]);
 
 	const logout = useCallback(() => {
