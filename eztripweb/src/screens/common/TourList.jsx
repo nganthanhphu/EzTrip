@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import InfiniteScroll from "react-infinite-scroller";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TourItem from "@components/customer/CardTourItem";
 import MySpinner from "@components/common/MySpinner";
-import PaginationComponent from "@components/common/PaginationComponent";
 import { getTourisms } from "@services/customerService";
-import usePagedList from "@hooks/usePagedList";
+import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 
 function TourList() {
     const [name, setName] = useState("");
@@ -37,15 +38,51 @@ function TourList() {
         [name, location, tourDuration, fromPrice, toPrice, rating, sortBy, order, pageSize]
     );
 
-    const { items: tourList, loading, page, totalPages, loadPage } = usePagedList(fetchPage, pageSize);
+    const {
+        items: tourList,
+        loading,
+        loadingMore,
+        hasMore,
+        loadMore,
+    } = useInfiniteScrollList({
+        queryKey: ["tourisms", name, location, tourDuration, fromPrice, toPrice, rating, sortBy, order, pageSize],
+        fetchPage,
+        pageSize,
+    });
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    // initialize from URL params and sync
+    useEffect(() => {
+        const qName = searchParams.get("name") || "";
+        const qLocation = searchParams.get("location") || "";
+        const qDuration = searchParams.get("tourDuration") || "";
+        const qFrom = searchParams.get("fromPrice") || "";
+        const qTo = searchParams.get("toPrice") || "";
+        const qRating = searchParams.get("rating") || "";
+        const qSort = searchParams.get("sort") || "";
+
+        if (qName !== name) setName(qName);
+        if (qLocation !== location) setLocation(qLocation);
+        if (qDuration !== tourDuration) setTourDuration(qDuration);
+        if (qFrom !== fromPrice) setFromPrice(qFrom);
+        if (qTo !== toPrice) setToPrice(qTo);
+        if (qRating !== rating) setRating(qRating);
+        if (qSort !== sortOption) setSortOption(qSort);
+    }, [searchParams.toString()]);
 
     const handleSearch = (event) => {
         event.preventDefault();
-        loadPage(1);
-    };
-
-    const handlePageChange = (nextPage) => {
-        loadPage(nextPage);
+        const params = new URLSearchParams(searchParams);
+        if (name) params.set("name", name); else params.delete("name");
+        if (location) params.set("location", location); else params.delete("location");
+        if (tourDuration) params.set("tourDuration", tourDuration); else params.delete("tourDuration");
+        if (fromPrice) params.set("fromPrice", fromPrice); else params.delete("fromPrice");
+        if (toPrice) params.set("toPrice", toPrice); else params.delete("toPrice");
+        if (rating) params.set("rating", rating); else params.delete("rating");
+        if (sortOption) params.set("sort", sortOption); else params.delete("sort");
+        params.delete("page");
+        navigate(`?${params.toString()}`);
     };
 
     return (
@@ -141,23 +178,24 @@ function TourList() {
                     </Row>
                 </Form>
 
-                <div className="d-flex flex-column gap-3">
-                    {tourList.map((tour) => (
-                        <TourItem key={tour.id} {...tour} />
-                    ))}
-                </div>
-
-                {totalPages > 1 && (
-                    <div className="d-flex justify-content-center mt-4">
-                        <PaginationComponent
-                            currentPage={page}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    </div>
+                {loading ? (
+                    <MySpinner />
+                ) : (
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={loadMore}
+                        hasMore={hasMore}
+                        initialLoad={false}
+                        threshold={250}
+                    >
+                        <div className="d-flex flex-column gap-3">
+                            {tourList.map((tour) => (
+                                <TourItem key={tour.id} {...tour} />
+                            ))}
+                        </div>
+                        {loadingMore ? <MySpinner /> : null}
+                    </InfiniteScroll>
                 )}
-
-                {loading && <MySpinner />}
             </Container>
         </CustomerLayout>
     );

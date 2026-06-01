@@ -1,12 +1,11 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
+import InfiniteScroll from "react-infinite-scroller";
 import CardServiceItem from "@components/provider/CardServiceItem";
-import ModalServiceDetail from "@components/provider/ModalServiceDetail";
 import ModalCreateEditService from "@components/provider/ModalCreateEditService";
-import PaginationComponent from "@components/common/PaginationComponent";
-import { useAuth } from "@hooks/useAuth";
-import { useLookupTables } from "@contexts/LookupTablesContext";
+import MySpinner from "@components/common/MySpinner";
+import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 
 import ProviderLayout from "@layouts/ProviderLayout";
 import { getProviderServices } from "@services/providerService";
@@ -15,80 +14,85 @@ function ServiceList() {
     const [searchText, setSearchText] = useState("");
     const [appliedSearchText, setAppliedSearchText] = useState("");
     const [sortOption, setSortOption] = useState("");
-    const [services, setServices] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [showDetailModal, setShowDetailModal] = useState(false);
-    const [selectedService, setSelectedService] = useState(null);
     const [showCreateEditModal, setShowCreateEditModal] = useState(false);
     const [selectedEditServiceId, setSelectedEditServiceId] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
     const nav = useNavigate();
-    const { currentUser } = useAuth();
-    const { lookupTables } = useLookupTables();
+    const [searchParams] = useSearchParams();
     const pageSize = 5;
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
+    const searchParamsString = searchParams.toString();
+    const serviceCacheRef = useRef([]);
+    const serviceCacheKeyRef = useRef("");
 
-    const providerTypeId =
-        currentUser?.providerProfile?.typeOfProvider ??
-        currentUser?.typeOfProvider ??
-        currentUser?.providerTypeId ??
-        "";
-    const providerTypeLabel = lookupTables.typeOfProviders.find(
-        (option) => String(option.value) === String(providerTypeId),
-    )?.label;
+    const fetchServices = async (pageNumber = 1) => {
+        const cacheKey = [appliedSearchText, sortBy, order].join("|");
+        if (serviceCacheKeyRef.current !== cacheKey) {
+            serviceCacheKeyRef.current = cacheKey;
+            serviceCacheRef.current = [];
+        }
 
+        if (serviceCacheRef.current.length === 0) {
+            const response = await getProviderServices({
+                name: appliedSearchText,
+                sortBy,
+                order,
+            });
+
+            serviceCacheRef.current = Array.isArray(response)
+                ? response
+                : response?.content || response?.items || response?.results || [];
+        }
+
+        const startIndex = (pageNumber - 1) * pageSize;
+        return serviceCacheRef.current.slice(startIndex, startIndex + pageSize);
+    };
+
+    const {
+        items: services,
+        loading,
+        loadingMore,
+        hasMore,
+        loadMore,
+        error,
+    } = useInfiniteScrollList({
+        queryKey: ["provider-services", appliedSearchText, sortBy, order, pageSize],
+        fetchPage: fetchServices,
+        pageSize,
+    });
+
+    // keep state in sync when URL changes (back/forward)
     useEffect(() => {
-        const loadServices = async () => {
-            try {
-                setLoading(true);
-                setError("");
+        const params = new URLSearchParams(searchParamsString);
+        const q = params.get("q") || "";
+        const sort = params.get("sort") || "";
 
-                const response = await getProviderServices({
-                    name: appliedSearchText,
-                    sortBy,
-                    order,
-                });
-                const items = Array.isArray(response)
-                    ? response
-                    : response?.content || response?.items || response?.results || [];
-
-                setServices(items);
-            } catch (fetchError) {
-                console.error("Error fetching provider services:", fetchError);
-                setServices([]);
-                setError("Không thể tải danh sách dịch vụ. Vui lòng thử lại sau.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadServices();
-    }, [appliedSearchText, sortBy, order]);
-
-    const totalPages = Math.ceil(services.length / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const pagedServices = services.slice(startIndex, startIndex + pageSize);
+        setAppliedSearchText(q);
+        setSearchText(q);
+        setSortOption(sort);
+    }, [searchParamsString]);
 
     function handleSearch(event) {
         event.preventDefault();
-        setAppliedSearchText(searchText.trim());
-        setCurrentPage(1);
+        const q = searchText.trim();
+        setAppliedSearchText(q);
+        const params = new URLSearchParams(searchParams);
+        if (q) params.set("q", q); else params.delete("q");
+        if (sortOption) params.set("sort", sortOption); else params.delete("sort");
+        params.delete("page");
+        nav(`?${params.toString()}`);
     }
 
     function handleSortChange(event) {
-        setSortOption(event.target.value);
-        setCurrentPage(1);
+        const value = event.target.value;
+        setSortOption(value);
+        const params = new URLSearchParams(searchParams);
+        if (searchText) params.set("q", searchText.trim()); else params.delete("q");
+        if (value) params.set("sort", value); else params.delete("sort");
+        params.delete("page");
+        nav(`?${params.toString()}`);
     }
 
-    function handlePageChange(nextPage) {
-        setCurrentPage(nextPage);
-    }
-
-    function handleOpenDetail(service) {
-        setSelectedService(service);
-        setShowDetailModal(true);
-    }
+    // Detail modal is not used currently; remove unused handler to satisfy linter
 
     function handleOpenCreate() {
         setSelectedEditServiceId("");
@@ -141,37 +145,40 @@ function ServiceList() {
 
                 {error ? <Alert variant="danger">{error}</Alert> : null}
 
-                <div className="d-flex flex-column gap-3">
-                    {pagedServices.map((service) => (
-                        <CardServiceItem
-                            key={service.id} {...service}
-                            onEdit={() => handleOpenEdit(service.baseInfo?.id ?? service.id)}
-                        />
-                    ))}
-
-                    {!loading && services.length === 0 ? (
-                        <div className="text-center text-secondary py-5 border border-dashed border-dark-subtle">
-                            Không tìm thấy dịch vụ phù hợp.
-                        </div>
-                    ) : null}
-
-                </div>
-
-                {totalPages > 1 ? (
-                    <div className="d-flex justify-content-center mt-4">
-                        <PaginationComponent
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
+                {loading ? (
+                    <div className="py-5 d-flex justify-content-center">
+                        <MySpinner />
                     </div>
-                ) : null}
+                ) : (
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={loadMore}
+                        hasMore={hasMore}
+                        initialLoad={false}
+                        threshold={250}
+                    >
+                        <div className="d-flex flex-column gap-3">
+                            {services.map((service) => (
+                                <CardServiceItem
+                                    key={service.id} {...service}
+                                    onEdit={() => handleOpenEdit(service.baseInfo?.id ?? service.id)}
+                                />
+                            ))}
 
-                <ModalServiceDetail
-                    show={showDetailModal}
-                    onHide={() => setShowDetailModal(false)}
-                    service={selectedService}
-                />
+                            {services.length === 0 ? (
+                                <div className="text-center text-secondary py-5 border border-dashed border-dark-subtle">
+                                    Không tìm thấy dịch vụ phù hợp.
+                                </div>
+                            ) : null}
+
+                        </div>
+                        {loadingMore ? (
+                            <div className="py-4 d-flex justify-content-center">
+                                <MySpinner />
+                            </div>
+                        ) : null}
+                    </InfiniteScroll>
+                )}
 
                 <ModalCreateEditService
                     show={showCreateEditModal}

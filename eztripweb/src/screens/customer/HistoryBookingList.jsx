@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import InfiniteScroll from "react-infinite-scroller";
 import CustomerLayout from "@layouts/CustomerLayout";
 import CardHistoryBookingItem from "@components/customer/CardHistoryBookingItem";
-import PaginationComponent from "@components/common/PaginationComponent";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import MySpinner from "@components/common/MySpinner";
 import { getBookings } from "@services/customerService";
-import usePagedList from "@hooks/usePagedList";
+import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 
 function HistoryBookingList() {
     const [serviceType, setServiceType] = useState("");
@@ -44,15 +45,39 @@ function HistoryBookingList() {
         [serviceType, status, serviceId, pageSize]
     );
 
-    const { items: bookings, loading, page, totalPages, loadPage } = usePagedList(fetchBookings, pageSize);
+    const {
+        items: bookings,
+        loading,
+        loadingMore,
+        hasMore,
+        loadMore,
+        refetch,
+    } = useInfiniteScrollList({
+        queryKey: ["bookings", serviceType, status, serviceId, pageSize],
+        fetchPage: fetchBookings,
+        pageSize,
+    });
+    const nav = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+        const t = searchParams.get("type") || "";
+        const s = searchParams.get("status") || "";
+        const sid = searchParams.get("serviceId") || "";
+
+        if (t !== serviceType) setServiceType(t);
+        if (s !== status) setStatus(s);
+        if (sid !== serviceId) setServiceId(sid);
+    }, [searchParams.toString()]);
 
     const handleSearch = (event) => {
         event.preventDefault();
-        loadPage(1);
-    };
-
-    const handlePageChange = (nextPage) => {
-        loadPage(nextPage);
+        const params = new URLSearchParams(searchParams);
+        if (serviceType) params.set("type", serviceType); else params.delete("type");
+        if (status) params.set("status", status); else params.delete("status");
+        if (serviceId) params.set("serviceId", serviceId); else params.delete("serviceId");
+        params.delete("page");
+        nav(`?${params.toString()}`);
     };
 
     return (
@@ -114,25 +139,28 @@ function HistoryBookingList() {
                         <MySpinner />
                     </div>
                 ) : (
-                    <div className="d-flex flex-column gap-3">
-                        {bookings.map((item) => (
-                            <CardHistoryBookingItem
-                                key={item.id}
-                                {...item}
-                                onUpdated={() => loadPage(page)}
-                            />
-                        ))}
-                    </div>
-                )}
-
-                {totalPages > 1 && (
-                    <div className="d-flex justify-content-center mt-4">
-                        <PaginationComponent
-                            currentPage={page}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    </div>
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={loadMore}
+                        hasMore={hasMore}
+                        initialLoad={false}
+                        threshold={250}
+                    >
+                        <div className="d-flex flex-column gap-3">
+                            {bookings.map((item) => (
+                                <CardHistoryBookingItem
+                                    key={item.id}
+                                    {...item}
+                                    onUpdated={() => refetch()}
+                                />
+                            ))}
+                        </div>
+                        {loadingMore ? (
+                            <div className="py-4 d-flex justify-content-center">
+                                <MySpinner />
+                            </div>
+                        ) : null}
+                    </InfiniteScroll>
                 )}
             </Container>
         </CustomerLayout>

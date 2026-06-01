@@ -1,19 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import InfiniteScroll from "react-infinite-scroller";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TransportationItem from "@components/customer/CardTransportationItem";
 import ModalConfirmTransportationBooking from "@components/customer/ModalConfirmTransportationBooking";
-import PaginationComponent from "@components/common/PaginationComponent";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import MySpinner from "@components/common/MySpinner";
 import { getTransportations } from "@services/customerService";
 
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@hooks/useAuth";
+import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 
 function TransportationList() {
-    const [loading, setLoading] = useState(false);
     const [name, setName] = useState("");
     const [departureLocation, setDepartureLocation] = useState("");
     const [arrivalLocation, setArrivalLocation] = useState("");
@@ -24,13 +24,13 @@ function TransportationList() {
     const [rating, setRating] = useState("");
     const [sortOption, setSortOption] = useState("");
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
-    const [transportationList, setTransportationList] = useState([]);
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedTransportation, setSelectedTransportation] = useState(null);
-    const [page, setPage] = useState(1);
-    const [hasNextPage, setHasNextPage] = useState(false);
     const { lookupTables } = useLookupTables();
     const pageSize = 5;
+    const { currentUser } = useAuth();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     function buildBookingTransportation(option) {
         const baseInfo = option?.baseInfo || {};
@@ -50,63 +50,82 @@ function TransportationList() {
         };
     }
 
-    const loadTransportations = async (pageNumber = 1) => {
-        try {
-            setLoading(true);
-            const response = await getTransportations({
-                name,
-                departureLocation,
-                arrivalLocation,
-                type: typeOfTransportation,
-                departureTime,
-                fromPrice,
-                toPrice,
-                rating,
-                sortBy,
-                order,
-                page: pageNumber,
-                size: pageSize,
-            });
+    const fetchTransportations = async (pageNumber = 1) => {
+        const response = await getTransportations({
+            name,
+            departureLocation,
+            arrivalLocation,
+            type: typeOfTransportation,
+            departureTime,
+            fromPrice,
+            toPrice,
+            rating,
+            sortBy,
+            order,
+            page: pageNumber,
+            size: pageSize,
+        });
 
-            const items = Array.isArray(response)
-                ? response
-                : response?.content || response?.items || response?.results || [];
-
-            setTransportationList(items);
-            setHasNextPage(items.length === pageSize);
-        } catch (error) {
-            console.error("Error fetching transportations:", error);
-            setTransportationList([]);
-            setHasNextPage(false);
-        } finally {
-            setLoading(false);
-        }
+        return Array.isArray(response)
+            ? response
+            : response?.content || response?.items || response?.results || [];
     };
 
+    const {
+        items: transportationList,
+        loading,
+        loadingMore,
+        hasMore,
+        loadMore,
+    } = useInfiniteScrollList({
+        queryKey: ["transportations", name, departureLocation, arrivalLocation, typeOfTransportation, departureTime, fromPrice, toPrice, rating, sortBy, order, pageSize],
+        fetchPage: fetchTransportations,
+        pageSize,
+    });
+
     useEffect(() => {
-        loadTransportations();
-    }, []);
+        const qName = searchParams.get("name") || "";
+        const qDeparture = searchParams.get("departureLocation") || "";
+        const qArrival = searchParams.get("arrivalLocation") || "";
+        const qType = searchParams.get("type") || "";
+        const qDepartureTime = searchParams.get("departureTime") || "";
+        const qFrom = searchParams.get("fromPrice") || "";
+        const qTo = searchParams.get("toPrice") || "";
+        const qRating = searchParams.get("rating") || "";
+        const qSort = searchParams.get("sort") || "";
+        if (qName !== name) setName(qName);
+        if (qDeparture !== departureLocation) setDepartureLocation(qDeparture);
+        if (qArrival !== arrivalLocation) setArrivalLocation(qArrival);
+        if (qType !== typeOfTransportation) setTypeOfTransportation(qType);
+        if (qDepartureTime !== departureTime) setDepartureTime(qDepartureTime);
+        if (qFrom !== fromPrice) setFromPrice(qFrom);
+        if (qTo !== toPrice) setToPrice(qTo);
+        if (qRating !== rating) setRating(qRating);
+        if (qSort !== sortOption) setSortOption(qSort);
+
+    }, [searchParams.toString()]);
 
     function handleSearch(event) {
         event.preventDefault();
-        setPage(1);
-        loadTransportations(1);
+        const params = new URLSearchParams(searchParams);
+        if (name) params.set("name", name); else params.delete("name");
+        if (departureLocation) params.set("departureLocation", departureLocation); else params.delete("departureLocation");
+        if (arrivalLocation) params.set("arrivalLocation", arrivalLocation); else params.delete("arrivalLocation");
+        if (typeOfTransportation) params.set("type", typeOfTransportation); else params.delete("type");
+        if (departureTime) params.set("departureTime", departureTime); else params.delete("departureTime");
+        if (fromPrice) params.set("fromPrice", fromPrice); else params.delete("fromPrice");
+        if (toPrice) params.set("toPrice", toPrice); else params.delete("toPrice");
+        if (rating) params.set("rating", rating); else params.delete("rating");
+        if (sortOption) params.set("sort", sortOption); else params.delete("sort");
+        params.delete("page");
+        navigate(`?${params.toString()}`);
     }
 
-    function handlePageChange(nextPage) {
-        setPage(nextPage);
-        loadTransportations(nextPage);
-    }
-
-    const totalPages = hasNextPage ? page + 1 : page;
-
-    const { currentUser } = useAuth();
-    const navigate = useNavigate();
-    const location = useLocation();
+    
 
     function handleSelectTransportation(option) {
         if (!currentUser) {
-            navigate("/login", { state: { from: location.pathname } });
+            navigate("/login", { state: { from: window.location.pathname } });
             return;
         }
 
@@ -168,12 +187,13 @@ function TransportationList() {
                             </Form.Select>
                         </Col>
                         
-                        {/* TODO: trong khoảng 0-23 */}
                         <Col md={2}>
                             <Form.Control
                                 type="number"
                                 placeholder="Giờ xuất phát"
                                 value={departureTime}
+                                min="0"
+                                max="23"
                                 onChange={(e) =>
                                     setDepartureTime(e.target.value)
                                 }
@@ -235,32 +255,33 @@ function TransportationList() {
                     </Row>
                 </Form>
 
-                <div className="d-flex flex-column gap-3">
-                    {transportationList.map((option) => (
-                        <TransportationItem
-                            key={option?.baseInfo?.id || `${option.departureLocation}-${option.arrivalLocation}`}
-                            {...option}
-                            typeOfTransportation={
-                                typeOfTransportationLabelMap[option?.typeOfTransportation] ||
-                                option?.typeOfTransportation ||
-                                "Loại phương tiện"
-                            }
-                            onSelect={() => handleSelectTransportation(option)}
-                        />
-                    ))}
-                </div>
-
-                {totalPages > 1 && (
-                    <div className="d-flex justify-content-center mt-4">
-                        <PaginationComponent
-                            currentPage={page}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
-                    </div>
+                {loading ? (
+                    <MySpinner />
+                ) : (
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={loadMore}
+                        hasMore={hasMore}
+                        initialLoad={false}
+                        threshold={250}
+                    >
+                        <div className="d-flex flex-column gap-3">
+                            {transportationList.map((option) => (
+                                <TransportationItem
+                                    key={option?.baseInfo?.id || `${option.departureLocation}-${option.arrivalLocation}`}
+                                    {...option}
+                                    typeOfTransportation={
+                                        typeOfTransportationLabelMap[option?.typeOfTransportation] ||
+                                        option?.typeOfTransportation ||
+                                        "Loại phương tiện"
+                                    }
+                                    onSelect={() => handleSelectTransportation(option)}
+                                />
+                            ))}
+                        </div>
+                        {loadingMore ? <MySpinner /> : null}
+                    </InfiniteScroll>
                 )}
-
-                {loading && <MySpinner />}
 
                 <ModalConfirmTransportationBooking
                     show={showBookingModal}
