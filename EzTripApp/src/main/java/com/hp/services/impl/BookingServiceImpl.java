@@ -18,6 +18,7 @@ import com.hp.repositories.BookingRepository;
 import com.hp.repositories.BookingStatusRepository;
 import com.hp.security.MyUserDetails;
 import com.hp.services.BookingService;
+import com.hp.services.ResourceAuthorizationService;
 import com.hp.utils.UserUtils;
 
 import java.text.SimpleDateFormat;
@@ -42,6 +43,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private BaseServiceRepository serviceRepository;
+
+    @Autowired
+    private ResourceAuthorizationService resourceAuthorizationService;
 
     @Autowired
     private BookingStatusRepository bookingStatusRepository;
@@ -120,8 +124,7 @@ public class BookingServiceImpl implements BookingService {
                     review.getComment(),
                     review.getReviewDate(),
                     booking.getCustomerId().getUserId().getAvatar(),
-                    booking.getCustomerId().getUserId().getFullname()
-            );
+                    booking.getCustomerId().getUserId().getFullname());
         }
 
         String imageUrl = "";
@@ -152,10 +155,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void updateBooking(int bookingId, BookingUpdateDTO bk) {
-        Booking booking = this.bookingRepository.getBookingById(bookingId);
-        if (booking == null) {
-            throw new IllegalArgumentException("Booking không tồn tại!");
-        }
+        Booking booking = this.resourceAuthorizationService.getBookingForUpdate(bookingId);
 
         String statusName = booking.getStatusId().getName();
         if (statusName.equals("COMPLETED") || statusName.equals("CANCELLED")) {

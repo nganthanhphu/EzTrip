@@ -39,6 +39,7 @@ import com.hp.repositories.AccommodationSvcRepository;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.security.MyUserDetails;
 import com.hp.services.AccommodationSvcService;
+import com.hp.services.ResourceAuthorizationService;
 import com.hp.utils.UserUtils;
 
 /**
@@ -54,6 +55,9 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Autowired
     private BaseServiceRepository baseServiceRepository;
+
+    @Autowired
+    private ResourceAuthorizationService resourceAuthorizationService;
 
     @Autowired
     private Cloudinary cloudinary;
@@ -129,10 +133,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Override
     public void updateAccommodation(Integer id, AccommodationUpdateDTO accommodation) throws ParseException {
-        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
-
-        if (svc == null)
-            throw new IllegalArgumentException("Dịch vụ không tồn tại!");
+        com.hp.pojo.Service svc = this.resourceAuthorizationService.getServiceForUpdate(id);
 
         BaseServiceUpdateDTO baseInfo = accommodation.baseInfo();
 
@@ -185,7 +186,7 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Override
     public void deleteAccommodation(Integer id) {
-        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+        com.hp.pojo.Service svc = this.resourceAuthorizationService.getServiceForUpdate(id);
         svc.setIsActive(false);
         this.baseServiceRepository.addOrUpdateService(svc);
     }

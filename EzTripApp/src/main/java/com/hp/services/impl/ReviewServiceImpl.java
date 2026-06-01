@@ -8,8 +8,8 @@ import com.hp.dto.review.ReviewCreateDTO;
 import com.hp.dto.review.ReviewViewDTO;
 import com.hp.pojo.Booking;
 import com.hp.pojo.Review;
-import com.hp.repositories.BookingRepository;
 import com.hp.repositories.ReviewRepository;
+import com.hp.services.ResourceAuthorizationService;
 import com.hp.services.ReviewService;
 
 import jakarta.transaction.Transactional;
@@ -33,7 +33,7 @@ public class ReviewServiceImpl implements ReviewService {
     private ReviewRepository reviewRepository;
 
     @Autowired
-    private BookingRepository bookingRepository;
+    private ResourceAuthorizationService resourceAuthorizationService;
 
     @Override
     public List<ReviewViewDTO> getReviewsByServiceId(int serviceId, Map<String, String> params) {
@@ -44,10 +44,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addReview(ReviewCreateDTO review, int bookingId) {
-        Booking booking = this.bookingRepository.getBookingById(bookingId);
-        if (booking == null) {
-            throw new IllegalArgumentException("Booking không tồn tại!");
-        }
+        Booking booking = this.resourceAuthorizationService.getBookingForReview(bookingId);
 
         if (!"COMPLETED".equals(booking.getStatusId().getName())) {
             throw new IllegalArgumentException("Chỉ có thể đánh giá sau khi dịch vụ đã hoàn thành!");
@@ -72,7 +69,6 @@ public class ReviewServiceImpl implements ReviewService {
                 review.getComment(),
                 review.getReviewDate(),
                 review.getBookingId().getCustomerId().getUserId().getAvatar(),
-                review.getBookingId().getCustomerId().getUserId().getFullname()
-            );
+                review.getBookingId().getCustomerId().getUserId().getFullname());
     }
 }

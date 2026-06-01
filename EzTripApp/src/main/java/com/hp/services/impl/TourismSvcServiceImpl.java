@@ -38,6 +38,7 @@ import com.hp.pojo.TypeOfService;
 import com.hp.repositories.BaseServiceRepository;
 import com.hp.repositories.TourismSvcRepository;
 import com.hp.security.MyUserDetails;
+import com.hp.services.ResourceAuthorizationService;
 import com.hp.services.TourismSvcService;
 import com.hp.utils.UserUtils;
 
@@ -54,6 +55,9 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Autowired
     private BaseServiceRepository baseServiceRepository;
+
+    @Autowired
+    private ResourceAuthorizationService resourceAuthorizationService;
 
     @Autowired
     private Cloudinary cloudinary;
@@ -127,10 +131,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Override
     public void updateTourism(Integer id, TourismUpdateDTO tourism) throws ParseException {
-        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
-
-        if (svc == null)
-            throw new IllegalArgumentException("Dịch vụ không tồn tại!");
+        com.hp.pojo.Service svc = this.resourceAuthorizationService.getServiceForUpdate(id);
 
         BaseServiceUpdateDTO baseInfo = tourism.baseInfo();
 
@@ -181,7 +182,7 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Override
     public void deleteTourism(Integer id) {
-        com.hp.pojo.Service svc = this.baseServiceRepository.getServiceById(id);
+        com.hp.pojo.Service svc = this.resourceAuthorizationService.getServiceForUpdate(id);
         svc.setIsActive(false);
         this.baseServiceRepository.addOrUpdateService(svc);
     }
