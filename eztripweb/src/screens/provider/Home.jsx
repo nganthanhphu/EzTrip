@@ -3,8 +3,6 @@ import {
     Card,
     Col,
     Container,
-    ListGroup,
-    ProgressBar,
     Row,
     Stack,
 } from "react-bootstrap";
@@ -13,171 +11,116 @@ import ProviderLayout from "@layouts/ProviderLayout";
 function Home() {
     return (
         <ProviderLayout>
-            <Container className="py-4 py-lg-5">
-                <Card className="border-0 shadow-sm mb-4 mb-lg-5">
-                    <Card.Body className="p-4 p-lg-5">
-                        <Stack
-                            direction="horizontal"
-                            className="justify-content-between flex-wrap"
-                            gap={2}
-                        >
-                            <div>
-                                <Badge bg="success" className="mb-3">
-                                    KHÔNG GIAN NHÀ CUNG CẤP
-                                </Badge>
-                                <h1 className="display-6 fw-bold mb-2">
-                                    Chào mừng đến với cổng thông tin nhà cung cấp EzTrip
-                                </h1>
-                                <p className="text-secondary mb-0">
-                                    Không gian tập trung giúp theo dõi đơn đặt, tối ưu
-                                    hiệu quả vận hành dịch vụ và nâng cao trải nghiệm khách
-                                    hàng.
-                                </p>
-                            </div>
-                            <Card className="border-0 bg-light">
-                                <Card.Body className="py-2 px-3">
-                                    <small className="text-secondary d-block">
-                                        Tuần này
-                                    </small>
-                                    <strong>+12.4% tăng trưởng đơn đặt</strong>
-                                </Card.Body>
-                            </Card>
-                        </Stack>
-                    </Card.Body>
-                </Card>
+            {/* Hero Section - Phần chào mừng đối tác */}
+            <div className="bg-light py-5 mb-5 border-bottom">
+                <Container className="py-lg-5">
+                    <Row className="justify-content-center text-center">
+                        <Col lg={9}>
+                            <Badge bg="success" pill className="px-3 py-2 mb-3 shadow-sm text-uppercase">
+                                Không gian đối tác EzTrip
+                            </Badge>
+                            <h1 className="display-5 fw-bold mb-4 text-dark">
+                                Quản lý dịch vụ thông minh, <br />
+                                <span className="text-success">Vận hành hiệu quả hơn.</span>
+                            </h1>
+                            <p className="lead text-secondary px-md-5">
+                                Chào mừng bạn đến với trung tâm kiểm soát toàn diện của EzTrip. 
+                                Nền tảng được thiết kế chuyên biệt để giúp các nhà cung cấp dễ dàng theo dõi, 
+                                tối ưu hóa nguồn lực và mang lại trải nghiệm hoàn hảo nhất cho khách hàng.
+                            </p>
+                        </Col>
+                    </Row>
+                </Container>
+            </div>
 
-                <Row className="g-3 g-lg-4 mb-4 mb-lg-5">
-                    <Col sm={6} xl={3}>
-                        <Card className="h-100 border-0 shadow-sm">
-                            <Card.Body>
-                                <p className="text-uppercase text-secondary small mb-2">
-                                    Tổng số dịch vụ
+            <Container className="mb-5 pb-lg-5">
+                {/* Core Values - Giá trị cốt lõi mang lại cho Provider */}
+                <div className="text-center mb-5">
+                    <h2 className="fw-bold mb-3">Trợ thủ đắc lực cho doanh nghiệp của bạn</h2>
+                    <p className="text-secondary fs-5">Hệ thống công cụ tập trung, đơn giản hóa mọi quy trình phức tạp.</p>
+                </div>
+
+                <Row className="g-4 mb-5">
+                    <Col md={4}>
+                        <Card className="h-100 border-0 shadow-sm rounded-4 text-center">
+                            <Card.Body className="p-4 p-lg-5">
+                                <div className="display-4 mb-3">📊</div>
+                                <h4 className="fw-bold mb-3">Quản lý tập trung</h4>
+                                <p className="text-secondary mb-0">
+                                    Kiểm soát toàn bộ danh mục từ phòng nghỉ, vé xe đến các tour du lịch chỉ trên một bảng điều khiển duy nhất, trực quan và liền mạch.
                                 </p>
-                                <h3 className="mb-1 fw-bold">96</h3>
-                                <small className="text-success">+4 trong tháng</small>
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col sm={6} xl={3}>
-                        <Card className="h-100 border-0 shadow-sm">
-                            <Card.Body>
-                                <p className="text-uppercase text-secondary small mb-2">
-                                    Đơn mới
+                    <Col md={4}>
+                        <Card className="h-100 border-0 shadow-sm rounded-4 text-center">
+                            <Card.Body className="p-4 p-lg-5">
+                                <div className="display-4 mb-3">💬</div>
+                                <h4 className="fw-bold mb-3">Tương tác trực tiếp</h4>
+                                <p className="text-secondary mb-0">
+                                    Hệ thống tin nhắn tích hợp giúp bạn trao đổi tức thì với khách hàng, tư vấn dịch vụ và giải quyết vấn đề nhanh chóng.
                                 </p>
-                                <h3 className="mb-1 fw-bold">142</h3>
-                                <small className="text-success">+9.2% so với tuần trước</small>
                             </Card.Body>
                         </Card>
                     </Col>
-                    <Col sm={6} xl={3}>
-                        <Card className="h-100 border-0 shadow-sm">
-                            <Card.Body>
-                                <p className="text-uppercase text-secondary small mb-2">
-                                    Tỷ lệ hoàn tất
+                    <Col md={4}>
+                        <Card className="h-100 border-0 shadow-sm rounded-4 text-center">
+                            <Card.Body className="p-4 p-lg-5">
+                                <div className="display-4 mb-3">⚙️</div>
+                                <h4 className="fw-bold mb-3">Tối ưu vận hành</h4>
+                                <p className="text-secondary mb-0">
+                                    Quy trình nhận và xác nhận đơn đặt được tự động hóa tối đa, giúp giảm thiểu sai sót thủ công và tiết kiệm thời gian.
                                 </p>
-                                <h3 className="mb-1 fw-bold">91%</h3>
-                                <small className="text-secondary">
-                                    Chất lượng phục vụ ổn định
-                                </small>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col sm={6} xl={3}>
-                        <Card className="h-100 border-0 shadow-sm">
-                            <Card.Body>
-                                <p className="text-uppercase text-secondary small mb-2">
-                                    Đánh giá trung bình
-                                </p>
-                                <h3 className="mb-1 fw-bold">4.7/5</h3>
-                                <small className="text-secondary">
-                                    Tổng hợp từ đánh giá gần đây
-                                </small>
                             </Card.Body>
                         </Card>
                     </Col>
                 </Row>
 
-                <Row className="g-4">
-                    <Col lg={7}>
-                        <Card className="border-0 shadow-sm h-100">
-                            <Card.Header className="bg-white border-0 pt-4 px-4">
-                                <h4 className="mb-1">Tổng quan vận hành</h4>
-                                <p className="text-secondary mb-0">
-                                    Bức tranh tổng hợp tình hình hoạt động hiện tại.
+                {/* Workflow/Onboarding - Lộ trình làm việc thay cho các con số cứng */}
+                <Row className="justify-content-center mt-5">
+                    <Col lg={10}>
+                        <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
+                            <Card.Header className="bg-success text-white border-0 pt-4 px-4 pb-3">
+                                <h4 className="mb-1">Hành trình kiến tạo thành công</h4>
+                                <p className="mb-0 text-white-50">
+                                    Các bước cơ bản để khai thác tối đa tiềm năng kinh doanh trên nền tảng EzTrip.
                                 </p>
                             </Card.Header>
-                            <Card.Body className="px-4 pb-4">
-                                <ListGroup variant="flush">
-                                    <ListGroup.Item className="px-0">
-                                        <div className="d-flex justify-content-between mb-1">
-                                            <span>Độ phủ hiển thị dịch vụ</span>
-                                            <span className="text-secondary">85%</span>
+                            <Card.Body className="p-4 p-lg-5 bg-white">
+                                <Stack gap={4}>
+                                    <div className="d-flex align-items-start">
+                                        <div className="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style={{ width: 48, height: 48 }}>
+                                            <span className="fw-bold fs-5">1</span>
                                         </div>
-                                        <ProgressBar now={85} variant="success" />
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="px-0">
-                                        <div className="d-flex justify-content-between mb-1">
-                                            <span>Tốc độ xác nhận đơn</span>
-                                            <span className="text-secondary">78%</span>
-                                        </div>
-                                        <ProgressBar now={78} variant="info" />
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="px-0">
-                                        <div className="d-flex justify-content-between mb-1">
-                                            <span>Tỷ lệ quay lại của khách</span>
-                                            <span className="text-secondary">73%</span>
-                                        </div>
-                                        <ProgressBar now={73} variant="warning" />
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="px-0 pb-0">
-                                        <div className="d-flex justify-content-between mb-1">
-                                            <span>Chỉ số chất lượng dịch vụ</span>
-                                            <span className="text-secondary">90%</span>
-                                        </div>
-                                        <ProgressBar now={90} variant="primary" />
-                                    </ListGroup.Item>
-                                </ListGroup>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-
-                    <Col lg={5}>
-                        <Card className="border-0 shadow-sm h-100">
-                            <Card.Header className="bg-white border-0 pt-4 px-4">
-                                <h4 className="mb-1">Lộ trình nhà cung cấp</h4>
-                                <p className="text-secondary mb-0">
-                                    Quy trình đề xuất để mở rộng và tối ưu vận hành.
-                                </p>
-                            </Card.Header>
-                            <Card.Body className="px-4 pb-4">
-                                <Stack gap={3}>
-                                    <Card className="bg-light border-0">
-                                        <Card.Body>
-                                            <h6 className="mb-1">1. Xây dựng danh mục</h6>
-                                            <p className="mb-0 text-secondary">
-                                                Đăng tải mô tả rõ ràng, khả năng phục vụ và
-                                                điểm khác biệt của từng dịch vụ.
+                                        <div>
+                                            <h5 className="fw-bold mb-2">Xây dựng hồ sơ ấn tượng</h5>
+                                            <p className="text-secondary mb-0">
+                                                Cập nhật đầy đủ thông tin dịch vụ, định giá rõ ràng và đính kèm hình ảnh chất lượng cao để thu hút sự chú ý của khách hàng ngay từ cái nhìn đầu tiên.
                                             </p>
-                                        </Card.Body>
-                                    </Card>
-                                    <Card className="bg-light border-0">
-                                        <Card.Body>
-                                            <h6 className="mb-1">2. Xử lý yêu cầu đặt</h6>
-                                            <p className="mb-0 text-secondary">
-                                                Xác nhận đơn kịp thời để tăng độ tin cậy và
-                                                tỷ lệ chốt đơn từ khách hàng.
+                                        </div>
+                                    </div>
+                                    <div className="d-flex align-items-start">
+                                        <div className="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style={{ width: 48, height: 48 }}>
+                                            <span className="fw-bold fs-5">2</span>
+                                        </div>
+                                        <div>
+                                            <h5 className="fw-bold mb-2">Sẵn sàng tiếp nhận yêu cầu</h5>
+                                            <p className="text-secondary mb-0">
+                                                Duy trì trạng thái hoạt động thường xuyên, kiểm tra hộp thư tin nhắn và xác nhận đơn đặt phòng/vé kịp thời để tăng độ uy tín cho thương hiệu.
                                             </p>
-                                        </Card.Body>
-                                    </Card>
-                                    <Card className="bg-light border-0">
-                                        <Card.Body>
-                                            <h6 className="mb-1">3. Cải tiến liên tục</h6>
-                                            <p className="mb-0 text-secondary">
-                                                Theo dõi hiệu suất và phản hồi để nâng cấp chất
-                                                lượng dịch vụ theo thời gian.
+                                        </div>
+                                    </div>
+                                    <div className="d-flex align-items-start">
+                                        <div className="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0" style={{ width: 48, height: 48 }}>
+                                            <span className="fw-bold fs-5">3</span>
+                                        </div>
+                                        <div>
+                                            <h5 className="fw-bold mb-2">Lắng nghe và hoàn thiện</h5>
+                                            <p className="text-secondary mb-0">
+                                                Theo dõi các đánh giá sau chuyến đi của khách hàng. Việc phản hồi tích cực và cải thiện liên tục là chìa khóa để giữ chân khách hàng lâu dài.
                                             </p>
-                                        </Card.Body>
-                                    </Card>
+                                        </div>
+                                    </div>
                                 </Stack>
                             </Card.Body>
                         </Card>
