@@ -5,6 +5,7 @@ import { getAccommodations, getTourisms } from "@services/customerService";
 import defaultAccommodationImage from "@assets/images/default_accommodation_item.jpg";
 import defaultTourImage from "@assets/images/default_tour_item.jpg";
 import { formatCurrency } from "@utils/formatters";
+import useDebounce from "@hooks/useDebounce";
 
 const SERVICE_CONFIG = {
 	accommodation: {
@@ -25,7 +26,7 @@ function getServiceInfo(service) {
 
 function PanelCompare({ currentService, serviceType = "accommodation" }) {
 	const [queryInput, setQueryInput] = useState("");
-	const [searchTerm, setSearchTerm] = useState("");
+	const debouncedQueryInput = useDebounce(queryInput);
 	const [services, setServices] = useState([]);
 	const [selectedServices, setSelectedServices] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -48,7 +49,7 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 			setError("");
 
 			try {
-				const response = await config.loadList({ name: searchTerm });
+				const response = await config.loadList({ name: debouncedQueryInput.trim() });
 				const nextServices = Array.isArray(response) ? response : response?.content ?? [];
 
 				if (!isMounted) {
@@ -77,12 +78,7 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 		return () => {
 			isMounted = false;
 		};
-	}, [config, currentServiceId, searchTerm]);
-
-	function handleSearchSubmit(event) {
-		event.preventDefault();
-		setSearchTerm(queryInput.trim());
-	}
+	}, [config, currentServiceId, debouncedQueryInput]);
 
 	function handleToggleSelect(service) {
 		const serviceId = service?.baseInfo?.id ?? service?.id;
@@ -127,7 +123,7 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 		<Card className="h-100 shadow-sm">
 			<Card.Header className="bg-white fw-semibold">So sánh ngay {config.label} khác</Card.Header>
 			<Card.Body className="d-flex flex-column gap-3">
-				<Form onSubmit={handleSearchSubmit}>
+				<Form>
 					<InputGroup>
 						<Form.Control
 							type="search"
@@ -135,9 +131,6 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 							value={queryInput}
 							onChange={(event) => setQueryInput(event.target.value)}
 						/>
-						<Button variant="outline-primary" type="submit" disabled={loading}>
-							Tìm
-						</Button>
 					</InputGroup>
 				</Form>
 

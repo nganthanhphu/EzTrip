@@ -6,16 +6,17 @@ import CardServiceItem from "@components/provider/CardServiceItem";
 import ModalCreateEditService from "@components/provider/ModalCreateEditService";
 import MySpinner from "@components/common/MySpinner";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
+import useDebounce from "@hooks/useDebounce";
 
 import ProviderLayout from "@layouts/ProviderLayout";
 import { getProviderServices } from "@services/providerService";
 
 function ServiceList() {
     const [searchText, setSearchText] = useState("");
-    const [appliedSearchText, setAppliedSearchText] = useState("");
     const [sortOption, setSortOption] = useState("");
     const [showCreateEditModal, setShowCreateEditModal] = useState(false);
     const [selectedEditServiceId, setSelectedEditServiceId] = useState("");
+    const debouncedSearchText = useDebounce(searchText);
     const nav = useNavigate();
     const [searchParams] = useSearchParams();
     const pageSize = 5;
@@ -23,6 +24,7 @@ function ServiceList() {
     const searchParamsString = searchParams.toString();
     const serviceCacheRef = useRef([]);
     const serviceCacheKeyRef = useRef("");
+    const appliedSearchText = debouncedSearchText.trim();
 
     const fetchServices = async (pageNumber = 1) => {
         const cacheKey = [appliedSearchText, sortBy, order].join("|");
@@ -66,33 +68,27 @@ function ServiceList() {
         const q = params.get("q") || "";
         const sort = params.get("sort") || "";
 
-        setAppliedSearchText(q);
         setSearchText(q);
         setSortOption(sort);
     }, [searchParamsString]);
 
-    function handleSearch(event) {
-        event.preventDefault();
-        const q = searchText.trim();
-        setAppliedSearchText(q);
-        const params = new URLSearchParams(searchParams);
+    function handleSortChange(event) {
+        setSortOption(event.target.value);
+    }
+
+    useEffect(() => {
+        const params = new URLSearchParams(searchParamsString);
+        const q = appliedSearchText;
+
         if (q) params.set("q", q); else params.delete("q");
         if (sortOption) params.set("sort", sortOption); else params.delete("sort");
         params.delete("page");
-        nav(`?${params.toString()}`);
-    }
 
-    function handleSortChange(event) {
-        const value = event.target.value;
-        setSortOption(value);
-        const params = new URLSearchParams(searchParams);
-        if (searchText) params.set("q", searchText.trim()); else params.delete("q");
-        if (value) params.set("sort", value); else params.delete("sort");
-        params.delete("page");
-        nav(`?${params.toString()}`);
-    }
-
-    // Detail modal is not used currently; remove unused handler to satisfy linter
+        const nextSearch = params.toString();
+        if (nextSearch !== searchParamsString) {
+            nav({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
+        }
+    }, [appliedSearchText, sortOption, searchParamsString, nav]);
 
     function handleOpenCreate() {
         setSelectedEditServiceId("");
@@ -107,7 +103,7 @@ function ServiceList() {
     return (
         <ProviderLayout>
             <Container className="py-4">
-                <Form className="mb-3" onSubmit={handleSearch}>
+                <Form className="mb-3">
                     <Row className="g-2 align-items-center">
                         <Col md={5}>
                             <Form.Control
@@ -118,7 +114,7 @@ function ServiceList() {
                             />
                         </Col>
 
-                        <Col md={2}>
+                        <Col md={3}>
                             <Form.Select value={sortOption} onChange={handleSortChange}>
                                 <option value="">Sắp xếp</option>
                                 <option value="price|asc">Giá thấp đến cao</option>
@@ -128,18 +124,11 @@ function ServiceList() {
                             </Form.Select>
                         </Col>
 
-                        <Col md={2} className="d-grid">
-                            <Button variant="primary" type="submit" disabled={loading}>
-                                Tìm kiếm
-                            </Button>
-                        </Col>
-
-                        <Col md={3} className="d-grid">
+                        <Col md={4} className="d-grid">
                             <Button variant="primary" onClick={handleOpenCreate}>
-                            Tạo dịch vụ
+                                Tạo dịch vụ
                             </Button>
                         </Col>
-                        
                     </Row>
                 </Form>
 

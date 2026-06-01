@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Form } from "react-bootstrap";
 import InfiniteScroll from "react-infinite-scroller";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TourItem from "@components/customer/CardTourItem";
 import MySpinner from "@components/common/MySpinner";
 import { getTourisms } from "@services/customerService";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
+import useDebounce from "@hooks/useDebounce";
 
 function TourList() {
     const [name, setName] = useState("");
@@ -17,6 +18,12 @@ function TourList() {
     const [toPrice, setToPrice] = useState("");
     const [rating, setRating] = useState("");
     const [sortOption, setSortOption] = useState("");
+    const debouncedName = useDebounce(name);
+    const debouncedLocation = useDebounce(location);
+    const debouncedTourDuration = useDebounce(tourDuration);
+    const debouncedFromPrice = useDebounce(fromPrice);
+    const debouncedToPrice = useDebounce(toPrice);
+    const debouncedRating = useDebounce(rating);
 
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
@@ -24,18 +31,18 @@ function TourList() {
     const fetchPage = useCallback(
         (nextPage) =>
             getTourisms({
-                name,
-                location,
-                tourDuration,
-                fromPrice,
-                toPrice,
-                rating,
+                name: debouncedName.trim(),
+                location: debouncedLocation.trim(),
+                tourDuration: debouncedTourDuration,
+                fromPrice: debouncedFromPrice,
+                toPrice: debouncedToPrice,
+                rating: debouncedRating,
                 sortBy,
                 order,
                 page: nextPage,
                 size: pageSize,
             }),
-        [name, location, tourDuration, fromPrice, toPrice, rating, sortBy, order, pageSize]
+        [debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize]
     );
 
     const {
@@ -51,8 +58,8 @@ function TourList() {
     });
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const searchParamsString = searchParams.toString();
 
-    // initialize from URL params and sync
     useEffect(() => {
         const qName = searchParams.get("name") || "";
         const qLocation = searchParams.get("location") || "";
@@ -71,24 +78,34 @@ function TourList() {
         if (qSort !== sortOption) setSortOption(qSort);
     }, [searchParams.toString()]);
 
-    const handleSearch = (event) => {
-        event.preventDefault();
-        const params = new URLSearchParams(searchParams);
-        if (name) params.set("name", name); else params.delete("name");
-        if (location) params.set("location", location); else params.delete("location");
-        if (tourDuration) params.set("tourDuration", tourDuration); else params.delete("tourDuration");
-        if (fromPrice) params.set("fromPrice", fromPrice); else params.delete("fromPrice");
-        if (toPrice) params.set("toPrice", toPrice); else params.delete("toPrice");
-        if (rating) params.set("rating", rating); else params.delete("rating");
+    useEffect(() => {
+        const params = new URLSearchParams(searchParamsString);
+        const nextName = debouncedName.trim();
+        const nextLocation = debouncedLocation.trim();
+        const nextTourDuration = debouncedTourDuration.trim();
+        const nextFromPrice = debouncedFromPrice.trim();
+        const nextToPrice = debouncedToPrice.trim();
+        const nextRating = debouncedRating.trim();
+
+        if (nextName) params.set("name", nextName); else params.delete("name");
+        if (nextLocation) params.set("location", nextLocation); else params.delete("location");
+        if (nextTourDuration) params.set("tourDuration", nextTourDuration); else params.delete("tourDuration");
+        if (nextFromPrice) params.set("fromPrice", nextFromPrice); else params.delete("fromPrice");
+        if (nextToPrice) params.set("toPrice", nextToPrice); else params.delete("toPrice");
+        if (nextRating) params.set("rating", nextRating); else params.delete("rating");
         if (sortOption) params.set("sort", sortOption); else params.delete("sort");
         params.delete("page");
-        navigate(`?${params.toString()}`);
-    };
+
+        const nextSearch = params.toString();
+        if (nextSearch !== searchParamsString) {
+            navigate({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
+        }
+    }, [debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortOption, searchParamsString, navigate]);
 
     return (
         <CustomerLayout>
             <Container className="py-4">
-                <Form className="mb-3" onSubmit={handleSearch}>
+                <Form className="mb-3">
                     <Row className="g-2 align-items-center mb-2">
                         <Col md={4}>
                             <Form.Control
@@ -99,7 +116,7 @@ function TourList() {
                             />
                         </Col>
 
-                        <Col md={3}>
+                        <Col md={4}>
                             <Form.Control
                                 type="text"
                                 placeholder="Địa điểm"
@@ -108,7 +125,7 @@ function TourList() {
                             />
                         </Col>
 
-                        <Col md={2}>
+                        <Col md={4}>
                             <Form.Control
                                 type="number"
                                 placeholder="Thời lượng (ngày)"
@@ -117,16 +134,6 @@ function TourList() {
                                     setTourDuration(e.target.value)
                                 }
                             />
-                        </Col>
-
-                        <Col md={3} className="d-grid">
-                            <Button
-                                variant="primary"
-                                type="submit"
-                                disabled={loading}
-                            >
-                                Tìm kiếm
-                            </Button>
                         </Col>
                     </Row>
 
@@ -163,7 +170,7 @@ function TourList() {
                             />
                         </Col>
 
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Select
                                 value={sortOption}
                                 onChange={(e) => setSortOption(e.target.value)}

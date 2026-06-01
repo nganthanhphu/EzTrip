@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Form } from "react-bootstrap";
 import InfiniteScroll from "react-infinite-scroller";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TransportationItem from "@components/customer/CardTransportationItem";
@@ -12,9 +12,9 @@ import { getTransportations } from "@services/customerService";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@hooks/useAuth";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
+import useDebounce from "@hooks/useDebounce";
 
 function TransportationList() {
-    const [name, setName] = useState("");
     const [departureLocation, setDepartureLocation] = useState("");
     const [arrivalLocation, setArrivalLocation] = useState("");
     const [typeOfTransportation, setTypeOfTransportation] = useState("");
@@ -23,6 +23,13 @@ function TransportationList() {
     const [toPrice, setToPrice] = useState("");
     const [rating, setRating] = useState("");
     const [sortOption, setSortOption] = useState("");
+    const debouncedDepartureLocation = useDebounce(departureLocation);
+    const debouncedArrivalLocation = useDebounce(arrivalLocation);
+    const debouncedTypeOfTransportation = useDebounce(typeOfTransportation);
+    const debouncedDepartureTime = useDebounce(departureTime);
+    const debouncedFromPrice = useDebounce(fromPrice);
+    const debouncedToPrice = useDebounce(toPrice);
+    const debouncedRating = useDebounce(rating);
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedTransportation, setSelectedTransportation] = useState(null);
@@ -52,14 +59,13 @@ function TransportationList() {
 
     const fetchTransportations = async (pageNumber = 1) => {
         const response = await getTransportations({
-            name,
-            departureLocation,
-            arrivalLocation,
-            type: typeOfTransportation,
-            departureTime,
-            fromPrice,
-            toPrice,
-            rating,
+            departureLocation: debouncedDepartureLocation.trim(),
+            arrivalLocation: debouncedArrivalLocation.trim(),
+            type: debouncedTypeOfTransportation,
+            departureTime: debouncedDepartureTime,
+            fromPrice: debouncedFromPrice,
+            toPrice: debouncedToPrice,
+            rating: debouncedRating,
             sortBy,
             order,
             page: pageNumber,
@@ -78,10 +84,11 @@ function TransportationList() {
         hasMore,
         loadMore,
     } = useInfiniteScrollList({
-        queryKey: ["transportations", name, departureLocation, arrivalLocation, typeOfTransportation, departureTime, fromPrice, toPrice, rating, sortBy, order, pageSize],
+        queryKey: ["transportations", debouncedDepartureLocation, debouncedArrivalLocation, debouncedTypeOfTransportation, debouncedDepartureTime, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize],
         fetchPage: fetchTransportations,
         pageSize,
     });
+    const searchParamsString = searchParams.toString();
 
     useEffect(() => {
         const qName = searchParams.get("name") || "";
@@ -93,7 +100,6 @@ function TransportationList() {
         const qTo = searchParams.get("toPrice") || "";
         const qRating = searchParams.get("rating") || "";
         const qSort = searchParams.get("sort") || "";
-        if (qName !== name) setName(qName);
         if (qDeparture !== departureLocation) setDepartureLocation(qDeparture);
         if (qArrival !== arrivalLocation) setArrivalLocation(qArrival);
         if (qType !== typeOfTransportation) setTypeOfTransportation(qType);
@@ -105,21 +111,30 @@ function TransportationList() {
 
     }, [searchParams.toString()]);
 
-    function handleSearch(event) {
-        event.preventDefault();
-        const params = new URLSearchParams(searchParams);
-        if (name) params.set("name", name); else params.delete("name");
-        if (departureLocation) params.set("departureLocation", departureLocation); else params.delete("departureLocation");
-        if (arrivalLocation) params.set("arrivalLocation", arrivalLocation); else params.delete("arrivalLocation");
-        if (typeOfTransportation) params.set("type", typeOfTransportation); else params.delete("type");
-        if (departureTime) params.set("departureTime", departureTime); else params.delete("departureTime");
-        if (fromPrice) params.set("fromPrice", fromPrice); else params.delete("fromPrice");
-        if (toPrice) params.set("toPrice", toPrice); else params.delete("toPrice");
-        if (rating) params.set("rating", rating); else params.delete("rating");
+    useEffect(() => {
+        const params = new URLSearchParams(searchParamsString);
+        const nextDepartureLocation = debouncedDepartureLocation.trim();
+        const nextArrivalLocation = debouncedArrivalLocation.trim();
+        const nextDepartureTime = debouncedDepartureTime.trim();
+        const nextFromPrice = debouncedFromPrice.trim();
+        const nextToPrice = debouncedToPrice.trim();
+        const nextRating = debouncedRating.trim();
+
+        if (nextDepartureLocation) params.set("departureLocation", nextDepartureLocation); else params.delete("departureLocation");
+        if (nextArrivalLocation) params.set("arrivalLocation", nextArrivalLocation); else params.delete("arrivalLocation");
+        if (debouncedTypeOfTransportation) params.set("type", debouncedTypeOfTransportation); else params.delete("type");
+        if (nextDepartureTime) params.set("departureTime", nextDepartureTime); else params.delete("departureTime");
+        if (nextFromPrice) params.set("fromPrice", nextFromPrice); else params.delete("fromPrice");
+        if (nextToPrice) params.set("toPrice", nextToPrice); else params.delete("toPrice");
+        if (nextRating) params.set("rating", nextRating); else params.delete("rating");
         if (sortOption) params.set("sort", sortOption); else params.delete("sort");
         params.delete("page");
-        navigate(`?${params.toString()}`);
-    }
+
+        const nextSearch = params.toString();
+        if (nextSearch !== searchParamsString) {
+            navigate({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
+        }
+    }, [debouncedDepartureLocation, debouncedArrivalLocation, debouncedTypeOfTransportation, debouncedDepartureTime, debouncedFromPrice, debouncedToPrice, debouncedRating, sortOption, searchParamsString, navigate]);
 
     
 
@@ -140,17 +155,8 @@ function TransportationList() {
     return (
         <CustomerLayout>
             <Container className="py-4">
-                <Form className="mb-3" onSubmit={handleSearch}>
+                <Form className="mb-3">
                     <Row className="g-2 align-items-center mb-2">
-                        <Col md={2}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Tên dịch vụ"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                            />
-                        </Col>
-
                         <Col md={2}>
                             <Form.Control
                                 type="text"
@@ -200,11 +206,6 @@ function TransportationList() {
                             />
                         </Col>
 
-                        <Col md={2} className="d-grid">
-                            <Button variant="primary" type="submit" disabled={loading}>
-                                Tìm kiếm
-                            </Button>
-                        </Col>
                     </Row>
 
                     <Row className="g-2 align-items-center">
@@ -240,7 +241,7 @@ function TransportationList() {
                             />
                         </Col>
 
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Select
                                 value={sortOption}
                                 onChange={(e) => setSortOption(e.target.value)}
