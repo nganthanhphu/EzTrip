@@ -16,6 +16,9 @@ function ServiceList() {
     const [sortOption, setSortOption] = useState("");
     const [showCreateEditModal, setShowCreateEditModal] = useState(false);
     const [selectedEditServiceId, setSelectedEditServiceId] = useState("");
+
+    const [refreshKey, setRefreshKey] = useState(0);
+
     const debouncedSearchText = useDebounce(searchText);
     const nav = useNavigate();
     const [searchParams] = useSearchParams();
@@ -24,10 +27,10 @@ function ServiceList() {
     const searchParamsString = searchParams.toString();
     const serviceCacheRef = useRef([]);
     const serviceCacheKeyRef = useRef("");
-    const appliedSearchText = debouncedSearchText.trim();
 
     const fetchServices = async (pageNumber = 1) => {
-        const cacheKey = [appliedSearchText, sortBy, order].join("|");
+        const cacheKey = [debouncedSearchText, sortBy, order, refreshKey].join("|");
+
         if (serviceCacheKeyRef.current !== cacheKey) {
             serviceCacheKeyRef.current = cacheKey;
             serviceCacheRef.current = [];
@@ -35,14 +38,17 @@ function ServiceList() {
 
         if (serviceCacheRef.current.length === 0) {
             const response = await getProviderServices({
-                name: appliedSearchText,
+                name: debouncedSearchText,
                 sortBy,
                 order,
             });
 
             serviceCacheRef.current = Array.isArray(response)
                 ? response
-                : response?.content || response?.items || response?.results || [];
+                : response?.content ||
+                response?.items ||
+                response?.results ||
+                [];
         }
 
         const startIndex = (pageNumber - 1) * pageSize;
@@ -57,12 +63,18 @@ function ServiceList() {
         loadMore,
         error,
     } = useInfiniteScrollList({
-        queryKey: ["provider-services", appliedSearchText, sortBy, order, pageSize],
+        queryKey: [
+            "provider-services",
+            debouncedSearchText,
+            sortBy,
+            order,
+            pageSize,
+            refreshKey,
+        ],
         fetchPage: fetchServices,
         pageSize,
     });
 
-    // keep state in sync when URL changes (back/forward)
     useEffect(() => {
         const params = new URLSearchParams(searchParamsString);
         const q = params.get("q") || "";
@@ -78,17 +90,25 @@ function ServiceList() {
 
     useEffect(() => {
         const params = new URLSearchParams(searchParamsString);
-        const q = appliedSearchText;
+        const q = debouncedSearchText;
 
-        if (q) params.set("q", q); else params.delete("q");
-        if (sortOption) params.set("sort", sortOption); else params.delete("sort");
+        if (q) params.set("q", q);
+        else params.delete("q");
+        if (sortOption) params.set("sort", sortOption);
+        else params.delete("sort");
         params.delete("page");
 
         const nextSearch = params.toString();
         if (nextSearch !== searchParamsString) {
-            nav({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
+            nav(
+                {
+                    pathname: window.location.pathname,
+                    search: nextSearch ? `?${nextSearch}` : "",
+                },
+                { replace: true },
+            );
         }
-    }, [appliedSearchText, sortOption, searchParamsString, nav]);
+    }, [debouncedSearchText, sortOption, searchParamsString, nav]);
 
     function handleOpenCreate() {
         setSelectedEditServiceId("");
@@ -98,6 +118,11 @@ function ServiceList() {
     function handleOpenEdit(serviceId) {
         setSelectedEditServiceId(serviceId);
         setShowCreateEditModal(true);
+    }
+
+    function handleSuccess() {
+        setShowCreateEditModal(false);
+        setRefreshKey((prev) => prev + 1);
     }
 
     return (
@@ -115,17 +140,31 @@ function ServiceList() {
                         </Col>
 
                         <Col md={3}>
-                            <Form.Select value={sortOption} onChange={handleSortChange}>
+                            <Form.Select
+                                value={sortOption}
+                                onChange={handleSortChange}
+                            >
                                 <option value="">Sắp xếp</option>
-                                <option value="price|asc">Giá thấp đến cao</option>
-                                <option value="price|desc">Giá cao đến thấp</option>
-                                <option value="hot|desc">Hot nhất đến thấp</option>
-                                <option value="hot|asc">Hot thấp đến cao</option>
+                                <option value="price|asc">
+                                    Giá thấp đến cao
+                                </option>
+                                <option value="price|desc">
+                                    Giá cao đến thấp
+                                </option>
+                                <option value="hot|desc">
+                                    Hot nhất đến thấp
+                                </option>
+                                <option value="hot|asc">
+                                    Hot thấp đến cao
+                                </option>
                             </Form.Select>
                         </Col>
 
                         <Col md={4} className="d-grid">
-                            <Button variant="primary" onClick={handleOpenCreate}>
+                            <Button
+                                variant="primary"
+                                onClick={handleOpenCreate}
+                            >
                                 Tạo dịch vụ
                             </Button>
                         </Col>
@@ -149,8 +188,13 @@ function ServiceList() {
                         <div className="d-flex flex-column gap-3">
                             {services.map((service) => (
                                 <CardServiceItem
-                                    key={service.id} {...service}
-                                    onEdit={() => handleOpenEdit(service.baseInfo?.id ?? service.id)}
+                                    key={service.id}
+                                    {...service}
+                                    onEdit={() =>
+                                        handleOpenEdit(
+                                            service.baseInfo?.id ?? service.id,
+                                        )
+                                    }
                                 />
                             ))}
 
@@ -159,7 +203,6 @@ function ServiceList() {
                                     Không tìm thấy dịch vụ phù hợp.
                                 </div>
                             ) : null}
-
                         </div>
                         {loadingMore ? (
                             <div className="py-4 d-flex justify-content-center">
@@ -172,6 +215,7 @@ function ServiceList() {
                 <ModalCreateEditService
                     show={showCreateEditModal}
                     onHide={() => setShowCreateEditModal(false)}
+                    onSuccess={handleSuccess}
                     serviceId={selectedEditServiceId}
                 />
             </Container>

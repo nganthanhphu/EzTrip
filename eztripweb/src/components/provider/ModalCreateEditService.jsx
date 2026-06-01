@@ -262,7 +262,7 @@ function getServiceCreator(serviceType) {
     return creators[serviceType] || null;
 }
 
-function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
+function ModalCreateEditService({ show = true, onHide, onSuccess, service, serviceId }) {
     const isEditMode = Boolean(serviceId || service);
     const { currentUser, loading: authLoading } = useAuth();
     const { lookupTables } = useLookupTables();
@@ -611,7 +611,11 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
             setDeletingService(true);
             setError("");
             await deleteServiceByType(serviceType, serviceId);
-            closeModal();
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                closeModal();
+            }
         } catch (deleteError) {
             setError(
                 deleteError?.response?.data?.message ||
@@ -647,7 +651,11 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
             const response = await creator(buildPayload());
 
             if (response?.status >= 200 && response?.status < 300) {
-                closeModal();
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    closeModal();
+                }
                 return;
             }
 
