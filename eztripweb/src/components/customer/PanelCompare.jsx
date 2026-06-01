@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
-import { Badge, Button, Card, Col, Form, Image, InputGroup, Row, Stack } from "react-bootstrap";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { Badge, Button, Card, Col, Form, Image, InputGroup, Row, Stack, Spinner } from "react-bootstrap";
 import ModalResultCompare from "@components/customer/ModalResultCompare";
 import { getAccommodations, getTourisms } from "@services/customerService";
 import defaultAccommodationImage from "@assets/images/default_accommodation_item.jpg";
 import defaultTourImage from "@assets/images/default_tour_item.jpg";
 import { formatCurrency } from "@utils/formatters";
 import useDebounce from "@hooks/useDebounce";
+import useInfiniteScrollList from "@hooks/useInfiniteScrollList"; // Đảm bảo import đúng đường dẫn
 
 const SERVICE_CONFIG = {
 	accommodation: {
@@ -27,10 +28,8 @@ function getServiceInfo(service) {
 function PanelCompare({ currentService, serviceType = "accommodation" }) {
 	const [queryInput, setQueryInput] = useState("");
 	const debouncedQueryInput = useDebounce(queryInput);
-	const [services, setServices] = useState([]);
 	const [selectedServices, setSelectedServices] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState("");
+	const [localError, setLocalError] = useState("");
 	const [showResultModal, setShowResultModal] = useState(false);
 
 	const currentServiceId = currentService?.baseInfo?.id ?? currentService?.id;
@@ -41,83 +40,89 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 		[selectedServices],
 	);
 
-	useEffect(() => {
-		let isMounted = true;
+    const fetchPage = async (pageParam) => {
+        const response = await config.loadList({ 
+            name: debouncedQueryInput.trim(),
+            page: pageParam,
+            size: 5
+        });
+        return Array.isArray(response) ? response : response?.content ?? [];
+    };
 
-		async function loadServices() {
-			setLoading(true);
-			setError("");
+    const {
+        items: rawItems,
+        loading,
+        loadingMore,
+        hasMore,
+        loadMore,
+        error: fetchError
+    } = useInfiniteScrollList({
+        queryKey: ["compare-services", serviceType, debouncedQueryInput],
+        fetchPage,
+        pageSize: 5
+    });
 
-			try {
-				const response = await config.loadList({ name: debouncedQueryInput.trim() });
-				const nextServices = Array.isArray(response) ? response : response?.content ?? [];
+    const services = useMemo(() => {
+        return rawItems.filter(service => {
+            const serviceId = service?.baseInfo?.id ?? service?.id;
+            return !currentServiceId || serviceId !== currentServiceId;
+        });
+    }, [rawItems, currentServiceId]);
 
-				if (!isMounted) {
-					return;
-				}
-
-				setServices(
-					nextServices.filter((service) => {
-						const serviceId = service?.baseInfo?.id ?? service?.id;
-						return !currentServiceId || serviceId !== currentServiceId;
-					}),
-				);
-			} catch (fetchError) {
-				if (isMounted) {
-					setError(`Không thể tải danh sách ${config.label}.`);
-				}
-			} finally {
-				if (isMounted) {
-					setLoading(false);
-				}
-			}
-		}
-
-		loadServices();
-
-		return () => {
-			isMounted = false;
-		};
-	}, [config, currentServiceId, debouncedQueryInput]);
+    const observer = useRef();
+    const lastElementRef = useCallback((node) => {
+        if (loadingMore) return;
+        
+        if (observer.current) observer.current.disconnect();
+        
+        observer.current = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMore) {
+                loadMore();
+            }
+        });
+        
+        if (node) observer.current.observe(node);
+    }, [loadingMore, hasMore, loadMore]);
 
 	function handleToggleSelect(service) {
 		const serviceId = service?.baseInfo?.id ?? service?.id;
 
-		if (!serviceId || serviceId === currentServiceId) {
-			return;
-		}
+		if (!serviceId || serviceId === currentServiceId) return;
 
 		setSelectedServices((currentSelected) => {
 			const existingIndex = currentSelected.findIndex((item) => (item?.baseInfo?.id ?? item?.id) === serviceId);
 
 			if (existingIndex >= 0) {
+                setLocalError("");
 				return currentSelected.filter((item) => (item?.baseInfo?.id ?? item?.id) !== serviceId);
 			}
 
 			if (currentSelected.length >= 2) {
-				setError("Chỉ được chọn tối đa 2 dịch vụ để so sánh.");
+				setLocalError("Chỉ được chọn tối đa 2 dịch vụ để so sánh.");
 				return currentSelected;
 			}
 
-			setError("");
+			setLocalError("");
 			return [...currentSelected, service];
 		});
 	}
 
 	function handleCompare() {
 		if (selectedServices.length === 0) {
-			setError("Hãy chọn ít nhất 1 dịch vụ để so sánh.");
+			setLocalError("Hãy chọn ít nhất 1 dịch vụ để so sánh.");
 			return;
 		}
-
 		setShowResultModal(true);
 	}
 
 	function handleRemoveSelected(serviceId) {
-		setSelectedServices((currentSelected) =>
-			currentSelected.filter((item) => (item?.baseInfo?.id ?? item?.id) !== serviceId),
-		);
+		setSelectedServices((currentSelected) => {
+            setLocalError("");
+			return currentSelected.filter((item) => (item?.baseInfo?.id ?? item?.id) !== serviceId);
+        });
 	}
+
+    const displayError = localError || (fetchError ? `Không thể tải danh sách ${config.label}.` : "");
 
 	return (
 		<Card className="h-100 shadow-sm">
@@ -134,7 +139,7 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 					</InputGroup>
 				</Form>
 
-				{selectedServices.length > 0 ? (
+				{selectedServices.length > 0 && (
 					<div className="d-flex flex-wrap gap-2">
 						{selectedServices.map((service) => {
 							const serviceInfo = getServiceInfo(service);
@@ -159,22 +164,25 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 							);
 						})}
 					</div>
-				) : null}
+				)}
 
-				{error ? <div className="alert alert-warning py-2 mb-0">{error}</div> : null}
+				{displayError && <div className="alert alert-warning py-2 mb-0">{displayError}</div>}
 
 				<div className="flex-grow-1 overflow-auto pe-1" style={{ maxHeight: 420 }}>
 					<Stack gap={3}>
 						{services.length > 0 ? (
-							services.map((service) => {
+							services.map((service, index) => {
 								const serviceInfo = getServiceInfo(service);
 								const serviceId = serviceInfo.id ?? service?.id;
 								const isSelected = selectedIds.includes(serviceId);
 								const canSelect = isSelected || selectedServices.length < 2;
+                                
+                                const isLastElement = services.length === index + 1;
 
 								return (
                                     <Card
                                         key={serviceId}
+                                        ref={isLastElement ? lastElementRef : null}
                                         body
                                         className={`border ${isSelected ? "border-primary" : ""}`}
                                     >
@@ -191,12 +199,12 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 
 											<Col xs={8} md={8} lg={8}>
 												<h5 className="mb-1 fw-semibold">{serviceInfo.name}</h5>
-												{serviceInfo.companyName ? (
+												{serviceInfo.companyName && (
 													<div className="text-body-secondary small mb-1">{serviceInfo.companyName}</div>
-												) : null}
-												{service.location ? (
+												)}
+												{service.location && (
 													<div className="text-body-secondary small mb-1">{service.location}</div>
-												) : null}
+												)}
 												<div className="small text-body-secondary">{formatCurrency(serviceInfo.price)}</div>
 											</Col>
 										</Row>
@@ -221,6 +229,12 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
 						) : (
 							<div className="text-body-secondary">Không tìm thấy dịch vụ phù hợp.</div>
 						)}
+
+                        {loadingMore && (
+                            <div className="d-flex justify-content-center py-2">
+                                <Spinner animation="border" variant="primary" size="sm" />
+                            </div>
+                        )}
 					</Stack>
 				</div>
 
