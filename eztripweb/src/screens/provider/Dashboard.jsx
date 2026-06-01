@@ -10,191 +10,279 @@ import {
     Legend,
     Filler,
 } from "chart.js";
-import { useEffect, useRef } from "react";
-import { Badge, Card, Col, Container, ProgressBar, Row, Table } from "react-bootstrap";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { Badge, Card, Col, Container, ProgressBar, Row, Form, Spinner } from "react-bootstrap";
 import ProviderLayout from "@layouts/ProviderLayout";
 import { formatCurrency } from "@utils/formatters";
+import providerService from "@services/providerService";
 
 ChartJS.register(LineController, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-const summaryCards = [
-    { label: "Tổng dịch vụ", value: 8, tone: "primary" },
-    { label: "Tổng lượt booking", value: 512, tone: "success" },
-    { label: "Đang phục vụ", value: 12, tone: "warning" },
-    { label: "Đã hoàn thành", value: 500, tone: "info" },
-];
-
-const revenueData = [
-    { month: "T1", revenue: 120000000 },
-    { month: "T2", revenue: 180000000 },
-    { month: "T3", revenue: 150000000 },
-    { month: "T4", revenue: 220000000 },
-    { month: "T5", revenue: 410000000 },
-    { month: "T6", revenue: 280000000 },
-    { month: "T7", revenue: 320000000 },
-    { month: "T8", revenue: 560000000 },
-    { month: "T9", revenue: 390000000 },
-    { month: "T10", revenue: 430000000 },
-    { month: "T11", revenue: 720000000 },
-    { month: "T12", revenue: 610000000 },
-];
-
-const servicesOverview = [
-    { name: "Phòng VIP", bookings: 126, status: "Đang phục vụ", revenue: 360000000, completionRate: 94 },
-    { name: "Tour Sài Gòn 3N2Đ", bookings: 84, status: "Hoàn thành", revenue: 280000000, completionRate: 89 },
-    { name: "Vé xe liên tỉnh", bookings: 152, status: "Hoàn thành", revenue: 190000000, completionRate: 97 },
-    { name: "Combo nghỉ dưỡng", bookings: 58, status: "Đang phục vụ", revenue: 145000000, completionRate: 81 },
-];
-
-const statusBreakdown = [
-    { label: "Đang phục vụ", value: 12, tone: "warning" },
-    { label: "Đã hoàn thành", value: 500, tone: "success" },
-    { label: "Đã hủy", value: 18, tone: "danger" },
-];
-
-const revenueChartData = {
-    labels: revenueData.map((item) => item.month),
-    datasets: [
-        {
-            label: "Doanh thu",
-            data: revenueData.map((item) => item.revenue),
-            borderColor: "#0d6efd",
-            backgroundColor: "rgba(13, 110, 253, 0.15)",
-            fill: true,
-            tension: 0.4,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-        },
-    ],
-};
-
-const revenueChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-        legend: { display: false },
-        tooltip: {
-            callbacks: {
-                label: (context) => formatCurrency(context.parsed.y),
-            },
-        },
-    },
-    scales: {
-        y: {
-            ticks: { callback: (value) => formatCurrency(value) },
-            grid: { color: "rgba(0,0,0,0.06)" },
-        },
-        x: { grid: { display: false } },
-    },
-};
-
 function Dashboard() {
     const chartRef = useRef(null);
-    const totalRevenue = revenueData.reduce((s, i) => s + i.revenue, 0);
-    const totalBookings = summaryCards[1].value;
+    const chartInstance = useRef(null);
+
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    
+    const [statType, setStatType] = useState("MONTH");
+    const [year, setYear] = useState(currentYear);
+    const [month, setMonth] = useState(currentMonth);
+
+    const [statsData, setStatsData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchStatistics = async () => {
+            setIsLoading(true);
+            try {
+                const params = { statsType: statType, year };
+                if (statType === "DAY") {
+                    params.month = month;
+                }
+
+                const response = await providerService.getStatistics(params);
+                setStatsData(response);
+            } catch (error) {
+                console.error("Lỗi khi tải dữ liệu thống kê:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchStatistics();
+    }, [statType, year, month]);
+
+    const chartConfig = useMemo(() => {
+        if (!statsData) return { labels: [], dataPoints: [] };
+
+        let labels = [];
+        let dataPoints = [];
+
+        if (statType === "DAY" && statsData.days) {
+            labels = statsData.days.map((d) => `Ngày ${d.day}`);
+            dataPoints = statsData.days.map((d) => d.revenue);
+        } else if (statType === "MONTH" && statsData.months) {
+            labels = statsData.months.map((m) => `Tháng ${m.month}`);
+            dataPoints = statsData.months.map((m) => m.revenue);
+        } else if (statType === "QUARTER" && statsData.quarters) {
+            labels = statsData.quarters.map((q) => `Quý ${q.quarter}`);
+            dataPoints = statsData.quarters.map((q) => q.revenue);
+        }
+
+        return { labels, dataPoints };
+    }, [statsData, statType]);
 
     useEffect(() => {
         const canvas = chartRef.current;
-        if (!canvas) return;
-        const existing = ChartJS.getChart(canvas);
-        if (existing) existing.destroy();
-        const chart = new ChartJS(canvas, { type: "line", data: revenueChartData, options: revenueChartOptions });
-        return () => chart.destroy();
-    }, []);
+        if (!canvas || isLoading) return;
+
+        if (chartInstance.current) {
+            chartInstance.current.destroy();
+        }
+
+        chartInstance.current = new ChartJS(canvas, {
+            type: "line",
+            data: {
+                labels: chartConfig.labels,
+                datasets: [
+                    {
+                        label: "Doanh thu",
+                        data: chartConfig.dataPoints,
+                        borderColor: "#0d6efd",
+                        backgroundColor: "rgba(13, 110, 253, 0.15)",
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => formatCurrency(context.parsed.y),
+                        },
+                    },
+                },
+                scales: {
+                    y: {
+                        ticks: { callback: (value) => formatCurrency(value) },
+                        grid: { color: "rgba(0,0,0,0.06)" },
+                    },
+                    x: { grid: { display: false } },
+                },
+            }
+        });
+
+        return () => {
+            if (chartInstance.current) {
+                chartInstance.current.destroy();
+            }
+        };
+    }, [chartConfig, isLoading]);
+
+    const totalBookings = statsData 
+        ? statsData.totalConfirmedBooking + statsData.totalCompletedBooking + statsData.totalCancelledBooking 
+        : 0;
 
     return (
         <ProviderLayout>
             <Container className="py-4">
-                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2 mb-4">
-                    <div>
-                        <h1 className="mb-1 fw-bold">Dashboard nhà cung cấp</h1>
-                        <div className="text-secondary">Thống kê tổng quan (theo service) cho một nhà cung cấp</div>
+                {isLoading ? (
+                    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
+                        <Spinner animation="border" variant="primary" />
                     </div>
-                    <Badge bg="dark" className="rounded-pill px-3 py-2">Hôm nay: 27/05/2026</Badge>
-                </div>
-
-                <Row className="g-3 mb-4">
-                    {summaryCards.map((c) => (
-                        <Col key={c.label} xs={12} sm={6} lg={3}>
-                            <Card className="h-100 border-0 shadow-sm">
-                                <Card.Body className="d-flex flex-column justify-content-between">
-                                    <div className="text-secondary fw-semibold">{c.label}</div>
-                                    <div className="d-flex align-items-end justify-content-between mt-3">
-                                        <div className={`fs-1 fw-bold text-${c.tone}`}>{c.value}</div>
-                                        <Badge bg={c.tone} className="rounded-pill px-3 py-2">Mock data</Badge>
-                                    </div>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
-
-                <Row className="g-3 mb-4">
-                    <Col xs={12} lg={8}>
-                        <Card className="h-100 border-0 shadow-sm">
-                            <Card.Body>
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    <div>
-                                        <Card.Title className="mb-1 fs-4 fw-bold">Doanh thu</Card.Title>
-                                        <Card.Subtitle className="text-secondary">Doanh thu theo tháng (tổng service)</Card.Subtitle>
-                                    </div>
-                                    <div className="text-md-end">
-                                        <div className="text-secondary small">Tổng doanh thu</div>
-                                        <div className="fs-3 fw-bold text-success">{formatCurrency(totalRevenue)}</div>
-                                    </div>
-                                </div>
-                                <div style={{ height: 360 }}>
-                                    <canvas ref={chartRef} />
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-
-                    <Col xs={12} lg={4}>
-                        <Card className="h-100 border-0 shadow-sm mb-3">
-                            <Card.Body>
-                                <Card.Title className="fw-bold mb-3">Tình trạng booking</Card.Title>
-                                <div className="d-flex flex-column gap-3">
-                                    {statusBreakdown.map((s) => (
-                                        <div key={s.label}>
-                                            <div className="d-flex justify-content-between align-items-center mb-1">
-                                                <div className="fw-semibold">{s.label}</div>
-                                                <Badge bg={s.tone}>{s.value} booking</Badge>
-                                            </div>
-                                            <ProgressBar now={(s.value / Math.max(1, totalBookings)) * 100} label={`${Math.round((s.value / Math.max(1, totalBookings)) * 100)}%`} />
+                ) : (
+                    <>
+                        <Row className="g-3 mb-4">
+                            <Col xs={12} sm={6} lg={3}>
+                                <Card className="h-100 border-0 shadow-sm">
+                                    <Card.Body className="d-flex flex-column justify-content-between">
+                                        <div className="text-secondary fw-semibold">Tổng số Dịch vụ</div>
+                                        <div className="fs-1 fw-bold text-primary mt-3">
+                                            {statsData?.totalService || 0}
                                         </div>
-                                    ))}
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-
-                <Card className="border-0 shadow-sm mt-4">
-                    <Card.Body>
-                        <Card.Title className="fw-bold mb-3">Tổng quan vận hành</Card.Title>
-                        <Row className="g-3">
-                            <Col xs={12} md={4}>
-                                <div className="p-3 rounded border bg-light h-100">
-                                    <div className="text-secondary mb-1">Số booking đang phục vụ</div>
-                                    <div className="fs-2 fw-bold text-warning">{summaryCards[2].value}</div>
-                                </div>
+                                    </Card.Body>
+                                </Card>
                             </Col>
-                            <Col xs={12} md={4}>
-                                <div className="p-3 rounded border bg-light h-100">
-                                    <div className="text-secondary mb-1">Số booking đã hoàn thành</div>
-                                    <div className="fs-2 fw-bold text-success">{summaryCards[3].value}</div>
-                                </div>
+                            <Col xs={12} sm={6} lg={3}>
+                                <Card className="h-100 border-0 shadow-sm">
+                                    <Card.Body className="d-flex flex-column justify-content-between">
+                                        <div className="text-secondary fw-semibold">Booking Đã xác nhận</div>
+                                        <div className="fs-1 fw-bold text-info mt-3">
+                                            {statsData?.totalConfirmedBooking || 0}
+                                        </div>
+                                    </Card.Body>
+                                </Card>
                             </Col>
-                            <Col xs={12} md={4}>
-                                <div className="p-3 rounded border bg-light h-100">
-                                    <div className="text-secondary mb-1">Tổng doanh thu</div>
-                                    <div className="fs-2 fw-bold text-primary">{formatCurrency(totalRevenue)}</div>
-                                </div>
+                            <Col xs={12} sm={6} lg={3}>
+                                <Card className="h-100 border-0 shadow-sm">
+                                    <Card.Body className="d-flex flex-column justify-content-between">
+                                        <div className="text-secondary fw-semibold">Booking Đã hoàn thành</div>
+                                        <div className="fs-1 fw-bold text-success mt-3">
+                                            {statsData?.totalCompletedBooking || 0}
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                            <Col xs={12} sm={6} lg={3}>
+                                <Card className="h-100 border-0 shadow-sm">
+                                    <Card.Body className="d-flex flex-column justify-content-between">
+                                        <div className="text-secondary fw-semibold">Booking Đã hủy</div>
+                                        <div className="fs-1 fw-bold text-danger mt-3">
+                                            {statsData?.totalCancelledBooking || 0}
+                                        </div>
+                                    </Card.Body>
+                                </Card>
                             </Col>
                         </Row>
-                    </Card.Body>
-                </Card>
+
+                        <Row className="g-3 mb-4">
+                            <Col xs={12} lg={8}>
+                                <div className="d-flex gap-2">
+                                    <Form.Select 
+                                        value={statType} 
+                                        onChange={(e) => setStatType(e.target.value)}
+                                        className="bg-light border-0 shadow-sm"
+                                    >
+                                        <option value="DAY">Theo ngày</option>
+                                        <option value="MONTH">Theo tháng</option>
+                                        <option value="QUARTER">Theo quý</option>
+                                    </Form.Select>
+
+                                    {statType === "DAY" && (
+                                        <Form.Select 
+                                            value={month} 
+                                            onChange={(e) => setMonth(Number(e.target.value))}
+                                            className="bg-light border-0 shadow-sm"
+                                        >
+                                            {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                                                <option key={m} value={m}>Tháng {m}</option>
+                                            ))}
+                                        </Form.Select>
+                                    )}
+
+                                    <Form.Select 
+                                        value={year} 
+                                        onChange={(e) => setYear(Number(e.target.value))}
+                                        className="bg-light border-0 shadow-sm"
+                                    >
+                                        {Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map((y) => (
+                                            <option key={y} value={y}>Năm {y}</option>
+                                        ))}
+                                    </Form.Select>
+                                </div>
+                                <Card className="h-100 border-0 shadow-sm">
+                                    <Card.Body>
+                                        <div className="d-flex justify-content-between align-items-center mb-3">
+                                            <div>
+                                                <Card.Title className="mb-1 fs-4 fw-bold">Biểu đồ doanh thu</Card.Title>
+                                                <Card.Subtitle className="text-secondary">
+                                                    Doanh thu theo {statType === "DAY" ? "ngày" : statType === "MONTH" ? "tháng" : "quý"}
+                                                </Card.Subtitle>
+                                            </div>
+                                            <div className="text-md-end">
+                                                <div className="text-secondary small">Tổng doanh thu kỳ này</div>
+                                                <div className="fs-3 fw-bold text-success">
+                                                    {formatCurrency(statsData?.totalRevenue || 0)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style={{ height: 360 }}>
+                                            <canvas ref={chartRef} />
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+
+                            <Col xs={12} lg={4}>
+                                <Card className="h-100 border-0 shadow-sm mb-3">
+                                    <Card.Body>
+                                        <Card.Title className="fw-bold mb-3">Tỉ trọng trạng thái Booking</Card.Title>
+                                        <div className="d-flex flex-column gap-3">
+                                            <div>
+                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                    <div className="fw-semibold">Đã xác nhận</div>
+                                                    <Badge bg="info">{statsData?.totalConfirmedBooking || 0}</Badge>
+                                                </div>
+                                                <ProgressBar 
+                                                    variant="info"
+                                                    now={((statsData?.totalConfirmedBooking || 0) / Math.max(1, totalBookings)) * 100} 
+                                                />
+                                            </div>
+                                            <div>
+                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                    <div className="fw-semibold">Đã hoàn thành</div>
+                                                    <Badge bg="success">{statsData?.totalCompletedBooking || 0}</Badge>
+                                                </div>
+                                                <ProgressBar 
+                                                    variant="success"
+                                                    now={((statsData?.totalCompletedBooking || 0) / Math.max(1, totalBookings)) * 100} 
+                                                />
+                                            </div>
+                                            {/* Cancelled */}
+                                            <div>
+                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                    <div className="fw-semibold">Đã hủy</div>
+                                                    <Badge bg="danger">{statsData?.totalCancelledBooking || 0}</Badge>
+                                                </div>
+                                                <ProgressBar 
+                                                    variant="danger"
+                                                    now={((statsData?.totalCancelledBooking || 0) / Math.max(1, totalBookings)) * 100} 
+                                                />
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </>
+                )}
             </Container>
         </ProviderLayout>
     );

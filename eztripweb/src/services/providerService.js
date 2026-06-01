@@ -163,6 +163,10 @@ export async function getReviewsByServiceId(serviceId, params = {}) {
     return commonService.getReviewsByServiceId(serviceId, params);
 }
 
+export async function getStatistics(params = {}) {
+    return requestList("/api/secure/stats", params);
+}
+
 const providerService = {
     getAccommodations,
     getAccommodationById,
@@ -186,6 +190,8 @@ const providerService = {
     deleteImage,
     getBookings,
     updateBooking,
+    getReviewsByServiceId,
+    getStatistics,
 };
 
 export default providerService;
