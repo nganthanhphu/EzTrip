@@ -52,7 +52,7 @@ function TourList() {
         hasMore,
         loadMore,
     } = useInfiniteScrollList({
-        queryKey: ["tourisms", name, location, tourDuration, fromPrice, toPrice, rating, sortBy, order, pageSize],
+        queryKey: ["tourisms", debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize],
         fetchPage,
         pageSize,
     });

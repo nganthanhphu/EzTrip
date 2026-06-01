@@ -51,9 +51,9 @@ function AccommodationList() {
         loading,
         loadingMore,
         hasMore,
-        loadMore,
+        loadMore, 
     } = useInfiniteScrollList({
-        queryKey: ["accommodations", name, location, fromPrice, toPrice, rating, sortBy, order, pageSize],
+        queryKey: ["accommodations", debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize],
         fetchPage,
         pageSize,
     });
