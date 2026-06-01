@@ -58,9 +58,9 @@ CREATE TABLE base_user (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role_id int NOT NULL DEFAULT 2, -- Mặc định là CUSTOMER
-    avatar VARCHAR(255) NULL,
+    avatar VARCHAR(255) NOT NULL,
     phone_number VARCHAR(20) NOT NULL UNIQUE,
-    is_active BOOLEAN DEFAULT TRUE,
+    is_active BOOLEAN DEFAULT TRUE NOT NULL,
 
     FOREIGN KEY (role_id) REFERENCES role(id)
 );

@@ -124,11 +124,16 @@ public class BookingServiceImpl implements BookingService {
             );
         }
 
+        String imageUrl = "";
+        if (booking.getServiceId().getImageSet() != null && !booking.getServiceId().getImageSet().isEmpty()) {
+            imageUrl = booking.getServiceId().getImageSet().stream().findFirst().orElse(null).getUrl();
+        }
+
         return new BookingViewDTO(
                 booking.getId(),
                 booking.getServiceId().getName(),
                 booking.getServiceId().getTypeOfServiceId().getId(),
-                booking.getServiceId().getImageSet().stream().findFirst().orElse(null).getUrl(),
+                imageUrl,
                 booking.getCreatedDate(),
                 booking.getBookingDay(),
                 booking.getQuantity(),

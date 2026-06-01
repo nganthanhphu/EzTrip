@@ -81,7 +81,8 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
         Expression<Integer> confirmedCount = b.sum(
                 b.<Integer>selectCase()
-                        .when(b.equal(bookingStatus.get("name"), "CONFIRMED"), 1)
+                        .when(b.or(b.equal(bookingStatus.get("name"), "CONFIRMED"),
+                                b.equal(bookingStatus.get("name"), "PENDING")), booking.get("quantity"))
                         .otherwise(0));
 
         Expression<Integer> remainingQuantity = b.diff(
@@ -161,7 +162,7 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
             String typeOfTransportation = params.get("type");
             if (typeOfTransportation != null && !typeOfTransportation.isEmpty()) {
-                predicates.add(b.equal(type.get("name"), typeOfTransportation));
+                predicates.add(b.equal(type.get("id"), typeOfTransportation));
             }
 
             String rating = params.get("rating");
@@ -200,7 +201,6 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
 
         }
 
-        
         if (providerId > 0) {
             predicates.add(b.equal(providerProfile.get("id"), providerId));
         } else {
@@ -251,7 +251,10 @@ public class TransportationSvcRepositoryImpl implements TransportationSvcReposit
         Join<Booking, Review> review = booking.join("review", JoinType.LEFT);
 
         Expression<Integer> confirmedCount = b.sum(
-                b.<Integer>selectCase().when(b.equal(bookingStatus.get("name"), "CONFIRMED"), 1).otherwise(0));
+                b.<Integer>selectCase()
+                        .when(b.or(b.equal(bookingStatus.get("name"), "CONFIRMED"),
+                                b.equal(bookingStatus.get("name"), "PENDING")), booking.get("quantity"))
+                        .otherwise(0));
 
         Expression<Integer> remainingQuantity = b.diff(root.get("quantity"), b.coalesce(confirmedCount, 0));
 
