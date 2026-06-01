@@ -11,7 +11,6 @@ import ProviderLayout from "@layouts/ProviderLayout";
 function Home() {
     return (
         <ProviderLayout>
-            {/* Hero Section - Phần chào mừng đối tác */}
             <div className="bg-light py-5 mb-5 border-bottom">
                 <Container className="py-lg-5">
                     <Row className="justify-content-center text-center">
@@ -34,7 +33,6 @@ function Home() {
             </div>
 
             <Container className="mb-5 pb-lg-5">
-                {/* Core Values - Giá trị cốt lõi mang lại cho Provider */}
                 <div className="text-center mb-5">
                     <h2 className="fw-bold mb-3">Trợ thủ đắc lực cho doanh nghiệp của bạn</h2>
                     <p className="text-secondary fs-5">Hệ thống công cụ tập trung, đơn giản hóa mọi quy trình phức tạp.</p>
@@ -76,7 +74,6 @@ function Home() {
                     </Col>
                 </Row>
 
-                {/* Workflow/Onboarding - Lộ trình làm việc thay cho các con số cứng */}
                 <Row className="justify-content-center mt-5">
                     <Col lg={10}>
                         <Card className="border-0 shadow-sm rounded-4 overflow-hidden">

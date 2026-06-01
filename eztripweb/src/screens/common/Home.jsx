@@ -5,7 +5,6 @@ import CustomerLayout from "@layouts/CustomerLayout";
 function Home() {
     return (
         <CustomerLayout>
-            {/* Hero Section (Phần hiển thị chính) */}
             <div className="bg-light py-5 mb-5 border-bottom">
                 <Container className="py-lg-5 text-center">
                     <Row className="justify-content-center">
@@ -37,7 +36,6 @@ function Home() {
                 </Container>
             </div>
 
-            {/* Core Features Section (Các tính năng cốt lõi) */}
             <Container className="mb-5 pb-lg-5">
                 <div className="text-center mb-5">
                     <h2 className="fw-bold mb-3">Mọi thứ bạn cần cho một chuyến đi</h2>
@@ -81,7 +79,6 @@ function Home() {
                 </Row>
             </Container>
 
-            {/* Value Proposition Section (Tuyên ngôn giá trị) */}
             <div className="bg-primary bg-opacity-10 py-5">
                 <Container className="py-lg-4">
                     <Row className="align-items-center g-5">
