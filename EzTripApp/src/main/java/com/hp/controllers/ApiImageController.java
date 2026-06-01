@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.hp.services.ImageService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  *
@@ -25,6 +26,7 @@ public class ApiImageController {
     @Autowired
     private ImageService imageService;
 
+    @PreAuthorize("hasRole('PROVIDER')")
     @DeleteMapping("/secure/images/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteImage(@PathVariable(value = "id") int id) {

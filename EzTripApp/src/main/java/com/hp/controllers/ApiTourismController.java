@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,12 +59,14 @@ public class ApiTourismController {
         }
     }
 
+    @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'TRAVEL_AGENCY'")
     @PostMapping(path = "/secure/tourisms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void addTourism(@ModelAttribute TourismCreateDTO tourism) throws ParseException {
         this.tourismService.addTourism(tourism);
     }
 
+    @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'TRAVEL_AGENCY'")
     @PatchMapping(path = "/secure/tourisms/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTourism(@PathVariable(value = "id") int id,
@@ -71,6 +74,7 @@ public class ApiTourismController {
         this.tourismService.updateTourism(id, tourism);
     }
 
+    @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'TRAVEL_AGENCY'")
     @DeleteMapping("/secure/tourisms/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTourism(@PathVariable(value = "id") int id) {

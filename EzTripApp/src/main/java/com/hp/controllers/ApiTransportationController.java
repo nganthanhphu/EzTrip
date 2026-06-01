@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,12 +61,14 @@ public class ApiTransportationController {
         }
     }
 
+    @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'TRANSPORTATION'")
     @PostMapping(path = "/secure/transportations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void addTransportation(@ModelAttribute TransportationCreateDTO transportation) throws ParseException {
         this.transportationService.addTransportation(transportation);
     }
 
+    @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'TRANSPORTATION'")
     @PatchMapping(path = "/secure/transportations/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTransportation(@PathVariable(value = "id") int id,
@@ -73,6 +76,7 @@ public class ApiTransportationController {
         this.transportationService.updateTransportation(id, transportation);
     }
 
+    @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'TRANSPORTATION'")
     @DeleteMapping("/secure/transportations/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTransportation(@PathVariable(value = "id") int id) {

@@ -8,6 +8,7 @@ import com.hp.dto.review.ReviewCreateDTO;
 import com.hp.dto.review.ReviewViewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,16 +36,17 @@ public class ApiReviewController {
     private ReviewService reviewService;
 
     @GetMapping("/services/{serviceId}/reviews")
-    public ResponseEntity<List<ReviewViewDTO>> getReviewsByService(@PathVariable(value = "serviceId") int serviceId, @RequestParam Map<String, String> params) {
+    public ResponseEntity<List<ReviewViewDTO>> getReviewsByService(@PathVariable(value = "serviceId") int serviceId,
+            @RequestParam Map<String, String> params) {
         List<ReviewViewDTO> reviews = this.reviewService.getReviewsByServiceId(serviceId, params);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/secure/bookings/{id}/reviews")
     @ResponseStatus(HttpStatus.CREATED)
     public void addReview(@RequestBody ReviewCreateDTO review, @PathVariable(value = "id") int id) {
         this.reviewService.addReview(review, id);
     }
 
-    
 }
