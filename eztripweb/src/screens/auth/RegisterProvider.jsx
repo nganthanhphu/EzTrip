@@ -47,7 +47,7 @@ const providerFields = [
 ];
 
 const RegisterProvider = () => {
-	const [user, setUser] = useState({ role: "PROVIDER" });
+	const [user, setUser] = useState({ role: 3 });
 	const [err, setErr] = useState("");
 	const [loading, setLoading] = useState(false);
 	const avatar = useRef();

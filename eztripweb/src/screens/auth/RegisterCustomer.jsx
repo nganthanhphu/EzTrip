@@ -41,7 +41,7 @@ const customerFields = [
 ];
 
 const RegisterCustomer = () => {
-	const [user, setUser] = useState({ role: "CUSTOMER" });
+	const [user, setUser] = useState({ role: 2 });
 	const [err, setErr] = useState("");
 	const [loading, setLoading] = useState(false);
 	const avatar = useRef();
