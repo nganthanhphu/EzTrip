@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { formatCurrency, formatBookingDate} from "@utils/formatters";
 import { createBooking } from "@services/customerService";
@@ -24,6 +25,7 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [submitError, setSubmitError] = useState("");
 	const [submitSuccess, setSubmitSuccess] = useState("");
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (!show) {
@@ -93,7 +95,10 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 			}
 
 			setSubmitSuccess("Đặt vé thành công. Thông tin ghế của bạn đã được lưu.");
-			setTimeout(() => onHide?.(), 5000);
+			setTimeout(() => {
+				onHide?.();
+				navigate("/history");
+			}, 5000);
 		} catch (error) {
 			setSubmitError(error?.response?.data?.message || "Không thể tạo booking, vui lòng thử lại.");
 		} finally {

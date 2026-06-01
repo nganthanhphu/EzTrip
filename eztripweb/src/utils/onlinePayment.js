@@ -19,7 +19,7 @@ function isMatchingBooking(booking, expected) {
 }
 
 export function buildMomoRedirectUrl() {
-	return window.location.href;
+	return `${window.location.origin}/history`;
 }
 
 export async function openMomoPaymentForBooking(expectedBooking) {
