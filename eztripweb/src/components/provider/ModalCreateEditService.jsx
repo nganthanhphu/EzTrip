@@ -249,7 +249,6 @@ function appendField(formData, key, value) {
     if (value === undefined || value === null || value === "") {
         return;
     }
-
     formData.append(key, value);
 }
 
@@ -270,7 +269,7 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
     const navigate = useNavigate();
     const imageInputRef = useRef(null);
 
-    const providerTypeId = currentUser?.providerProfile?.id ?? "";
+    const providerTypeId = currentUser?.providerProfile?.typeOfProvider;
 
     const [serviceType, setServiceType] = useState("");
     const [form, setForm] = useState(buildEmptyForm);
@@ -392,6 +391,9 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
                         setServiceType("");
                         setForm(buildEmptyForm());
                         setExistingImages([]);
+                        setError(
+                            "Không nhận diện được phân loại của nhà cung cấp. Vui lòng kiểm tra lại tài khoản.",
+                        );
                     }
                 } else {
                     if (!cancelled) {
@@ -521,16 +523,20 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
     };
 
     const validate = () => {
-        const requiredValidation = validateRequiredFields(form, [
-            { name: "name", label: "name" },
-            { name: "description", label: "description" },
-            { name: "price", label: "price" },
-            { name: "quantity", label: "quantity" },
-            ...serviceFactory.childFields.filter((field) => field.required),
-        ], {
-            messagePrefix: "Vui lòng nhập",
-            messageSuffix: ".",
-        });
+        const requiredValidation = validateRequiredFields(
+            form,
+            [
+                { name: "name", label: "name" },
+                { name: "description", label: "description" },
+                { name: "price", label: "price" },
+                { name: "quantity", label: "quantity" },
+                ...serviceFactory.childFields.filter((field) => field.required),
+            ],
+            {
+                messagePrefix: "Vui lòng nhập",
+                messageSuffix: ".",
+            },
+        );
 
         if (!requiredValidation.valid) {
             setError(requiredValidation.message);
@@ -554,11 +560,7 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
 
         switch (serviceType) {
             case "TRANSPORTATION":
-                appendField(
-                    payload,
-                    "arrivalLocation",
-                    form.arrivalLocation.trim(),
-                );
+                appendField(payload, "arrivalLocation", form.arrivalLocation);
                 appendField(
                     payload,
                     "departureLocation",
@@ -693,56 +695,60 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
                                 <div className="d-flex flex-column gap-3 p-3 p-md-4">
                                     <Row className="g-3">
                                         <Col xs={12}>
-                                        <Form.Group controlId="serviceType">
-                                            <Form.Label>
-                                                Loại dịch vụ
-                                            </Form.Label>
-                                            <Form.Control
-                                                value={resolveServiceTypeLabel(
-                                                    serviceType,
-                                                )}
-                                                readOnly
-                                                disabled
-                                            />
-                                        </Form.Group>
+                                            <Form.Group controlId="serviceType">
+                                                <Form.Label>
+                                                    Loại dịch vụ
+                                                </Form.Label>
+                                                <Form.Control
+                                                    value={resolveServiceTypeLabel(
+                                                        serviceType,
+                                                    )}
+                                                    readOnly
+                                                    disabled
+                                                />
+                                            </Form.Group>
                                         </Col>
                                     </Row>
 
                                     <Row className="g-3">
                                         <Col xs={12}>
-                                        <Form.Group controlId="name">
-                                            <Form.Label>Tên dịch vụ</Form.Label>
-                                            <Form.Control
-                                                name="name"
-                                                type="text"
-                                                value={form.name}
-                                                onChange={handleChange}
-                                                placeholder="Nhập tên dịch vụ"
-                                            />
-                                        </Form.Group>
+                                            <Form.Group controlId="name">
+                                                <Form.Label>
+                                                    Tên dịch vụ
+                                                </Form.Label>
+                                                <Form.Control
+                                                    name="name"
+                                                    type="text"
+                                                    value={form.name}
+                                                    onChange={handleChange}
+                                                    placeholder="Nhập tên dịch vụ"
+                                                />
+                                            </Form.Group>
                                         </Col>
                                     </Row>
 
                                     <Row className="g-3">
                                         <Col xs={12}>
-                                        <Form.Group controlId="description">
-                                            <Form.Label>Mô tả</Form.Label>
-                                            <Form.Control
-                                                name="description"
-                                                as="textarea"
-                                                rows={4}
-                                                value={form.description}
-                                                onChange={handleChange}
-                                                placeholder="Mô tả ngắn gọn dịch vụ"
-                                            />
-                                        </Form.Group>
+                                            <Form.Group controlId="description">
+                                                <Form.Label>Mô tả</Form.Label>
+                                                <Form.Control
+                                                    name="description"
+                                                    as="textarea"
+                                                    rows={4}
+                                                    value={form.description}
+                                                    onChange={handleChange}
+                                                    placeholder="Mô tả ngắn gọn dịch vụ"
+                                                />
+                                            </Form.Group>
                                         </Col>
                                     </Row>
 
                                     <Row className="g-3">
                                         <Col xs={12} md={6}>
                                             <Form.Group controlId="quantity">
-                                                <Form.Label>Số lượng</Form.Label>
+                                                <Form.Label>
+                                                    Số lượng
+                                                </Form.Label>
                                                 <Form.Control
                                                     name="quantity"
                                                     type="number"
@@ -773,219 +779,259 @@ function ModalCreateEditService({ show = true, onHide, service, serviceId }) {
 
                                     <Row className="g-3">
                                         <Col xs={12}>
-                                        <div className="d-flex align-items-center justify-content-between gap-3 mb-2">
-                                            <Form.Label className="mb-0">
-                                                Hình ảnh
-                                            </Form.Label>
-                                            <div className="text-muted small">
-                                                {existingImages.length +
-                                                    selectedImagePreviews.length}{" "}
-                                                ảnh
+                                            <div className="d-flex align-items-center justify-content-between gap-3 mb-2">
+                                                <Form.Label className="mb-0">
+                                                    Hình ảnh
+                                                </Form.Label>
+                                                <div className="text-muted small">
+                                                    {existingImages.length +
+                                                        selectedImagePreviews.length}{" "}
+                                                    ảnh
+                                                </div>
                                             </div>
-                                        </div>
-                                        <Form.Control
-                                            ref={imageInputRef}
-                                            type="file"
-                                            multiple
-                                            accept="image/*"
-                                            onChange={handleFileChange}
-                                            className="d-none"
-                                        />
+                                            <Form.Control
+                                                ref={imageInputRef}
+                                                type="file"
+                                                multiple
+                                                accept="image/*"
+                                                onChange={handleFileChange}
+                                                className="d-none"
+                                            />
 
-                                        {existingImages.length === 0 &&
-                                        selectedImagePreviews.length === 0 ? (
-                                            <div className="text-muted small mb-2">
-                                                Chưa có ảnh nào.
-                                            </div>
-                                        ) : null}
+                                            {existingImages.length === 0 &&
+                                            selectedImagePreviews.length ===
+                                                0 ? (
+                                                <div className="text-muted small mb-2">
+                                                    Chưa có ảnh nào.
+                                                </div>
+                                            ) : null}
 
-                                        <Row className="g-3">
-                                            {existingImages.map(
-                                                (image, index) => (
-                                                    <Col
-                                                        xs={6}
-                                                        md={4}
-                                                        lg={3}
-                                                        key={
-                                                            image?.id ??
-                                                            image?.imageId ??
-                                                            image?.publicId ??
-                                                            image?.url ??
-                                                            image?.imageUrl ??
-                                                            image?.path ??
-                                                            index
+                                            <Row className="g-3">
+                                                {existingImages.map(
+                                                    (image, index) => (
+                                                        <Col
+                                                            xs={6}
+                                                            md={4}
+                                                            lg={3}
+                                                            key={
+                                                                image?.id ??
+                                                                image?.imageId ??
+                                                                image?.publicId ??
+                                                                image?.url ??
+                                                                image?.imageUrl ??
+                                                                image?.path ??
+                                                                index
+                                                            }
+                                                        >
+                                                            <div className="position-relative rounded-3 overflow-hidden border bg-light h-100">
+                                                                <Image
+                                                                    src={
+                                                                        image?.url ||
+                                                                        image?.imageUrl ||
+                                                                        image?.path ||
+                                                                        image
+                                                                    }
+                                                                    alt="Ảnh hiện có"
+                                                                    className="w-100 h-100 object-fit-cover"
+                                                                    style={{
+                                                                        minHeight: 140,
+                                                                    }}
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="dark"
+                                                                    size="sm"
+                                                                    className="position-absolute top-0 end-0 m-2 rounded-circle d-inline-flex align-items-center justify-content-center p-0"
+                                                                    style={{
+                                                                        width: 30,
+                                                                        height: 30,
+                                                                    }}
+                                                                    onClick={() =>
+                                                                        handleDeleteExistingImage(
+                                                                            image,
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        deletingImageId ===
+                                                                        String(
+                                                                            image?.id ??
+                                                                                image?.imageId ??
+                                                                                image?.publicId ??
+                                                                                "",
+                                                                        )
+                                                                    }
+                                                                    aria-label="Xóa ảnh"
+                                                                >
+                                                                    ×
+                                                                </Button>
+                                                            </div>
+                                                        </Col>
+                                                    ),
+                                                )}
+
+                                                {selectedImagePreviews.map(
+                                                    (preview, index) => (
+                                                        <Col
+                                                            xs={6}
+                                                            md={4}
+                                                            lg={3}
+                                                            key={`${preview.file.name}-${preview.file.lastModified}-${index}`}
+                                                        >
+                                                            <div className="position-relative rounded-3 overflow-hidden border bg-light h-100">
+                                                                <Image
+                                                                    src={
+                                                                        preview.previewUrl
+                                                                    }
+                                                                    alt={
+                                                                        preview
+                                                                            .file
+                                                                            .name
+                                                                    }
+                                                                    className="w-100 h-100 object-fit-cover"
+                                                                    style={{
+                                                                        minHeight: 140,
+                                                                    }}
+                                                                />
+                                                                <Button
+                                                                    type="button"
+                                                                    variant="dark"
+                                                                    size="sm"
+                                                                    className="position-absolute top-0 end-0 m-2 rounded-circle d-inline-flex align-items-center justify-content-center p-0"
+                                                                    style={{
+                                                                        width: 30,
+                                                                        height: 30,
+                                                                    }}
+                                                                    onClick={() =>
+                                                                        removeSelectedImage(
+                                                                            index,
+                                                                        )
+                                                                    }
+                                                                    aria-label="Xóa ảnh mới chọn"
+                                                                >
+                                                                    ×
+                                                                </Button>
+                                                            </div>
+                                                        </Col>
+                                                    ),
+                                                )}
+
+                                                <Col xs={6} md={4} lg={3}>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline-secondary"
+                                                        className="w-100 h-100 rounded-3 d-flex flex-column align-items-center justify-content-center text-decoration-none"
+                                                        style={{
+                                                            minHeight: 140,
+                                                            borderStyle:
+                                                                "dashed",
+                                                        }}
+                                                        onClick={
+                                                            openImagePicker
                                                         }
                                                     >
-                                                        <div className="position-relative rounded-3 overflow-hidden border bg-light h-100">
-                                                            <Image
-                                                                src={
-                                                                    image?.url ||
-                                                                    image?.imageUrl ||
-                                                                    image?.path ||
-                                                                    image
-                                                                }
-                                                                alt="Ảnh hiện có"
-                                                                className="w-100 h-100 object-fit-cover"
-                                                                style={{
-                                                                    minHeight: 140,
-                                                                }}
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                variant="dark"
-                                                                size="sm"
-                                                                className="position-absolute top-0 end-0 m-2 rounded-circle d-inline-flex align-items-center justify-content-center p-0"
-                                                                style={{
-                                                                    width: 30,
-                                                                    height: 30,
-                                                                }}
-                                                                onClick={() =>
-                                                                    handleDeleteExistingImage(
-                                                                        image,
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    deletingImageId ===
-                                                                    String(
-                                                                        image?.id ??
-                                                                            image?.imageId ??
-                                                                            image?.publicId ??
-                                                                            "",
-                                                                    )
-                                                                }
-                                                                aria-label="Xóa ảnh"
-                                                            >
-                                                                ×
-                                                            </Button>
-                                                        </div>
-                                                    </Col>
-                                                ),
-                                            )}
+                                                        <span className="fs-1 lh-1">
+                                                            +
+                                                        </span>
+                                                        <span className="small mt-2">
+                                                            Thêm ảnh
+                                                        </span>
+                                                    </Button>
+                                                </Col>
+                                            </Row>
+                                        </Col>
 
-                                            {selectedImagePreviews.map(
-                                                (preview, index) => (
-                                                    <Col
-                                                        xs={6}
-                                                        md={4}
-                                                        lg={3}
-                                                        key={`${preview.file.name}-${preview.file.lastModified}-${index}`}
-                                                    >
-                                                        <div className="position-relative rounded-3 overflow-hidden border bg-light h-100">
-                                                            <Image
-                                                                src={
-                                                                    preview.previewUrl
-                                                                }
-                                                                alt={
-                                                                    preview.file
-                                                                        .name
-                                                                }
-                                                                className="w-100 h-100 object-fit-cover"
-                                                                style={{
-                                                                    minHeight: 140,
-                                                                }}
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                variant="dark"
-                                                                size="sm"
-                                                                className="position-absolute top-0 end-0 m-2 rounded-circle d-inline-flex align-items-center justify-content-center p-0"
-                                                                style={{
-                                                                    width: 30,
-                                                                    height: 30,
-                                                                }}
-                                                                onClick={() =>
-                                                                    removeSelectedImage(
-                                                                        index,
-                                                                    )
-                                                                }
-                                                                aria-label="Xóa ảnh mới chọn"
-                                                            >
-                                                                ×
-                                                            </Button>
-                                                        </div>
-                                                    </Col>
-                                                ),
-                                            )}
-
-                                            <Col xs={6} md={4} lg={3}>
-                                                <Button
-                                                    type="button"
-                                                    variant="outline-secondary"
-                                                    className="w-100 h-100 rounded-3 d-flex flex-column align-items-center justify-content-center text-decoration-none"
-                                                    style={{
-                                                        minHeight: 140,
-                                                        borderStyle: "dashed",
-                                                    }}
-                                                    onClick={openImagePicker}
+                                        {serviceFactory.childFields.map(
+                                            (field) => (
+                                                <Col
+                                                    xs={12}
+                                                    md={
+                                                        field.name ===
+                                                        "location"
+                                                            ? 12
+                                                            : 6
+                                                    }
+                                                    key={field.name}
                                                 >
-                                                    <span className="fs-1 lh-1">
-                                                        +
-                                                    </span>
-                                                    <span className="small mt-2">
-                                                        Thêm ảnh
-                                                    </span>
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Col>
-
-                                    {serviceFactory.childFields.map((field) => (
-                                        <Col
-                                            xs={12}
-                                            md={
-                                                field.name === "location"
-                                                    ? 12
-                                                    : 6
-                                            }
-                                            key={field.name}
-                                        >
-                                            <Form.Group controlId={field.name}>
-                                                <Form.Label>
-                                                    {field.label}
-                                                </Form.Label>
-                                                {field.type === "select" ? (
-                                                    <Form.Select
-                                                        name={field.name}
-                                                        value={form[field.name]}
-                                                        onChange={handleChange}
+                                                    <Form.Group
+                                                        controlId={field.name}
                                                     >
-                                                        <option value="">
-                                                            Chọn{" "}
-                                                            {field.label.toLowerCase()}
-                                                        </option>
-                                                        {(
-                                                            field.options || []
-                                                        ).map((option) => (
-                                                            <option
-                                                                key={
-                                                                    option.value
+                                                        <Form.Label>
+                                                            {field.label}
+                                                        </Form.Label>
+                                                        {field.type ===
+                                                        "select" ? (
+                                                            <Form.Select
+                                                                name={
+                                                                    field.name
                                                                 }
                                                                 value={
-                                                                    option.value
+                                                                    form[
+                                                                        field
+                                                                            .name
+                                                                    ]
+                                                                }
+                                                                onChange={
+                                                                    handleChange
                                                                 }
                                                             >
-                                                                {option.label}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Select>
-                                                ) : (
-                                                    <Form.Control
-                                                        name={field.name}
-                                                        type={field.type}
-                                                        min={field.min}
-                                                        step={field.step}
-                                                        value={form[field.name]}
-                                                        onChange={handleChange}
-                                                        placeholder={
-                                                            field.label
-                                                        }
-                                                    />
-                                                )}
-                                            </Form.Group>
-                                        </Col>
-                                    ))}
-                                </Row>
-                                                </div>
+                                                                <option value="">
+                                                                    Chọn{" "}
+                                                                    {field.label.toLowerCase()}
+                                                                </option>
+                                                                {(
+                                                                    field.options ||
+                                                                    []
+                                                                ).map(
+                                                                    (
+                                                                        option,
+                                                                    ) => (
+                                                                        <option
+                                                                            key={
+                                                                                option.value
+                                                                            }
+                                                                            value={
+                                                                                option.value
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                option.label
+                                                                            }
+                                                                        </option>
+                                                                    ),
+                                                                )}
+                                                            </Form.Select>
+                                                        ) : (
+                                                            <Form.Control
+                                                                name={
+                                                                    field.name
+                                                                }
+                                                                type={
+                                                                    field.type
+                                                                }
+                                                                min={field.min}
+                                                                step={
+                                                                    field.step
+                                                                }
+                                                                value={
+                                                                    form[
+                                                                        field
+                                                                            .name
+                                                                    ]
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                placeholder={
+                                                                    field.label
+                                                                }
+                                                            />
+                                                        )}
+                                                    </Form.Group>
+                                                </Col>
+                                            ),
+                                        )}
+                                    </Row>
+                                </div>
                             </Form>
                         </Card.Body>
                     </Card>
