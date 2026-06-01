@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Alert, Badge, Modal } from "react-bootstrap";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getDatabase, onValue, push, ref } from "firebase/database";
@@ -8,24 +8,11 @@ import defaultAvatar from "@assets/images/default_avatar.jpg";
 import { MessageBubble, ChatInput } from "@components/common/ChatComponents";
 import { useAuth } from "@hooks/useAuth";
 
-function resolveFallbackAvatar(senderId, currentUserId, partnerUserId, currentAvatar, partnerAvatar) {
-	if (String(senderId) === String(currentUserId)) {
-		return currentAvatar || defaultAvatar;
-	}
-
-	if (String(senderId) === String(partnerUserId)) {
-		return partnerAvatar || defaultAvatar;
-	}
-
-	return defaultAvatar;
-}
-
 function ModalChat({
 	show = true,
 	onHide,
 	currentUserId,
 	partnerUserId,
-	roomId,
 	currentName,
 	partnerName,
 	currentAvatar,
@@ -33,18 +20,9 @@ function ModalChat({
 }) {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const params = useParams();
 	const { currentUser } = useAuth();
 	const scrollRef = useRef(null);
 	const [messages, setMessages] = useState([]);
-
-	const fallbackCurrentUserId = String(currentUserId || currentUser?.id || params.fromId || "").trim();
-	const fallbackPartnerUserId = String(partnerUserId || params.toId || "").trim();
-	const fallbackRoomId = String(roomId || "").trim();
-	const resolvedCurrentName = currentName || currentUser?.name || currentUser?.fullname || "Tôi";
-	const resolvedPartnerName = partnerName || location.state?.partnerName || "Đối tác";
-	const resolvedCurrentAvatar = currentAvatar || currentUser?.avatar || defaultAvatar;
-	const resolvedPartnerAvatar = partnerAvatar || location.state?.partnerAvatar || defaultAvatar;
 
 	const app = useMemo(() => {
 		if (!FirebaseConfigs.apiKey || !FirebaseConfigs.databaseURL) {
@@ -66,14 +44,14 @@ function ModalChat({
 		}
 	}, [messages]);
 
-	const currentId = fallbackCurrentUserId;
-	const partnerId = fallbackPartnerUserId;
-	const resolvedRoomId = fallbackRoomId || (currentId && partnerId ? [currentId, partnerId].sort().join("__") : "");
+	const currentId = currentUserId;
+	const partnerId = partnerUserId;
+	const roomId = (currentId && partnerId ? [currentId, partnerId].sort().join("__") : "");
 
 	useEffect(() => {
-		if (!database || !resolvedRoomId || !currentId || !partnerId) return undefined;
+		if (!database || !roomId || !currentId || !partnerId) return undefined;
 
-		const chatRef = ref(database, `chats/${resolvedRoomId}`);
+		const chatRef = ref(database, `chats/${roomId}`);
 		const unsubscribe = onValue(chatRef, (snapshot) => {
 			const payload = snapshot.val();
 			const nextMessages = payload
@@ -84,29 +62,29 @@ function ModalChat({
 
 			const normalized = nextMessages.map((message) => ({
 				...message,
-				senderAvatar: message.senderAvatar || resolveFallbackAvatar(message.senderId, currentId, partnerId, resolvedCurrentAvatar, resolvedPartnerAvatar),
-				recipientAvatar: message.recipientAvatar || resolveFallbackAvatar(message.recipientId, currentId, partnerId, resolvedCurrentAvatar, resolvedPartnerAvatar),
-				senderName: message.senderName || (String(message.senderId) === String(currentId) ? resolvedCurrentName : resolvedPartnerName),
-				recipientName: message.recipientName || (String(message.recipientId) === String(currentId) ? resolvedCurrentName : resolvedPartnerName),
+				senderAvatar: message.senderAvatar || defaultAvatar,
+				recipientAvatar: message.recipientAvatar || defaultAvatar,
+				senderName: message.senderName || (String(message.senderId) === String(currentId) ? currentName : partnerName),
+				recipientName: message.recipientName || (String(message.recipientId) === String(currentId) ? currentName : partnerName),
 			}));
 
 			setMessages(normalized);
 		});
 
 		return () => unsubscribe();
-	}, [database, resolvedRoomId, currentId, partnerId, resolvedCurrentAvatar, resolvedCurrentName, resolvedPartnerAvatar, resolvedPartnerName]);
+	}, [database, roomId, currentId, partnerId, currentAvatar, currentName, partnerAvatar, partnerName]);
 
 	const missingIds = !currentId || !partnerId;
 
 	const handleSend = (text) => {
-		if (missingIds || !database || !resolvedRoomId) return;
+		if (missingIds || !database || !roomId) return;
 
-		const chatRef = ref(database, `chats/${resolvedRoomId}`);
+		const chatRef = ref(database, `chats/${roomId}`);
 		void push(chatRef, {
 			senderId: currentId,
-			senderName: resolvedCurrentName,
+			senderName: currentName,
 			recipientId: partnerId,
-			recipientName: resolvedPartnerName,
+			recipientName: partnerName,
 			text,
 			timestamp: Date.now(),
 		});
@@ -126,7 +104,7 @@ function ModalChat({
 		navigate("/", { replace: true });
 	};
 
-	const headerTitle = `Chat: ${resolvedCurrentName} → ${resolvedPartnerName}`;
+	const headerTitle = `Chat: ${currentName} → ${partnerName}`;
 
 	return (
 		<Modal show={show} onHide={handleHide} centered size="lg" backdrop="static" scrollable>
@@ -139,11 +117,11 @@ function ModalChat({
 			<Modal.Body className="p-0 d-flex flex-column" style={{ minHeight: "70vh" }}>
 				<div className="d-flex flex-wrap gap-2 justify-content-between align-items-center border-bottom px-3 py-2 bg-light">
 					<div className="d-inline-flex flex-wrap gap-2">
-						<Badge bg="primary">{resolvedCurrentName}</Badge>
-						<Badge bg="secondary">{resolvedPartnerName}</Badge>
+						<Badge bg="primary">{currentName}</Badge>
+						<Badge bg="secondary">{partnerName}</Badge>
 					</div>
 					<div className="text-muted small">
-						{missingIds ? "Thiếu ID người dùng" : `Room: ${resolvedRoomId ? `${resolvedRoomId.slice(0, 12)}...` : "-"}`}
+						{missingIds ? "Thiếu ID người dùng" : `Room: ${roomId ? `${roomId.slice(0, 12)}...` : "-"}`}
 					</div>
 				</div>
 
