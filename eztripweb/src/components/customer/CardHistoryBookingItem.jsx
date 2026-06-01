@@ -6,122 +6,133 @@ import ModalReview from "@components/customer/ModalReview";
 import ModalChat from "@components/common/ModalChat";
 import { useAuth } from "@hooks/useAuth";
 import { updateBooking } from "@services/customerService";
+import { openMomoPaymentForBooking } from "@utils/onlinePayment";
 
 const SERVICE_TYPE_LABELS = {
-	1: "Tour",
-	2: "Lưu trú",
-	3: "Vận chuyển",
+    1: "Tour",
+    2: "Lưu trú",
+    3: "Vận chuyển",
 };
 
 const STATUS_META = {
-	1: { key: "PENDING", label: "Đang chờ", badge: "warning" },
-	2: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
-	3: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
-	4: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
-	PENDING: { key: "PENDING", label: "Đang chờ", badge: "warning" },
-	CONFIRMED: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
-	COMPLETED: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
-	CANCELLED: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
+    1: { key: "PENDING", label: "Đang chờ", badge: "warning" },
+    2: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
+    3: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
+    4: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
+    PENDING: { key: "PENDING", label: "Đang chờ", badge: "warning" },
+    CONFIRMED: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
+    COMPLETED: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
+    CANCELLED: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
 };
 
 const PAYMENT_METHOD_LABELS = {
-	1: "Tiền mặt",
-	2: "Momo",
-	3: "Chuyển khoản",
-	CASH: "Tiền mặt",
-	MOMO: "Momo",
-	BANK_TRANSFER: "Chuyển khoản",
+    1: "Tiền mặt",
+    2: "Momo",
+    3: "Chuyển khoản",
+    CASH: "Tiền mặt",
+    MOMO: "Momo",
+    BANK_TRANSFER: "Chuyển khoản",
 };
 
 function resolveStatusMeta(status) {
-	return STATUS_META[status] || STATUS_META[String(status).toUpperCase()] || {
-		key: String(status || ""),
-		label: status || "Trạng thái",
-		badge: "secondary",
-	};
+    return STATUS_META[status] || STATUS_META[String(status).toUpperCase()] || {
+        key: String(status || ""),
+        label: status || "Trạng thái",
+        badge: "secondary",
+    };
 }
 
 function resolveServiceTypeLabel(serviceType) {
-	return SERVICE_TYPE_LABELS[serviceType] || SERVICE_TYPE_LABELS[String(serviceType)] || serviceType || "Loại dịch vụ";
+    return SERVICE_TYPE_LABELS[serviceType] || SERVICE_TYPE_LABELS[String(serviceType)] || serviceType || "Loại dịch vụ";
 }
 
 function resolvePaymentMethodLabel(paymentMethod) {
-	return PAYMENT_METHOD_LABELS[paymentMethod] || PAYMENT_METHOD_LABELS[String(paymentMethod).toUpperCase()] || paymentMethod || "-";
+    return PAYMENT_METHOD_LABELS[paymentMethod] || PAYMENT_METHOD_LABELS[String(paymentMethod).toUpperCase()] || paymentMethod || "-";
 }
 
 function CardHistoryBookingItem(props) {
-	const { currentUser } = useAuth();
-	const [showReviewModal, setShowReviewModal] = useState(false);
-	const [showChatModal, setShowChatModal] = useState(false);
-	const [savingStatus, setSavingStatus] = useState(false);
-	const [actionError, setActionError] = useState("");
-	const {
-		id,
-		serviceName,
-		serviceType,
-		serviceImage,
-		createdDate,
-		bookingDay,
-		quantity,
-		totalAmount,
-		note,
-		status,
-		customerId,
-		customerName,
-		customerPhone,
-		customerAvatar,
-		companyId,
-		companyName,
-		paymentMethod,
-		review,
-	} = props;
+    const { currentUser } = useAuth();
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [showChatModal, setShowChatModal] = useState(false);
+    
+    const [savingStatus, setSavingStatus] = useState(false);
+    const [payingStatus, setPayingStatus] = useState(false);
+    const [actionError, setActionError] = useState("");
+    
+    const {
+        id,
+        serviceName,
+        serviceType,
+        serviceImage,
+        createdDate,
+        bookingDay,
+        quantity,
+        totalAmount,
+        note,
+        status,
+        customerId,
+        customerName,
+        customerPhone,
+        customerAvatar,
+        companyId,
+        companyName,
+        paymentMethod,
+        review,
+    } = props;
 
-	const normalizedReview = review ?? null;
-	const statusMeta = resolveStatusMeta(status);
-	const formattedAmount = Number.isFinite(Number(totalAmount))
-		? formatCurrency(Number(totalAmount))
-		: totalAmount;
-	const serviceTypeLabel = resolveServiceTypeLabel(serviceType);
-	const paymentMethodLabel = resolvePaymentMethodLabel(paymentMethod);
-	const createdDateLabel = formatDateTime(createdDate) || createdDate || "-";
-	const bookingDayLabel = formatDateTime(bookingDay) || bookingDay || "-";
-	const isProviderViewing = Boolean(currentUser?.id && String(currentUser.id) === String(companyId));
-	const canChat = Boolean(currentUser?.id && (isProviderViewing ? customerId : companyId));
+    const normalizedReview = review ?? null;
+    const statusMeta = resolveStatusMeta(status);
+    const formattedAmount = Number.isFinite(Number(totalAmount))
+        ? formatCurrency(Number(totalAmount))
+        : totalAmount;
+    const serviceTypeLabel = resolveServiceTypeLabel(serviceType);
+    const paymentMethodLabel = resolvePaymentMethodLabel(paymentMethod);
+    const createdDateLabel = formatDateTime(createdDate) || createdDate || "-";
+    const bookingDayLabel = formatDateTime(bookingDay) || bookingDay || "-";
+    const isProviderViewing = Boolean(currentUser?.id && String(currentUser.id) === String(companyId));
+    const canChat = Boolean(currentUser?.id && (isProviderViewing ? customerId : companyId));
 
-	const handleCancelBooking = async () => {
-		setSavingStatus(true);
-		setActionError("");
+    const isPending = statusMeta.key === "PENDING";
+    const isCompleted = statusMeta.key === "COMPLETED";
+    const isMomoPayment = Number(paymentMethod) === 2 || String(paymentMethod).toUpperCase() === "MOMO";
+    const isProcessing = savingStatus || payingStatus;
 
-		try {
-			await updateBooking(id, { status: "CANCELLED" });
-			props.onUpdated?.();
-		} catch (error) {
-			setActionError(error?.response?.data?.error || "Không thể hủy booking.");
-		} finally {
-			setSavingStatus(false);
-		}
-	};
+    const handleCancelBooking = async () => {
+        setSavingStatus(true);
+        setActionError("");
 
-	const handlePrimaryClick = () => {
-		if (statusMeta.key === "PENDING") {
-			void handleCancelBooking();
-			return;
-		}
+        try {
+            await updateBooking(id, { status: "CANCELLED" });
+            props.onUpdated?.();
+        } catch (error) {
+            setActionError(error?.response?.data?.error || "Không thể hủy booking.");
+        } finally {
+            setSavingStatus(false);
+        }
+    };
 
-		if (statusMeta.key === "COMPLETED") {
-			setShowReviewModal(true);
-		}
-	};
+    const handleMomoPaymentClick = async () => {
+        setPayingStatus(true);
+        setActionError("");
 
-	const primaryVisible = statusMeta.key === "PENDING" || statusMeta.key === "COMPLETED";
-	const primaryLabel = statusMeta.key === "PENDING"
-		? "Hủy"
-		: normalizedReview
-			? "Xem đánh giá"
-			: "Đánh giá";
-	const primaryVariant = statusMeta.key === "PENDING" ? "danger" : "success";
+        try {
+            const expectedBooking = {
+                serviceName,
+                bookingDay,
+                note,
+                paymentMethodId: paymentMethod, 
+                quantity
+            };
+            
+            await openMomoPaymentForBooking(expectedBooking);
+        } catch (error) {
+            setActionError(error?.message || "Lỗi khi khởi tạo thanh toán Momo.");
+        } finally {
+            setPayingStatus(false);
+        }
+    };
 
-	return (
+    return (
         <Card className="w-100 border border-dark-subtle rounded-0 shadow-none overflow-hidden">
             <Card.Body className="p-0">
                 <Row className="g-0 align-items-stretch">
@@ -215,14 +226,49 @@ function CardHistoryBookingItem(props) {
                                 {statusMeta.label}
                             </Badge>
 
-                            {primaryVisible ? (
+                            {isPending ? (
+                                <>
+                                    <div className="d-flex w-100 gap-2">
+                                        {isMomoPayment && (
+                                            <Button
+                                                variant="primary"
+                                                onClick={handleMomoPaymentClick}
+                                                className="w-100 rounded-0"
+                                                disabled={isProcessing}
+                                            >
+                                                {payingStatus
+                                                    ? "Đang xử lý"
+                                                    : "Thanh toán"}
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <div className="d-flex w-100 gap-2">
+                                        <Button
+                                            variant="danger"
+                                            onClick={handleCancelBooking}
+                                            className={
+                                                isMomoPayment
+                                                    ? "w-100 rounded-0"
+                                                    : "w-100 rounded-0"
+                                            }
+                                            disabled={isProcessing}
+                                        >
+                                            {savingStatus
+                                                ? "Đang xử lý"
+                                                : "Hủy"}
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : isCompleted ? (
                                 <Button
-                                    variant={primaryVariant}
-                                    onClick={handlePrimaryClick}
+                                    variant="success"
+                                    onClick={() => setShowReviewModal(true)}
                                     className="w-100 rounded-0"
                                     disabled={savingStatus}
                                 >
-                                    {savingStatus ? "Đang xử lý" : primaryLabel}
+                                    {normalizedReview
+                                        ? "Xem đánh giá"
+                                        : "Đánh giá"}
                                 </Button>
                             ) : null}
                         </div>
@@ -233,12 +279,8 @@ function CardHistoryBookingItem(props) {
                 show={showChatModal}
                 onHide={() => setShowChatModal(false)}
                 currentUserId={currentUser?.id || ""}
-                partnerUserId={
-                    isProviderViewing ? companyId : ""
-                }
-                currentName={
-                    currentUser?.fullname || "Tôi"
-                }
+                partnerUserId={isProviderViewing ? companyId : ""}
+                currentName={currentUser?.fullname || "Tôi"}
                 partnerName={
                     isProviderViewing
                         ? customerName || "Khách hàng"
@@ -264,4 +306,3 @@ function CardHistoryBookingItem(props) {
 }
 
 export default CardHistoryBookingItem;
-
