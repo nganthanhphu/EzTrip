@@ -1,0 +1,97 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Quản lý người dùng</title>
+    <th:block th:replace="base :: css"></th:block>
+</head>
+
+<body class="mb-5">
+    <div th:replace="base :: header"></div>
+
+    <section class="container">
+        <h1 class="text-center text-uppercase">Danh sách người dùng</h1>
+        <form class="row mb-2">
+            <div class="col-md-3 col-12">
+                <input type="text" name="fullname" class="form-control" placeholder="Tên người dùng..." th:value="${params['fullname']}">
+            </div>
+            <div class="col-md-3 col-12">
+                <input type="text" name="phoneNumber" class="form-control" placeholder="Số điện thoại..." th:value="${params['phoneNumber']}">
+            </div>
+            <div class="col-md-3 col-12">
+                <select name="role" class="form-select">
+                    <option value="" selected>Vai trò...</option>
+                    <option th:each="role : ${roles}" th:value="${role.name}" th:text="${role.name}" th:selected="${params['role'] == role.name}"></option>
+                </select>
+            </div>
+            <div class="col-md-3 col-12">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </form>
+        <table class=" table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Avatar</th>
+                    <th>Vai trò</th>
+                    <th>Kích hoạt</th>
+                    <th>Ngày sinh</th>
+                    <th>Giới tính</th>
+                    <th>Tên công ty</th>
+                    <th>Địa chỉ</th>
+                    <th>Loại nhà cung cấp</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.fullname}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.phoneNumber}"></td>
+                    <td><img th:src="@{${user.avatar}}" alt="Avatar" style="width: 50px;"></td>
+                    <td th:text="${user.roleId.name}"></td>
+                    <td>
+                        <i th:if="${user.getIsActive()}" class="fa-solid fa-check"></i>
+                        <i th:unless="${user.getIsActive()}" class="fa-solid fa-circle-xmark"></i>
+                    </td>
+                    <td>
+                        <span th:if="${user.getCustomerProfile() != null && user.getCustomerProfile().getDob() != null}"
+                            th:text="${#dates.format(user.getCustomerProfile().getDob(), 'dd/MM/yyyy')}"></span>
+                    </td>
+                    <td th:text="${user.getCustomerProfile()?.getGenderId()?.getName()}"></td>
+                    <td th:text="${user.getProviderProfile()?.getCompanyName()}"></td>
+                    <td th:text="${user.getProviderProfile()?.getCompanyAddress()}"></td>
+                    <td th:text="${user.getProviderProfile()?.getTypeOfProviderId()?.getName()}"></td>
+                    <td>
+                        <button
+                            th:onclick="'setActiveUser(\'' + @{/admin/api/users/} + ${user.id} + '?active=true' + '\')'"
+                            th:if="${!user.getIsActive()}" class="btn btn-sm btn-success">Kích hoạt</button>
+                        <button
+                            th:onclick="'setActiveUser(\'' + @{/admin/api/users/} + ${user.id} + '?active=false' + '\')'"
+                            th:unless="${!user.getIsActive()}" class="btn btn-sm btn-danger">Hủy kích hoạt</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row mb-2">
+            <div class="col-md-6 col-12 text-start">
+                <a th:if="${currentPage > 1}"
+                    th:href="@{/admin/users(page=${currentPage - 1}, fullname=${params['fullname']}, phoneNumber=${params['phoneNumber']}, role=${params['role']})}"
+                    class="btn btn-secondary">Trang trước</a>
+            </div>
+            <div class="col-md-6 col-12 text-end">
+                <a th:href="@{/admin/users(page=${currentPage + 1}, fullname=${params['fullname']}, phoneNumber=${params['phoneNumber']}, role=${params['role']})}"
+                    class="btn btn-secondary">Trang sau</a>
+            </div>
+        </div>
+        <a th:href="@{/admin/users/create}" class="btn btn-primary w-100">Tạo người dùng mới</a>
+    </section>
+
+    <div th:replace="base :: footer"></div>
+</body>
+
+</html>
