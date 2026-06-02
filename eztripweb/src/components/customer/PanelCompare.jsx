@@ -6,7 +6,7 @@ import defaultAccommodationImage from "@assets/images/default_accommodation_item
 import defaultTourImage from "@assets/images/default_tour_item.jpg";
 import { formatCurrency } from "@utils/formatters";
 import useDebounce from "@hooks/useDebounce";
-import useInfiniteScrollList from "@hooks/useInfiniteScrollList"; // Đảm bảo import đúng đường dẫn
+import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 
 const SERVICE_CONFIG = {
 	accommodation: {
