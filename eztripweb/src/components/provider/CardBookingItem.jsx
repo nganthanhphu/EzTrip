@@ -10,33 +10,14 @@ const STATUS_META = {
 	1: { key: "PENDING", label: "Đang chờ", badge: "warning" },
 	2: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
 	3: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
-	4: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
-	PENDING: { key: "PENDING", label: "Đang chờ", badge: "warning" },
-	CONFIRMED: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
-	COMPLETED: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
-	CANCELLED: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
+	4: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" }
 };
 
 const PAYMENT_METHOD_LABELS = {
 	1: "Tiền mặt",
 	2: "Momo",
-	3: "Chuyển khoản",
-	CASH: "Tiền mặt",
-	MOMO: "Momo",
-	BANK_TRANSFER: "Chuyển khoản",
+	3: "Chuyển khoản"
 };
-
-function resolveStatusMeta(status) {
-	return STATUS_META[status] || STATUS_META[String(status).toUpperCase()] || {
-		key: String(status || ""),
-		label: status || "Trạng thái",
-		badge: "secondary",
-	};
-}
-
-function resolvePaymentMethodLabel(paymentMethod) {
-	return PAYMENT_METHOD_LABELS[paymentMethod] || PAYMENT_METHOD_LABELS[String(paymentMethod).toUpperCase()] || paymentMethod || "-";
-}
 
 function CardBookingItem(props) {
 	const { currentUser } = useAuth();
@@ -57,13 +38,10 @@ function CardBookingItem(props) {
 		paymentMethod,
 	} = props;
 
-	const statusMeta = resolveStatusMeta(status);
+	const statusMeta = STATUS_META[status];
 	const createdDateLabel = formatDateTime(createdDate) || createdDate || "-";
 	const bookingDayLabel = formatDateTime(bookingDay) || bookingDay || "-";
-	const paymentMethodLabel = resolvePaymentMethodLabel(paymentMethod);
-	const formattedAmount = Number.isFinite(Number(totalAmount))
-		? formatCurrency(Number(totalAmount))
-		: totalAmount || "-";
+	const paymentMethodLabel =  PAYMENT_METHOD_LABELS[paymentMethod] || "-";
 
 	const isPending = statusMeta.key === "PENDING";
 	const isConfirmed = statusMeta.key === "CONFIRMED";
@@ -153,7 +131,7 @@ function CardBookingItem(props) {
                         </div>
 
                         <div className="mt-2 fs-5 fw-semibold text-nowrap">
-                            {formattedAmount}
+                            {totalAmount}
                         </div>
                     </Col>
 
