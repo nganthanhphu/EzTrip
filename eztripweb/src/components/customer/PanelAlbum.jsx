@@ -1,8 +1,8 @@
 import { Card, Carousel, Image } from "react-bootstrap";
 import defaultAccommodationImage from "@assets/images/default_accommodation_item.jpg";
 
-function PanelAlbum({ images = [], urls = [], image = [] }) {
-	const sourceImages = images.length > 0 ? images : urls.length > 0 ? urls : image;
+function PanelAlbum({ images = []}) {
+	const sourceImages = images;
 	const imagesList = Array.isArray(sourceImages) && sourceImages.length > 0
 		? sourceImages.map((item) => (typeof item === "string" ? item : item?.url)).filter(Boolean)
 		: [defaultAccommodationImage];

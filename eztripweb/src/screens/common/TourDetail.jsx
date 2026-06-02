@@ -4,7 +4,7 @@ import { useAuth } from "@hooks/useAuth";
 import { Alert, Badge, Button, Card, Col, Container, ListGroup, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
-import AlbumPanel from "@components/customer/PanelAlbum";
+import PanelAlbum from "@components/customer/PanelAlbum";
 import PanelProviderInfo from "@components/customer/PanelProviderInfo";
 import ReviewPanel from "@components/customer/PanelReview";
 import PanelCompare from "@components/customer/PanelCompare";
@@ -85,7 +85,7 @@ function TourDetail() {
             <Container className="py-4">
                 <Row className="g-4 mb-4 align-items-stretch">
                     <Col xs={12} lg={4}>
-                        <AlbumPanel images={baseInfo?.images} />
+                        <PanelAlbum images={baseInfo?.images} />
                     </Col>
 
                     <Col xs={12} lg={5}>
