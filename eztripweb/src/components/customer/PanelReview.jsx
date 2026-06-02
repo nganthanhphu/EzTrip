@@ -3,7 +3,7 @@ import moment from "moment";
 import "moment/locale/vi";
 
 function PanelReview({ reviews = [] }) {
-	const reviewList = Array.isArray(reviews) ? reviews : [];
+	const reviewList = reviews;
 
 	return (
         <Card className="h-100 shadow-sm">
