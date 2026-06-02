@@ -6,7 +6,7 @@ function getServiceInfo(service) {
 	return service?.baseInfo ?? service ?? {};
 }
 
-function ModalResultCompare({ show, onHide, currentService, selectedServices = [], serviceType = "accommodation" }) {
+function ModalResultCompare({ show, onHide, currentService, selectedServices = [], serviceType}) {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [result, setResult] = useState("");
