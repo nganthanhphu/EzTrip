@@ -9,8 +9,11 @@ import MySpinner from "@components/common/MySpinner";
 import { getBookings } from "@services/customerService";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
+import { useAuth } from "@hooks/useAuth";
 
 function HistoryBookingList() {
+    const { currentUser } = useAuth();
+
     const nav = useNavigate();
     const [searchParams] = useSearchParams();
     const searchParamsString = searchParams.toString();
@@ -39,7 +42,7 @@ function HistoryBookingList() {
 
             return getBookings(params.toString());
         },
-        [debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize],
+        [currentUser?.id, debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize],
     );
 
     const {
@@ -50,7 +53,7 @@ function HistoryBookingList() {
         loadMore,
         refetch,
     } = useInfiniteScrollList({
-        queryKey: ["bookings", debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize],
+        queryKey: ["bookings", currentUser?.id, debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize],
         fetchPage: fetchBookings,
         pageSize,
     });

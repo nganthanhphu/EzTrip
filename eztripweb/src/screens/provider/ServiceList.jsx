@@ -7,6 +7,7 @@ import ModalCreateEditService from "@components/provider/ModalCreateEditService"
 import MySpinner from "@components/common/MySpinner";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
+import { useAuth } from "@hooks/useAuth";
 
 import ProviderLayout from "@layouts/ProviderLayout";
 import { getProviderServices } from "@services/providerService";
@@ -14,6 +15,8 @@ import { getProviderServices } from "@services/providerService";
 import { useQueryClient } from "@tanstack/react-query"; 
 
 function ServiceList() {
+    const { currentUser } = useAuth();
+
     const [searchText, setSearchText] = useState("");
     const [sortOption, setSortOption] = useState("");
     const [showCreateEditModal, setShowCreateEditModal] = useState(false);
@@ -29,6 +32,11 @@ function ServiceList() {
     const searchParamsString = searchParams.toString();
     const serviceCacheRef = useRef([]);
     const serviceCacheKeyRef = useRef("");
+
+    useEffect(() => {
+        serviceCacheRef.current = [];
+        serviceCacheKeyRef.current = "";
+    }, [currentUser?.id]);
 
     const fetchServices = async (pageNumber = 1) => {
         const cacheKey = [debouncedSearchText, sortBy, order].join("|");
@@ -67,6 +75,7 @@ function ServiceList() {
     } = useInfiniteScrollList({
         queryKey: [
             "provider-services",
+            currentUser?.id,
             debouncedSearchText,
             sortBy,
             order,
