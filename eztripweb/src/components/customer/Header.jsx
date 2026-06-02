@@ -17,11 +17,9 @@ function HeaderCustomer() {
                     EzTrip
                 </Link>
                 
-                {/* Nút Hamburger cho màn hình nhỏ */}
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 
                 <Navbar.Collapse id="basic-navbar-nav">
-                    {/* Nhóm menu chính: me-auto đẩy phần tử tiếp theo về bên phải */}
                     <Nav className="me-auto">
                         <Link className="nav-link" to="/accommodations">
                             Lưu trú
@@ -37,11 +35,9 @@ function HeaderCustomer() {
                         </Link>
                     </Nav>
 
-                    {/* Nhóm hồ sơ người dùng: ms-auto để nằm ở góc phải trên Desktop */}
                     <Nav className="ms-auto align-items-lg-center mt-3 mt-lg-0">
                         {currentUser ? (
                             <>
-                                {/* Bọc Avatar và Tên vào một cụm flex để không bị rớt dòng */}
                                 <div className="d-flex align-items-center px-lg-3 py-2 py-lg-0">
                                     <Image
                                         src={avatarSrc}
