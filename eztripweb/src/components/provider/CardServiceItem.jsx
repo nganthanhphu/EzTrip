@@ -7,7 +7,7 @@ function CardServiceItem(props) {
     const baseInfo = props.baseInfo || {};
     const { id, name, price, image, quantity, remainingQuantity, avgRating, reviewCount, bookingCount, companyName } = baseInfo;
     const nav = useNavigate();
-    const handleEdit = props.onEdit || (() => nav(`/provider/services/${id}/edit`));
+    const handleEdit = props.onEdit;
 
 	return (
         <Card className="w-100 border border-dark-subtle rounded-0 shadow-none overflow-hidden mb-3">
