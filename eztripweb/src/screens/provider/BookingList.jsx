@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef, useMemo } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { Alert, Container, Row, Col, Form, Badge, ProgressBar } from "react-bootstrap";
+import { useParams } from "react-router-dom";
+import { Alert, Container, Row, Col, Form, Badge, ProgressBar, Card } from "react-bootstrap";
 import InfiniteScroll from "react-infinite-scroller";
 import {
     Chart as ChartJS,
@@ -27,9 +27,6 @@ ChartJS.register(LineController, CategoryScale, LinearScale, PointElement, LineE
 
 function BookingList() {
     const { id } = useParams();
-    const nav = useNavigate();
-    const [searchParams] = useSearchParams();
-    const searchParamsString = searchParams.toString();
 
     const currentYear = new Date().getFullYear();
     const currentMonth = new Date().getMonth() + 1;
@@ -42,8 +39,8 @@ function BookingList() {
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
 
-    const [customerName, setCustomerName] = useState(searchParams.get("customerName") || "");
-    const [status, setStatus] = useState(searchParams.get("status") || "");
+    const [customerName, setCustomerName] = useState("");
+    const [status, setStatus] = useState("");
 
     const debouncedCustomerName = useDebounce(customerName);
     const debouncedStatus = useDebounce(status);
@@ -51,22 +48,6 @@ function BookingList() {
     const { lookupTables } = useLookupTables();
     const statusOptions = lookupTables.bookingStatuses || [];
     const pageSize = 5;
-
-    // --- Cập nhật URL Query Parameters (Tham số truy vấn) khi filter thay đổi ---
-    useEffect(() => {
-        const params = new URLSearchParams(searchParamsString);
-        const nextCustomerName = debouncedCustomerName.trim();
-        const nextStatus = debouncedStatus.trim();
-
-        if (nextCustomerName) params.set("customerName", nextCustomerName); else params.delete("customerName");
-        if (nextStatus) params.set("status", nextStatus); else params.delete("status");
-        params.delete("page");
-
-        const nextSearch = params.toString();
-        if (nextSearch !== searchParamsString) {
-            nav({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
-        }
-    }, [debouncedCustomerName, debouncedStatus, searchParamsString, nav]);
 
     const fetchBookings = useCallback(
         (nextPage) => {
@@ -79,10 +60,7 @@ function BookingList() {
             if (debouncedCustomerName) params.customerName = debouncedCustomerName;
             if (debouncedStatus) params.status = debouncedStatus;
 
-            return getBookings(params).then((response) => {
-                if (Array.isArray(response)) return response;
-                return response?.content || response?.items || response?.results || [];
-            });
+            return getBookings(params);
         },
         [id, debouncedCustomerName, debouncedStatus, pageSize]
     );
@@ -152,11 +130,12 @@ function BookingList() {
                     {
                         label: "Doanh thu dịch vụ",
                         data: chartConfig.dataPoints,
-                        borderColor: "#198754",
-                        backgroundColor: "rgba(25, 135, 84, 0.15)",
+                        borderColor: "#0d6efd",
+                        backgroundColor: "rgba(13, 110, 253, 0.1)",
                         fill: true,
                         tension: 0.4,
                         pointRadius: 4,
+                        pointHoverRadius: 6,
                     },
                 ],
             },
@@ -166,11 +145,18 @@ function BookingList() {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        callbacks: { label: (ctx) => formatCurrency(ctx.parsed.y) },
+                        backgroundColor: "rgba(0,0,0,0.8)",
+                        padding: 12,
+                        callbacks: { label: (ctx) => ` ${formatCurrency(ctx.parsed.y)}` },
                     },
                 },
                 scales: {
-                    y: { ticks: { callback: (val) => formatCurrency(val) } },
+                    y: { 
+                        beginAtZero: true,
+                        border: { dash: [4, 4] },
+                        grid: { color: "#e9ecef" },
+                        ticks: { callback: (val) => formatCurrency(val) } 
+                    },
                     x: { grid: { display: false } },
                 },
             }
@@ -187,107 +173,112 @@ function BookingList() {
 
     return (
         <ProviderLayout>
-            <Container className="py-4">
-                <div className="d-flex flex-column gap-2 mb-4">
-                    <h1 className="mb-0">Chi tiết & Thống kê dịch vụ</h1>
-                    <div className="text-secondary">Service ID: {id}</div>
+            <Container className="py-4 py-lg-5 max-w-1200">
+                <div className="d-flex flex-column gap-1 mb-4 pb-2 border-bottom">
+                    <h2 className="fw-bolder text-dark mb-0">Chi tiết & Thống kê dịch vụ</h2>
+                    <p className="text-muted fw-medium">Service ID: <Badge bg="secondary" className="fw-normal">{id}</Badge></p>
                 </div>
 
-                <div className="mb-5 p-4 bg-white rounded shadow-sm border">
-                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-                        <h4 className="fw-bold mb-0">Hiệu suất kinh doanh</h4>
-                        <div className="d-flex gap-2">
-                            <Form.Select value={statType} onChange={(e) => setStatType(e.target.value)} size="sm">
-                                <option value="DAY">Theo ngày</option>
-                                <option value="MONTH">Theo tháng</option>
-                                <option value="QUARTER">Theo quý</option>
-                            </Form.Select>
-                            {statType === "DAY" && (
-                                <Form.Select value={month} onChange={(e) => setMonth(Number(e.target.value))} size="sm">
-                                    {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                                        <option key={m} value={m}>Th. {m}</option>
+                <Card className="border-0 shadow-sm rounded-4 mb-5 overflow-hidden">
+                    <Card.Header className="bg-white border-bottom-0 pt-4 pb-0 px-4">
+                        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 flex-wrap">
+                            <h5 className="fw-bold text-primary mb-0">Hiệu suất kinh doanh</h5>
+                            <div className="d-flex gap-2 bg-light p-1 rounded-3">
+                                <Form.Select className="border-0 bg-transparent fw-medium shadow-none w-auto" value={statType} onChange={(e) => setStatType(e.target.value)} size="sm">
+                                    <option value="DAY">Theo ngày</option>
+                                    <option value="MONTH">Theo tháng</option>
+                                    <option value="QUARTER">Theo quý</option>
+                                </Form.Select>
+                                {statType === "DAY" && (
+                                    <Form.Select className="border-0 bg-transparent fw-medium shadow-none w-auto" value={month} onChange={(e) => setMonth(Number(e.target.value))} size="sm">
+                                        {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                                            <option key={m} value={m}>Th. {m}</option>
+                                        ))}
+                                    </Form.Select>
+                                )}
+                                <Form.Select className="border-0 bg-transparent fw-medium shadow-none w-auto" value={year} onChange={(e) => setYear(Number(e.target.value))} size="sm">
+                                    {Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map((y) => (
+                                        <option key={y} value={y}>{y}</option>
                                     ))}
                                 </Form.Select>
-                            )}
-                            <Form.Select value={year} onChange={(e) => setYear(Number(e.target.value))} size="sm">
-                                {Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map((y) => (
-                                    <option key={y} value={y}>{y}</option>
-                                ))}
-                            </Form.Select>
+                            </div>
                         </div>
+                    </Card.Header>
+                    
+                    <Card.Body className="p-4">
+                        {loadingStats ? (
+                            <div className="py-5 d-flex justify-content-center"><MySpinner /></div>
+                        ) : errorStats ? (
+                            <Alert variant="danger" className="rounded-3 border-0">{errorStats}</Alert>
+                        ) : statsData ? (
+                            <Row className="g-5">
+                                <Col xs={12} lg={8}>
+                                    <div className="mb-4">
+                                        <span className="text-muted fw-medium text-uppercase" style={{ letterSpacing: '0.5px', fontSize: '0.85rem' }}>Tổng doanh thu kỳ</span>
+                                        <h3 className="fw-black text-dark mt-1 mb-0">
+                                            {formatCurrency(statsData.totalRevenue)}
+                                        </h3>
+                                    </div>
+                                    <div style={{ height: 280, position: 'relative' }}>
+                                        <canvas ref={chartRef} />
+                                    </div>
+                                </Col>
+                                <Col xs={12} lg={4} className="d-flex flex-column justify-content-center">
+                                    <div className="p-4 bg-light rounded-4 h-100 d-flex flex-column justify-content-center gap-4">
+                                        <div>
+                                            <div className="d-flex justify-content-between align-items-end mb-2">
+                                                <span className="fw-semibold text-secondary">Xác nhận</span>
+                                                <span className="fw-bold fs-5 text-info">{statsData.totalConfirmedBooking}</span>
+                                            </div>
+                                            <ProgressBar variant="info" className="rounded-pill" style={{ height: '8px' }} now={(statsData.totalConfirmedBooking / Math.max(1, totalBookings)) * 100} />
+                                        </div>
+                                        <div>
+                                            <div className="d-flex justify-content-between align-items-end mb-2">
+                                                <span className="fw-semibold text-secondary">Hoàn thành</span>
+                                                <span className="fw-bold fs-5 text-success">{statsData.totalCompletedBooking}</span>
+                                            </div>
+                                            <ProgressBar variant="success" className="rounded-pill" style={{ height: '8px' }} now={(statsData.totalCompletedBooking / Math.max(1, totalBookings)) * 100} />
+                                        </div>
+                                        <div>
+                                            <div className="d-flex justify-content-between align-items-end mb-2">
+                                                <span className="fw-semibold text-secondary">Đã hủy</span>
+                                                <span className="fw-bold fs-5 text-danger">{statsData.totalCancelledBooking}</span>
+                                            </div>
+                                            <ProgressBar variant="danger" className="rounded-pill" style={{ height: '8px' }} now={(statsData.totalCancelledBooking / Math.max(1, totalBookings)) * 100} />
+                                        </div>
+                                    </div>
+                                </Col>
+                            </Row>
+                        ) : null}
+                    </Card.Body>
+                </Card>
+
+                <div className="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <h4 className="fw-bold mb-0">Danh sách Booking</h4>
+                    
+                    <div className="d-flex flex-column flex-sm-row gap-2" style={{ maxWidth: '600px', width: '100%' }}>
+                        <Form.Control
+                            type="text"
+                            placeholder="🔍 Nhập tên khách hàng..."
+                            value={customerName}
+                            onChange={(e) => setCustomerName(e.target.value)}
+                            className="border-0 bg-white shadow-sm rounded-3 py-2 px-3"
+                        />
+                        <Form.Select
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                            className="border-0 bg-white shadow-sm rounded-3 py-2 px-3 fw-medium text-secondary"
+                            style={{ minWidth: '180px' }}
+                        >
+                            <option value="">Tất cả trạng thái</option>
+                            {statusOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </Form.Select>
                     </div>
-
-                    {loadingStats ? (
-                        <div className="py-4 d-flex justify-content-center"><MySpinner /></div>
-                    ) : errorStats ? (
-                        <Alert variant="warning">{errorStats}</Alert>
-                    ) : statsData ? (
-                        <Row className="g-4">
-                            <Col xs={12} lg={8}>
-                                <div className="text-secondary small mb-1">Tổng doanh thu kỳ:</div>
-                                <div className="fs-4 fw-bold text-success mb-3">
-                                    {formatCurrency(statsData.totalRevenue)}
-                                </div>
-                                <div style={{ height: 250 }}>
-                                    <canvas ref={chartRef} />
-                                </div>
-                            </Col>
-                            <Col xs={12} lg={4} className="d-flex flex-column justify-content-center gap-3">
-                                <div>
-                                    <div className="d-flex justify-content-between mb-1">
-                                        <small className="fw-semibold">Xác nhận</small>
-                                        <Badge bg="info">{statsData.totalConfirmedBooking}</Badge>
-                                    </div>
-                                    <ProgressBar variant="info" now={(statsData.totalConfirmedBooking / Math.max(1, totalBookings)) * 100} />
-                                </div>
-                                <div>
-                                    <div className="d-flex justify-content-between mb-1">
-                                        <small className="fw-semibold">Hoàn thành</small>
-                                        <Badge bg="success">{statsData.totalCompletedBooking}</Badge>
-                                    </div>
-                                    <ProgressBar variant="success" now={(statsData.totalCompletedBooking / Math.max(1, totalBookings)) * 100} />
-                                </div>
-                                <div>
-                                    <div className="d-flex justify-content-between mb-1">
-                                        <small className="fw-semibold">Đã hủy</small>
-                                        <Badge bg="danger">{statsData.totalCancelledBooking}</Badge>
-                                    </div>
-                                    <ProgressBar variant="danger" now={(statsData.totalCancelledBooking / Math.max(1, totalBookings)) * 100} />
-                                </div>
-                            </Col>
-                        </Row>
-                    ) : null}
                 </div>
-
-                <h4 className="fw-bold mb-3">Danh sách Booking chi tiết</h4>
-                <Form className="mb-4">
-                    <Row className="g-3 align-items-center">
-                        <Col md={4}>
-                            <Form.Control
-                                type="text"
-                                placeholder="Tên khách hàng"
-                                value={customerName}
-                                onChange={(e) => setCustomerName(e.target.value)}
-                            />
-                        </Col>
-                        <Col md={4}>
-                            <Form.Select
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                            >
-                                <option value="">Tất cả trạng thái</option>
-                                {statusOptions.map((option) => (
-                                    <option
-                                        key={option.value}
-                                        value={option.value}
-                                    >
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </Col>
-                    </Row>
-                </Form>
 
                 {loadingBookings && !bookings.length ? (
                     <div className="py-5 d-flex justify-content-center">
@@ -303,17 +294,19 @@ function BookingList() {
                     >
                         <div className="d-flex flex-column gap-3">
                             {bookings.map((item) => (
-                                <CardBookingItem
-                                    key={item.id}
-                                    {...item}
-                                    onUpdated={() => refetch()} 
-                                />
+                                <div key={item.id} className="transition-hover">
+                                    <CardBookingItem
+                                        {...item}
+                                        onUpdated={() => refetch()} 
+                                    />
+                                </div>
                             ))}
                         </div>
                         
                         {!loadingBookings && bookings.length === 0 && (
-                            <div className="py-5 text-center text-secondary bg-light rounded border-dashed mt-3">
-                                Chưa có booking nào phù hợp với tìm kiếm.
+                            <div className="py-5 text-center bg-white rounded-4 shadow-sm mt-3 d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '200px' }}>
+                                <span className="fs-3 mb-2">📭</span>
+                                <p className="text-muted fw-medium mb-0">Chưa có booking nào phù hợp với tìm kiếm của bạn.</p>
                             </div>
                         )}
 
