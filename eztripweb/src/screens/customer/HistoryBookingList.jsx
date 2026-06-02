@@ -18,12 +18,12 @@ function HistoryBookingList() {
     const [searchParams] = useSearchParams();
     const searchParamsString = searchParams.toString();
 
-    const [serviceType, setServiceType] = useState(() => searchParams.get("serviceType") || "");
+    const [typeOfService, setServiceType] = useState(() => searchParams.get("typeOfService") || "");
     const [status, setStatus] = useState(() => searchParams.get("status") || "");
     const [serviceName, setServiceName] = useState(() => searchParams.get("serviceName") || "");
-    const debouncedServiceType = useDebounce(serviceType);
-    const debouncedStatus = useDebounce(status);
+
     const debouncedServiceName = useDebounce(serviceName);
+
     const { lookupTables } = useLookupTables();
     const typeOfServiceOptions = lookupTables.typeOfServices || [];
     const pageSize = 5;
@@ -34,15 +34,15 @@ function HistoryBookingList() {
             params.append("page", nextPage);
             params.append("size", pageSize);
 
-            if (debouncedServiceType)
-                params.append("serviceType", debouncedServiceType);
-            if (debouncedStatus) params.append("status", debouncedStatus);
+            if (typeOfService)
+                params.append("typeOfService", typeOfService);
+            if (status) params.append("status", status);
             if (debouncedServiceName)
                 params.append("serviceName", debouncedServiceName);
 
             return getBookings(params.toString());
         },
-        [currentUser?.id, debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize],
+        [currentUser?.id, typeOfService, status, debouncedServiceName, pageSize],
     );
 
     const {
@@ -53,28 +53,28 @@ function HistoryBookingList() {
         loadMore,
         refetch,
     } = useInfiniteScrollList({
-        queryKey: ["bookings", currentUser?.id, debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize],
+        queryKey: ["bookings", currentUser?.id, typeOfService, status, debouncedServiceName, pageSize],
         fetchPage: fetchBookings,
         pageSize,
     });
 
     useEffect(() => {
-        const t = searchParams.get("serviceType") || "";
+        const t = searchParams.get("typeOfService") || "";
         const s = searchParams.get("status") || "";
         const n = searchParams.get("serviceName") || "";
 
-        if (t !== serviceType) setServiceType(t);
+        if (t !== typeOfService) setServiceType(t);
         if (s !== status) setStatus(s);
         if (n !== serviceName) setServiceName(n);
     }, [searchParams.toString()]);
 
     useEffect(() => {
         const params = new URLSearchParams(searchParamsString);
-        const nextServiceType = debouncedServiceType.trim();
-        const nextStatus = debouncedStatus.trim();
+        const nextServiceType = typeOfService.trim();
+        const nextStatus = status.trim();
         const nextServiceName = debouncedServiceName.trim();
 
-        if (nextServiceType) params.set("serviceType", nextServiceType); else params.delete("serviceType");
+        if (nextServiceType) params.set("typeOfService", nextServiceType); else params.delete("typeOfService");
         if (nextStatus) params.set("status", nextStatus); else params.delete("status");
         if (nextServiceName) params.set("serviceName", nextServiceName); else params.delete("serviceName");
         params.delete("page");
@@ -83,7 +83,7 @@ function HistoryBookingList() {
         if (nextSearch !== searchParamsString) {
             nav({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
         }
-    }, [debouncedServiceType, debouncedStatus, debouncedServiceName, searchParamsString, nav]);
+    }, [typeOfService, status, debouncedServiceName, searchParamsString, nav]);
 
     return (
         <CustomerLayout>
@@ -100,7 +100,7 @@ function HistoryBookingList() {
                         </Col>
                         <Col md={4}>
                             <Form.Select
-                                value={serviceType}
+                                value={typeOfService}
                                 onChange={(e) => setServiceType(e.target.value)}
                             >
                                 <option value="">Loại dịch vụ</option>
