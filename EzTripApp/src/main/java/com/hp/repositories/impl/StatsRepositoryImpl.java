@@ -39,7 +39,7 @@ public class StatsRepositoryImpl implements StatsRepository {
     private LocalSessionFactoryBean factory;
 
     @Override
-    public int getServiceCount(int year, Integer providerId, Integer serviceId, Integer month) {
+    public int getServiceCount(int year, Integer providerId, Integer serviceId, Integer month, boolean isOnlyActive) {
         Session s = this.factory.getObject().getCurrentSession();
         CriteriaBuilder b = s.getCriteriaBuilder();
         CriteriaQuery<Long> q = b.createQuery(Long.class);
@@ -62,6 +62,10 @@ public class StatsRepositoryImpl implements StatsRepository {
 
         if (month != null) {
             predicates.add(b.equal(b.function("MONTH", Integer.class, booking.get("createdDate")), month));
+        }
+
+        if (isOnlyActive) {
+            predicates.add(b.isTrue(service.get("isActive")));
         }
 
         q.where(predicates.toArray(Predicate[]::new));
