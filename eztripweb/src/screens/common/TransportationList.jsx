@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react"; // Đã thêm useCallback
 import { Container, Row, Col, Form } from "react-bootstrap";
 import InfiniteScroll from "react-infinite-scroller";
 import CustomerLayout from "@layouts/CustomerLayout";
@@ -38,6 +38,8 @@ function TransportationList() {
     const { currentUser } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    
+    const searchParamsString = searchParams.toString();
 
     function buildBookingTransportation(option) {
         const baseInfo = option?.baseInfo || {};
@@ -57,25 +59,42 @@ function TransportationList() {
         };
     }
 
-    const fetchTransportations = async (pageNumber = 1) => {
-        const response = await getTransportations({
-            departureLocation: debouncedDepartureLocation.trim(),
-            arrivalLocation: debouncedArrivalLocation.trim(),
-            type: debouncedTypeOfTransportation,
-            departureTime: debouncedDepartureTime,
-            fromPrice: debouncedFromPrice,
-            toPrice: debouncedToPrice,
-            rating: debouncedRating,
+    const fetchPage = useCallback(
+        (nextPage) => {
+            const params = new URLSearchParams();
+
+            if (debouncedDepartureLocation.trim()) params.append("departureLocation", debouncedDepartureLocation.trim());
+            if (debouncedArrivalLocation.trim()) params.append("arrivalLocation", debouncedArrivalLocation.trim());
+            if (debouncedTypeOfTransportation) params.append("type", debouncedTypeOfTransportation);
+            if (debouncedDepartureTime) params.append("departureTime", debouncedDepartureTime);
+            if (debouncedFromPrice) params.append("fromPrice", debouncedFromPrice);
+            if (debouncedToPrice) params.append("toPrice", debouncedToPrice);
+            if (debouncedRating) params.append("rating", debouncedRating);
+            if (sortBy) params.append("sortBy", sortBy);
+            if (order) params.append("order", order);
+            
+            params.append("page", nextPage);
+            params.append("size", pageSize);
+
+            return getTransportations(params.toString()).then((response) => {
+                return Array.isArray(response)
+                    ? response
+                    : response?.content || response?.items || response?.results || [];
+            });
+        },
+        [
+            debouncedDepartureLocation,
+            debouncedArrivalLocation,
+            debouncedTypeOfTransportation,
+            debouncedDepartureTime,
+            debouncedFromPrice,
+            debouncedToPrice,
+            debouncedRating,
             sortBy,
             order,
-            page: pageNumber,
-            size: pageSize,
-        });
-
-        return Array.isArray(response)
-            ? response
-            : response?.content || response?.items || response?.results || [];
-    };
+            pageSize
+        ]
+    );
 
     const {
         items: transportationList,
@@ -84,14 +103,24 @@ function TransportationList() {
         hasMore,
         loadMore,
     } = useInfiniteScrollList({
-        queryKey: ["transportations", debouncedDepartureLocation, debouncedArrivalLocation, debouncedTypeOfTransportation, debouncedDepartureTime, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize],
-        fetchPage: fetchTransportations,
+        queryKey: [
+            "transportations", 
+            debouncedDepartureLocation, 
+            debouncedArrivalLocation, 
+            debouncedTypeOfTransportation, 
+            debouncedDepartureTime, 
+            debouncedFromPrice, 
+            debouncedToPrice, 
+            debouncedRating, 
+            sortBy, 
+            order, 
+            pageSize
+        ],
+        fetchPage, 
         pageSize,
     });
-    const searchParamsString = searchParams.toString();
 
     useEffect(() => {
-        const qName = searchParams.get("name") || "";
         const qDeparture = searchParams.get("departureLocation") || "";
         const qArrival = searchParams.get("arrivalLocation") || "";
         const qType = searchParams.get("type") || "";
@@ -135,8 +164,6 @@ function TransportationList() {
             navigate({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
         }
     }, [debouncedDepartureLocation, debouncedArrivalLocation, debouncedTypeOfTransportation, debouncedDepartureTime, debouncedFromPrice, debouncedToPrice, debouncedRating, sortOption, searchParamsString, navigate]);
-
-    
 
     function handleSelectTransportation(option) {
         if (!currentUser) {

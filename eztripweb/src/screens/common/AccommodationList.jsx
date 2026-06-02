@@ -31,20 +31,24 @@ function AccommodationList() {
 
     const pageSize = 5;
     const fetchPage = useCallback(
-        (nextPage) =>
-            getAccommodations({
-                name: debouncedName.trim(),
-                location: debouncedLocation.trim(),
-                fromPrice: debouncedFromPrice,
-                toPrice: debouncedToPrice,
-                rating: debouncedRating,
-                sortBy,
-                order,
-                page: nextPage,
-                size: pageSize,
-            }),
-        [debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize]
-    );
+    (nextPage) => {
+        const params = new URLSearchParams();
+        
+        if (debouncedName.trim()) params.append("name", debouncedName.trim());
+        if (debouncedLocation.trim()) params.append("location", debouncedLocation.trim());
+        if (debouncedFromPrice) params.append("fromPrice", debouncedFromPrice);
+        if (debouncedToPrice) params.append("toPrice", debouncedToPrice);
+        if (debouncedRating) params.append("rating", debouncedRating);
+        if (sortBy) params.append("sortBy", sortBy);
+        if (order) params.append("order", order);
+        
+        params.append("page", nextPage);
+        params.append("size", pageSize);
+
+        return getAccommodations(params.toString());
+    },
+    [debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize]
+);
 
     const {
         items: accommodationList,

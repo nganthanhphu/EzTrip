@@ -29,21 +29,25 @@ function TourList() {
 
     const pageSize = 5;
     const fetchPage = useCallback(
-        (nextPage) =>
-            getTourisms({
-                name: debouncedName.trim(),
-                location: debouncedLocation.trim(),
-                tourDuration: debouncedTourDuration,
-                fromPrice: debouncedFromPrice,
-                toPrice: debouncedToPrice,
-                rating: debouncedRating,
-                sortBy,
-                order,
-                page: nextPage,
-                size: pageSize,
-            }),
-        [debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize]
-    );
+    (nextPage) => {
+        const params = new URLSearchParams();
+
+        if (debouncedName.trim()) params.append("name", debouncedName.trim());
+        if (debouncedLocation.trim()) params.append("location", debouncedLocation.trim());
+        if (debouncedTourDuration) params.append("tourDuration", debouncedTourDuration);
+        if (debouncedFromPrice) params.append("fromPrice", debouncedFromPrice);
+        if (debouncedToPrice) params.append("toPrice", debouncedToPrice);
+        if (debouncedRating) params.append("rating", debouncedRating);
+        if (sortBy) params.append("sortBy", sortBy);
+        if (order) params.append("order", order);
+        
+        params.append("page", nextPage);
+        params.append("size", pageSize);
+
+        return getTourisms(params.toString());
+    },
+    [debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize]
+);
 
     const {
         items: tourList,

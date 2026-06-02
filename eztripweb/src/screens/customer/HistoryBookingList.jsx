@@ -23,29 +23,19 @@ function HistoryBookingList() {
 
     const fetchBookings = React.useCallback(
         (nextPage) => {
-            const params = {
-                page: nextPage,
-                size: pageSize,
-            };
+            const params = new URLSearchParams();
+            params.append("page", nextPage);
+            params.append("size", pageSize);
 
-            if (debouncedServiceType) {
-                params.serviceType = Number(debouncedServiceType);
-            }
+            if (debouncedServiceType)
+                params.append("serviceType", debouncedServiceType);
+            if (debouncedStatus) params.append("status", debouncedStatus);
+            if (debouncedServiceName)
+                params.append("serviceName", debouncedServiceName);
 
-            if (debouncedStatus) {
-                params.status = debouncedStatus;
-            }
-
-            if (debouncedServiceName) {
-                params.serviceName = debouncedServiceName;
-            }
-
-            return getBookings(params).then((response) => {
-                if (Array.isArray(response)) return response;
-                return response?.content || response?.items || response?.results || [];
-            });
+            return getBookings(params.toString());
         },
-        [debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize]
+        [debouncedServiceType, debouncedStatus, debouncedServiceName, pageSize],
     );
 
     const {
