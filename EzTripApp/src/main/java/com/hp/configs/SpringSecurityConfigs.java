@@ -47,6 +47,7 @@ public class SpringSecurityConfigs {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/admin").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll())
                 .formLogin(form -> form.loginPage("/admin/login")
@@ -54,7 +55,7 @@ public class SpringSecurityConfigs {
                         .defaultSuccessUrl("/admin", true)
                         .failureUrl("/admin/login?error=true")
                         .permitAll())
-                .logout((logout) -> logout.logoutSuccessUrl("/admin/login").permitAll());
+                .logout((logout) -> logout.logoutUrl("/admin/logout").logoutSuccessUrl("/admin").permitAll());
         return http.build();
     }
 
