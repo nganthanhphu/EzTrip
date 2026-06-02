@@ -11,6 +11,7 @@ import com.hp.pojo.Review;
 import com.hp.repositories.ReviewRepository;
 import com.hp.services.ResourceAuthorizationService;
 import com.hp.services.ReviewService;
+import com.hp.utils.UserUtils;
 
 import jakarta.transaction.Transactional;
 
@@ -44,6 +45,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public void addReview(ReviewCreateDTO review, int bookingId) {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         Booking booking = this.resourceAuthorizationService.getBookingForReview(bookingId);
 
         if (!"COMPLETED".equals(booking.getStatusId().getName())) {
