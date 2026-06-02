@@ -56,12 +56,14 @@ public class ApiUserController {
             }
 
             Integer providerId = null;
+            String providerType = null;
             if (user.getProviderProfile() != null) {
                 providerId = user.getProviderProfile().getId();
+                providerType = user.getProviderProfile().getTypeOfProviderId().getName();
             }
 
             try {
-                String token = this.jwtUtils.generateToken(user.getId(), customerId, providerId, user.getPhoneNumber(),
+                String token = this.jwtUtils.generateToken(user.getId(), customerId, providerId, providerType, user.getPhoneNumber(),
                         user.getRoleId().getName());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {

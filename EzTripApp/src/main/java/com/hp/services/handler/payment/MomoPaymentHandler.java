@@ -4,6 +4,8 @@
  */
 package com.hp.services.handler.payment;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -44,7 +46,8 @@ public class MomoPaymentHandler implements PaymentHandler {
         String secretKey = this.env.getProperty("MOMO_SECRET_KEY");
         String requestId = UUID.randomUUID().toString();
         Long amount = booking.getTotalAmount().longValue();
-        String orderId = String.valueOf(booking.getId());
+        String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        String orderId = String.format("%s%s", dateTime, String.valueOf(booking.getId()));
         String orderInfo = "Thanh toán cho dịch vụ: " + booking.getServiceId().getName();
         String ipnUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/momo/ipn").toUriString();
@@ -86,8 +89,8 @@ public class MomoPaymentHandler implements PaymentHandler {
     @Override
     public void handlePaymentResult(Map<String, String> ipnRequest) {
         if (ipnRequest.get("resultCode").equals("0")) {
-
-            int bookingId = Integer.parseInt(ipnRequest.get("orderId"));
+            String orderId = ipnRequest.get("orderId");
+            int bookingId = Integer.parseInt(orderId.substring(14));
             Booking booking = this.bookingRepository.getBookingById(bookingId);
 
             if (booking == null || !booking.getStatusId().getName().equals("PENDING"))
@@ -98,7 +101,6 @@ public class MomoPaymentHandler implements PaymentHandler {
             Long amount = booking.getTotalAmount().longValue();
             String extraData = "";
             String message = ipnRequest.get("message");
-            String orderId = String.valueOf(booking.getId());
             String orderInfo = "Thanh toán cho dịch vụ: " + booking.getServiceId().getName();
             String orderType = "momo_wallet";
             String partnerCode = this.env.getProperty("MOMO_PARTNER_CODE");

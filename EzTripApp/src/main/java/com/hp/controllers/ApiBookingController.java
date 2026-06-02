@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,18 +37,21 @@ public class ApiBookingController {
     @Autowired
     private BookingService bookingService;
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/secure/bookings")
     @ResponseStatus(HttpStatus.CREATED)
     public void createBooking(@RequestBody BookingCreateDTO booking) {
         this.bookingService.addBooking(booking);
     }
 
+    @PreAuthorize("hasRole('PROVIDER') or hasRole('CUSTOMER')")
     @GetMapping("/secure/bookings")
     public ResponseEntity<List<BookingViewDTO>> getBooking(@RequestParam Map<String, String> params) {
         List<BookingViewDTO> bookings = this.bookingService.getBookings(params);
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('PROVIDER')")
     @PatchMapping("/secure/bookings/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateBooking(@PathVariable(value = "id") int id, @RequestBody BookingUpdateDTO booking) {

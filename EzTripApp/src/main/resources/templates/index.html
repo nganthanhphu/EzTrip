@@ -5,11 +5,12 @@
         <title>Trang chủ</title>
     <th:block th:replace="base :: css"></th:block>
 </head>
-<body>
+<body class="mb-5">
     <div th:replace="base :: header"></div>
 
     <section class="container">
         <h1>Chào mừng đến với EzTrip Admin Dashboard</h1>
+        <h5 sec:authorize="isAnonymous()">Vui lòng <a class="text-danger" th:href="@{/admin/login}">đăng nhập</a> để tiếp tục!</h5>
     </section>
 
     <div th:replace="base :: footer"></div>

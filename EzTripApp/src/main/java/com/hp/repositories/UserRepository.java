@@ -4,6 +4,9 @@
  */
 package com.hp.repositories;
 
+import java.util.List;
+import java.util.Map;
+
 import com.hp.pojo.BaseUser;
 
 /**
@@ -13,6 +16,8 @@ import com.hp.pojo.BaseUser;
 public interface UserRepository {
     BaseUser getUserByPhone(String phoneNumber);
     BaseUser addOrUpdateUser(BaseUser u);
+    List<BaseUser> getUsers(Map<String, String> params);
     BaseUser authenticate(String phoneNumber, String password);
+    BaseUser getUserById(Integer userId);
     
 }

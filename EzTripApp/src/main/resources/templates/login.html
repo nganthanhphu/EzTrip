@@ -5,12 +5,12 @@
         <title>Đăng nhập</title>
         <th:block th:replace="base :: css"></th:block>
     </head>
-    <body>
+    <body class="mb-5">
         <div th:replace="base :: header"></div>
 
         <section class="container">
             <h1>Đăng nhập</h1>
-            <form th:action="@{/login}" method="post">
+            <form th:action="@{/admin/login}" method="post">
                 <div class="mb-3">
                     <label for="username" class="form-label">Tên người dùng</label>
                     <input type="text" class="form-control" id="username" name="username" required>

@@ -47,7 +47,8 @@ public class BookingRepositoryImpl implements BookingRepository {
         Query<Booking> query = s.createQuery("""
                 SELECT b
                 FROM Booking b
-                LEFT JOIN FETCH b.serviceId
+                LEFT JOIN FETCH b.serviceId s
+                LEFT JOIN FETCH s.providerId
                 LEFT JOIN FETCH b.statusId
                 LEFT JOIN FETCH b.paymentMethodId
                 LEFT JOIN FETCH b.review

@@ -5,6 +5,7 @@
 package com.hp.repositories.impl;
 
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
@@ -27,7 +28,15 @@ public class ImageRepositoryImpl implements ImageRepository {
     @Override
     public Image getImageById(Integer id) {
         Session s = this.factory.getObject().getCurrentSession();
-        return s.get(Image.class, id);
+        Query<Image> query = s.createQuery("""
+                SELECT i
+                FROM Image i
+                LEFT JOIN FETCH i.serviceId s
+                LEFT JOIN FETCH s.providerId
+                WHERE i.id = :id
+                """, Image.class);
+        query.setParameter("id", id);
+        return query.uniqueResult();
     }
 
     @Override

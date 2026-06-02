@@ -12,6 +12,8 @@ import com.hp.dto.user.UserCreateDTO;
 import com.hp.dto.user.UserUpdateDTO;
 import com.hp.dto.user.UserViewDTO;
 import com.hp.pojo.BaseUser;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -21,5 +23,7 @@ public interface UserService extends UserDetailsService {
     UserViewDTO getUserByPhone(String phoneNumber);
     UserViewDTO addUser(UserCreateDTO request) throws ParseException;
     UserViewDTO updateUser(UserUpdateDTO request) throws ParseException;
+    List<BaseUser> getUsers(Map<String, String> params);
+    void setActive(Integer userId, boolean active);
     BaseUser authenticate(String phoneNumber, String password);
 }

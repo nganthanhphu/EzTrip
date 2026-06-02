@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hp.pojo.Image;
 import com.hp.repositories.ImageRepository;
 import com.hp.services.ImageService;
+import com.hp.services.ResourceAuthorizationService;
 
 /**
  *
@@ -18,16 +19,17 @@ import com.hp.services.ImageService;
  */
 @Service
 @Transactional
-public class ImageServiceImpl implements ImageService{
-    
+public class ImageServiceImpl implements ImageService {
+
     @Autowired
     private ImageRepository imageRepository;
 
+    @Autowired
+    private ResourceAuthorizationService resourceAuthorizationService;
+
     @Override
     public void deleteImageById(Integer id) {
-        Image image = this.imageRepository.getImageById(id);
-        if (image != null) {
-            this.imageRepository.deleteImage(image);
-        }
+        Image image = this.resourceAuthorizationService.getImageForUpdate(id);
+        this.imageRepository.deleteImage(image);
     }
 }

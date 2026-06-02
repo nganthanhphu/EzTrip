@@ -24,6 +24,7 @@ import com.hp.utils.UserUtils;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -72,14 +73,17 @@ public class UserServiceImpl implements UserService {
         }
 
         Integer providerId = null;
+        String providerType = null;
         if (user.getProviderProfile() != null) {
             providerId = user.getProviderProfile().getId();
+            providerType = user.getProviderProfile().getTypeOfProviderId().getName();
         }
 
         Set<GrantedAuthority> authorities = new HashSet<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRoleId().getName()));
 
-        return new MyUserDetails(user.getId(), customerId, providerId, user.getPhoneNumber(), user.getPassword(),
+        return new MyUserDetails(user.getId(), customerId, providerId, providerType, user.getPhoneNumber(),
+                user.getPassword(),
                 authorities);
     }
 
@@ -125,7 +129,7 @@ public class UserServiceImpl implements UserService {
         String currentUserPhoneNumber = UserUtils.getCurrentUserDetails().getUsername();
 
         BaseUser currentUser = this.userRepository.getUserByPhone(currentUserPhoneNumber);
-        
+
         if (request.fullname() != null && !request.fullname().isEmpty())
             currentUser.setFullname(request.fullname());
 
@@ -162,6 +166,20 @@ public class UserServiceImpl implements UserService {
             handler.handleProfileUpdate(currentUser, request);
 
         return toUserProfileDTO(this.userRepository.addOrUpdateUser(currentUser));
+    }
+
+    @Override
+    public List<BaseUser> getUsers(Map<String, String> params) {
+        return this.userRepository.getUsers(params);
+    }
+
+    @Override
+    public void setActive(Integer userId, boolean active) {
+        BaseUser user = this.userRepository.getUserById(userId);
+        if (user != null) {
+            user.setIsActive(active);
+            this.userRepository.addOrUpdateUser(user);
+        }
     }
 
     @Override

@@ -1,0 +1,138 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thêm người dùng</title>
+    <th:block th:replace="base :: css"></th:block>
+</head>
+
+<body class="mb-5">
+    <div th:replace="base :: header"></div>
+
+    <section class="container">
+        <h1 class="text-center text-uppercase">Thêm người dùng</h1>
+
+        <form class="row" method="post" th:object="${user}" th:action="@{/admin/users/create}"
+            enctype="multipart/form-data">
+            <div class="form-group mb-2">
+                <label for="fullname">Họ tên:</label>
+                <input type="text" class="form-control" placeholder="Nhập họ và tên" id="fullname"
+                    th:field="*{fullname}" required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" placeholder="Nhập email" id="email" th:field="*{email}"
+                    required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="phoneNumber">Số điện thoại:</label>
+                <input type="text" class="form-control" placeholder="Nhập số điện thoại" id="phoneNumber"
+                    th:field="*{phoneNumber}" required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="password">Mật khẩu:</label>
+                <input type="password" class="form-control" placeholder="Nhập mật khẩu" id="password"
+                    th:field="*{password}" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+                    title="Mật khẩu phải dài ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và chữ số." required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="confirmpwd">Xác nhận mật khẩu:</label>
+                <input type="password" class="form-control" placeholder="Xác nhận mật khẩu" id="confirmpwd" required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="role">Vai trò:</label>
+                <select class="form-control" id="role" th:field="*{role}" required onchange="handleRoleChange()">
+                    <option th:each="role : ${roles}" th:if="${role.name != 'ADMIN'}" th:value="${role.id}"
+                        th:text="${role.name}"></option>
+                </select>
+            </div>
+            <div class="form-group mb-2">
+                <label for="gender">Giới tính:</label>
+                <select class="form-control" id="gender" th:field="*{gender}" disabled>
+                    <option th:each="gender : ${genders}" th:value="${gender.id}" th:text="${gender.name}"></option>
+                </select>
+            </div>
+            <div class="form-group mb-2">
+                <label for="dob">Ngày sinh:</label>
+                <input type="date" class="form-control" id="dob" th:field="*{dob}" disabled>
+            </div>
+            <div class="form-group mb-2">
+                <label for="companyName">Tên công ty:</label>
+                <input type="text" class="form-control" placeholder="Nhập tên công ty" id="companyName"
+                    th:field="*{companyName}" disabled required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="companyAddress">Địa chỉ công ty:</label>
+                <input type="text" class="form-control" placeholder="Nhập địa chỉ công ty" id="companyAddress"
+                    th:field="*{companyAddress}" disabled required>
+            </div>
+            <div class="form-group mb-2">
+                <label for="typeOfProvider">Loại nhà cung cấp:</label>
+                <select class="form-control" id="typeOfProvider" th:field="*{typeOfProvider}" disabled required>
+                    <option value="" disabled selected>Chọn loại nhà cung cấp</option>
+                    <option th:each="type : ${typesOfProviders}" th:value="${type.id}" th:text="${type.name}"></option>
+                </select>
+            </div>
+            <div class="form-group mb-2">
+                <label for="avatar">Avatar:</label>
+                <input type="file" class="form-control" id="avatar" th:field="*{avatar}">
+            </div>
+            <div class="form-group mb-2">
+                <button type="submit" class="btn btn-primary" onclick="handleSubmit(event)">Tạo người dùng</button>
+            </div>
+
+        </form>
+
+    </section>
+
+    <div th:replace="base :: footer"></div>
+</body>`
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        handleRoleChange();
+    });
+
+
+    function toggleCompanyFields(value) {
+        const roleSelect = document.getElementById('role');
+        document.getElementById('companyName').disabled = value;
+        document.getElementById('companyAddress').disabled = value;
+        document.getElementById('typeOfProvider').disabled = value;
+    }
+
+    function toggleCustomerFields(value) {
+        const roleSelect = document.getElementById('role');
+        document.getElementById('gender').disabled = value;
+        document.getElementById('dob').disabled = value;
+    }
+
+    function handleRoleChange() {
+        const roleSelect = document.getElementById('role');
+        const selectedRole = roleSelect.options[roleSelect.selectedIndex].text;
+
+        if (selectedRole === 'CUSTOMER') {
+            toggleCompanyFields(true);
+            toggleCustomerFields(false);
+        } else if (selectedRole === 'PROVIDER') {
+            toggleCompanyFields(false);
+            toggleCustomerFields(true);
+        } else {
+            toggleCompanyFields(false);
+            toggleCustomerFields(false);
+        }
+    }
+
+    function handleSubmit(event) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmpwd').value;
+
+        if (password !== confirmPassword) {
+            event.preventDefault();
+            alert('Mật khẩu và xác nhận mật khẩu không khớp!');
+        }
+    }
+
+</script>
+
+</html>

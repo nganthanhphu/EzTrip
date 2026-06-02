@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hp.pojo.Booking;
-import com.hp.repositories.BookingRepository;
 import com.hp.services.PaymentService;
+import com.hp.services.ResourceAuthorizationService;
 import com.hp.services.handler.payment.PaymentHandler;
 
 /**
@@ -25,18 +25,14 @@ import com.hp.services.handler.payment.PaymentHandler;
 public class PaymentServiceimpl implements PaymentService {
 
     @Autowired
-    private BookingRepository bookingRepository;
+    private ResourceAuthorizationService resourceAuthorizationService;
 
     @Autowired
     private Map<String, PaymentHandler> paymentHandlers;
 
     @Override
     public String createPaymentLink(int bookingId, String redirectUrl) {
-        Booking booking = this.bookingRepository.getBookingById(bookingId);
-
-        if (booking == null) {
-            throw new IllegalArgumentException("Booking không tồn tại!");
-        }
+        Booking booking = this.resourceAuthorizationService.getBookingForPayment(bookingId);
 
         if (!booking.getStatusId().getName().equals("PENDING"))
             throw new IllegalStateException("Booking này đã thanh toán, hoàn thành hoặc bị hủy!");

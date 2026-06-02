@@ -1,4 +1,4 @@
-package com.hp.controllers;
+package com.hp.controllers.admin;
 
 import java.util.Map;
 
