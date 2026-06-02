@@ -27,13 +27,14 @@ function TransportationList() {
     const [toPrice, setToPrice] = useState(() => searchParams.get("toPrice") || "");
     const [rating, setRating] = useState(() => searchParams.get("rating") || "");
     const [sortOption, setSortOption] = useState(() => searchParams.get("sort") || "");
+
     const debouncedDepartureLocation = useDebounce(departureLocation);
     const debouncedArrivalLocation = useDebounce(arrivalLocation);
-    const debouncedTypeOfTransportation = useDebounce(typeOfTransportation);
     const debouncedDepartureTime = useDebounce(departureTime);
     const debouncedFromPrice = useDebounce(fromPrice);
     const debouncedToPrice = useDebounce(toPrice);
     const debouncedRating = useDebounce(rating);
+    
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedTransportation, setSelectedTransportation] = useState(null);
@@ -65,7 +66,7 @@ function TransportationList() {
 
             if (debouncedDepartureLocation.trim()) params.append("departureLocation", debouncedDepartureLocation.trim());
             if (debouncedArrivalLocation.trim()) params.append("arrivalLocation", debouncedArrivalLocation.trim());
-            if (debouncedTypeOfTransportation) params.append("type", debouncedTypeOfTransportation);
+            if (typeOfTransportation) params.append("type", typeOfTransportation);
             if (debouncedDepartureTime) params.append("departureTime", debouncedDepartureTime);
             if (debouncedFromPrice) params.append("fromPrice", debouncedFromPrice);
             if (debouncedToPrice) params.append("toPrice", debouncedToPrice);
@@ -85,7 +86,7 @@ function TransportationList() {
         [
             debouncedDepartureLocation,
             debouncedArrivalLocation,
-            debouncedTypeOfTransportation,
+            typeOfTransportation,
             debouncedDepartureTime,
             debouncedFromPrice,
             debouncedToPrice,
@@ -107,7 +108,7 @@ function TransportationList() {
             "transportations", 
             debouncedDepartureLocation, 
             debouncedArrivalLocation, 
-            debouncedTypeOfTransportation, 
+            typeOfTransportation, 
             debouncedDepartureTime, 
             debouncedFromPrice, 
             debouncedToPrice, 
@@ -151,7 +152,7 @@ function TransportationList() {
 
         if (nextDepartureLocation) params.set("departureLocation", nextDepartureLocation); else params.delete("departureLocation");
         if (nextArrivalLocation) params.set("arrivalLocation", nextArrivalLocation); else params.delete("arrivalLocation");
-        if (debouncedTypeOfTransportation) params.set("type", debouncedTypeOfTransportation); else params.delete("type");
+        if (typeOfTransportation) params.set("type", typeOfTransportation); else params.delete("type");
         if (nextDepartureTime) params.set("departureTime", nextDepartureTime); else params.delete("departureTime");
         if (nextFromPrice) params.set("fromPrice", nextFromPrice); else params.delete("fromPrice");
         if (nextToPrice) params.set("toPrice", nextToPrice); else params.delete("toPrice");
@@ -163,7 +164,7 @@ function TransportationList() {
         if (nextSearch !== searchParamsString) {
             navigate({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
         }
-    }, [debouncedDepartureLocation, debouncedArrivalLocation, debouncedTypeOfTransportation, debouncedDepartureTime, debouncedFromPrice, debouncedToPrice, debouncedRating, sortOption, searchParamsString, navigate]);
+    }, [debouncedDepartureLocation, debouncedArrivalLocation, typeOfTransportation, debouncedDepartureTime, debouncedFromPrice, debouncedToPrice, debouncedRating, sortOption, searchParamsString, navigate]);
 
     function handleSelectTransportation(option) {
         if (!currentUser) {
