@@ -15,14 +15,18 @@ import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
 
 function TransportationList() {
-    const [departureLocation, setDepartureLocation] = useState("");
-    const [arrivalLocation, setArrivalLocation] = useState("");
-    const [typeOfTransportation, setTypeOfTransportation] = useState("");
-    const [departureTime, setDepartureTime] = useState("");
-    const [fromPrice, setFromPrice] = useState("");
-    const [toPrice, setToPrice] = useState("");
-    const [rating, setRating] = useState("");
-    const [sortOption, setSortOption] = useState("");
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const searchParamsString = searchParams.toString();
+
+    const [departureLocation, setDepartureLocation] = useState(() => searchParams.get("departureLocation") || "");
+    const [arrivalLocation, setArrivalLocation] = useState(() => searchParams.get("arrivalLocation") || "");
+    const [typeOfTransportation, setTypeOfTransportation] = useState(() => searchParams.get("type") || "");
+    const [departureTime, setDepartureTime] = useState(() => searchParams.get("departureTime") || "");
+    const [fromPrice, setFromPrice] = useState(() => searchParams.get("fromPrice") || "");
+    const [toPrice, setToPrice] = useState(() => searchParams.get("toPrice") || "");
+    const [rating, setRating] = useState(() => searchParams.get("rating") || "");
+    const [sortOption, setSortOption] = useState(() => searchParams.get("sort") || "");
     const debouncedDepartureLocation = useDebounce(departureLocation);
     const debouncedArrivalLocation = useDebounce(arrivalLocation);
     const debouncedTypeOfTransportation = useDebounce(typeOfTransportation);
@@ -36,10 +40,6 @@ function TransportationList() {
     const { lookupTables } = useLookupTables();
     const pageSize = 5;
     const { currentUser } = useAuth();
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    
-    const searchParamsString = searchParams.toString();
 
     function buildBookingTransportation(option) {
         const baseInfo = option?.baseInfo || {};

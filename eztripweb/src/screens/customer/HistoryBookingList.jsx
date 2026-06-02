@@ -11,9 +11,13 @@ import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
 
 function HistoryBookingList() {
-    const [serviceType, setServiceType] = useState("");
-    const [status, setStatus] = useState("");
-    const [serviceName, setServiceName] = useState("");
+    const nav = useNavigate();
+    const [searchParams] = useSearchParams();
+    const searchParamsString = searchParams.toString();
+
+    const [serviceType, setServiceType] = useState(() => searchParams.get("serviceType") || "");
+    const [status, setStatus] = useState(() => searchParams.get("status") || "");
+    const [serviceName, setServiceName] = useState(() => searchParams.get("serviceName") || "");
     const debouncedServiceType = useDebounce(serviceType);
     const debouncedStatus = useDebounce(status);
     const debouncedServiceName = useDebounce(serviceName);
@@ -50,9 +54,6 @@ function HistoryBookingList() {
         fetchPage: fetchBookings,
         pageSize,
     });
-    const nav = useNavigate();
-    const [searchParams] = useSearchParams();
-    const searchParamsString = searchParams.toString();
 
     useEffect(() => {
         const t = searchParams.get("serviceType") || "";

@@ -11,21 +11,21 @@ import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
 
 function AccommodationList() {
-    const [name, setName] = useState("");
-    const [location, setLocation] = useState("");
-    const [fromPrice, setFromPrice] = useState("");
-    const [toPrice, setToPrice] = useState("");
-    const [rating, setRating] = useState("");
-    const [sortOption, setSortOption] = useState("");
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const searchParamsString = searchParams.toString();
+    
+    const [name, setName] = useState(() => searchParams.get("name") || "");
+    const [location, setLocation] = useState(() => searchParams.get("location") || "");
+    const [fromPrice, setFromPrice] = useState(() => searchParams.get("fromPrice") || "");
+    const [toPrice, setToPrice] = useState(() => searchParams.get("toPrice") || "");
+    const [rating, setRating] = useState(() => searchParams.get("rating") || "");
+    const [sortOption, setSortOption] = useState(() => searchParams.get("sort") || "");
     const debouncedName = useDebounce(name);
     const debouncedLocation = useDebounce(location);
     const debouncedFromPrice = useDebounce(fromPrice);
     const debouncedToPrice = useDebounce(toPrice);
     const debouncedRating = useDebounce(rating);
-
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const searchParamsString = searchParams.toString();
 
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 

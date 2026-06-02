@@ -11,13 +11,17 @@ import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
 
 function TourList() {
-    const [name, setName] = useState("");
-    const [location, setLocation] = useState("");
-    const [tourDuration, setTourDuration] = useState("");
-    const [fromPrice, setFromPrice] = useState("");
-    const [toPrice, setToPrice] = useState("");
-    const [rating, setRating] = useState("");
-    const [sortOption, setSortOption] = useState("");
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const searchParamsString = searchParams.toString();
+    
+    const [name, setName] = useState(() => searchParams.get("name") || "");
+    const [location, setLocation] = useState(() => searchParams.get("location") || "");
+    const [tourDuration, setTourDuration] = useState(() => searchParams.get("tourDuration") || "");
+    const [fromPrice, setFromPrice] = useState(() => searchParams.get("fromPrice") || "");
+    const [toPrice, setToPrice] = useState(() => searchParams.get("toPrice") || "");
+    const [rating, setRating] = useState(() => searchParams.get("rating") || "");
+    const [sortOption, setSortOption] = useState(() => searchParams.get("sort") || "");
     const debouncedName = useDebounce(name);
     const debouncedLocation = useDebounce(location);
     const debouncedTourDuration = useDebounce(tourDuration);
@@ -60,9 +64,6 @@ function TourList() {
         fetchPage,
         pageSize,
     });
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const searchParamsString = searchParams.toString();
 
     useEffect(() => {
         const qName = searchParams.get("name") || "";
