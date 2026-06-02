@@ -7,26 +7,11 @@ import { useAuth } from "@hooks/useAuth";
 import { validateRequiredFields } from "@utils/validators";
 import {
     deleteImage,
-    deleteServiceByType,
-    createAccommodation,
-    createTourism,
-    createTransportation,
-    getServiceById,
-    updateServiceByType,
+    createAccommodation, updateAccommodation, getAccommodationById, deleteAccommodation,
+    createTourism, updateTourism, getTourismById, deleteTourism,
+    createTransportation, updateTransportation, getTransportationById, deleteTransportation
 } from "@services/providerService";
 import { useQueryClient } from "@tanstack/react-query";
-
-const SERVICE_TYPES = {
-    ACCOMMODATION: "ACCOMMODATION",
-    TRANSPORTATION: "TRANSPORTATION",
-    TOURISM: "TOURISM"
-};
-
-const SERVICE_TYPE_OPTIONS = [
-    { value: SERVICE_TYPES.ACCOMMODATION, label: "Lưu trú" },
-    { value: SERVICE_TYPES.TRANSPORTATION, label: "Vận chuyển" },
-    { value: SERVICE_TYPES.TOURISM, label: "Tour" },
-];
 
 const EMPTY_FORM = {
     name: "", description: "", price: "", quantity: "",
@@ -35,87 +20,9 @@ const EMPTY_FORM = {
     typeOfTransportation: "", tourDuration: "",
 };
 
-const PROVIDER_TYPE_MAP = {
-    1: SERVICE_TYPES.TOURISM,
-    2: SERVICE_TYPES.ACCOMMODATION,
-    3: SERVICE_TYPES.TRANSPORTATION
-};
-
-const CREATORS_MAP = {
-    [SERVICE_TYPES.ACCOMMODATION]: createAccommodation,
-    [SERVICE_TYPES.TRANSPORTATION]: createTransportation,
-    [SERVICE_TYPES.TOURISM]: createTourism,
-};
-
-const resolveServiceTypeLabel = (type) => SERVICE_TYPE_OPTIONS.find((opt) => opt.value === type)?.label || "Dịch vụ";
-
-const inferServiceType = (service) => {
-    if (!service) return "";
-    if (service.quantityOfBed !== undefined || service.area !== undefined) return SERVICE_TYPES.ACCOMMODATION;
-    if (service.arrivalLocation !== undefined || service.departureLocation !== undefined || service.typeOfTransportation !== undefined) return SERVICE_TYPES.TRANSPORTATION;
-    if (service.tourDuration !== undefined) return SERVICE_TYPES.TOURISM;
-    return "";
-};
-
-const buildFormFromService = (service, serviceType) => {
-    const baseInfo = service?.baseInfo || {};
-    const nextForm = {
-        ...EMPTY_FORM,
-        name: baseInfo.name || "",
-        description: baseInfo.description || "",
-        price: baseInfo.price ?? "",
-        quantity: baseInfo.quantity ?? "",
-    };
-
-    const typeSpecificKeys = {
-        [SERVICE_TYPES.TRANSPORTATION]: ["arrivalLocation", "departureLocation", "arrivalTime", "departureTime", "typeOfTransportation"],
-        [SERVICE_TYPES.TOURISM]: ["tourDuration", "location"],
-        [SERVICE_TYPES.ACCOMMODATION]: ["quantityOfBed", "area", "location"]
-    };
-
-    (typeSpecificKeys[serviceType] || typeSpecificKeys[SERVICE_TYPES.ACCOMMODATION]).forEach(key => {
-        nextForm[key] = service?.[key] ?? "";
-    });
-
-    return nextForm;
-};
-
-const sameSelectedFile = (left, right) => left?.name === right?.name && left?.size === right?.size && left?.lastModified === right?.lastModified;
-
+const sameSelectedFile = (oldFile, newFile) => oldFile?.name === newFile?.name && oldFile?.size === newFile?.size && oldFile?.lastModified === newFile?.lastModified;
 const getImageId = (img) => String(img?.id || "").trim();
 const getImageUrl = (img) => img?.url || "";
-
-const getServiceFactory = (type, transOptions, isEdit) => {
-    const mode = isEdit ? "Chỉnh sửa" : "Tạo";
-    const configs = {
-        [SERVICE_TYPES.ACCOMMODATION]: {
-            title: `${mode} dịch vụ lưu trú`, submitLabel: isEdit ? "Lưu thay đổi" : "Tạo lưu trú",
-            fields: [
-                { name: "quantityOfBed", label: "Số giường", type: "number", min: 1, step: 1, required: true },
-                { name: "area", label: "Diện tích (m²)", type: "number", min: 0, step: "0.1", required: true },
-                { name: "location", label: "Vị trí", type: "text", required: true },
-            ],
-        },
-        [SERVICE_TYPES.TRANSPORTATION]: {
-            title: `${mode} dịch vụ vận chuyển`, submitLabel: isEdit ? "Lưu thay đổi" : "Tạo vận chuyển",
-            fields: [
-                { name: "arrivalLocation", label: "Điểm đến", type: "text", required: true },
-                { name: "departureLocation", label: "Điểm khởi hành", type: "text", required: true },
-                { name: "arrivalTime", label: "Giờ đến", type: "number", min: 0, max: 23, step: 1, required: true },
-                { name: "departureTime", label: "Giờ khởi hành", type: "number", min: 0, max: 23, step: 1, required: true },
-                { name: "typeOfTransportation", label: "Loại phương tiện", type: "select", required: true, options: transOptions },
-            ],
-        },
-        [SERVICE_TYPES.TOURISM]: {
-            title: `${mode} dịch vụ tour`, submitLabel: isEdit ? "Lưu thay đổi" : "Tạo tour",
-            fields: [
-                { name: "tourDuration", label: "Thời lượng (ngày)", type: "number", min: 1, step: 1, required: true },
-                { name: "location", label: "Địa điểm", type: "text", required: true },
-            ],
-        },
-    };
-    return configs[type] || configs[SERVICE_TYPES.ACCOMMODATION];
-};
 
 export default function ModalCreateEditService({ show = true, onHide, onSuccess, service, serviceId }) {
     const isEditMode = Boolean(serviceId || service);
@@ -125,9 +32,8 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
     const imageInputRef = useRef(null);
     const queryClient = useQueryClient();
 
-    const providerTypeId = currentUser?.providerProfile?.typeOfProvider;
+    const providerType = currentUser?.providerProfile?.typeOfProvider;
 
-    const [serviceType, setServiceType] = useState("");
     const [form, setForm] = useState({ ...EMPTY_FORM });
     const [error, setError] = useState("");
     const [initializing, setInitializing] = useState(true);
@@ -140,11 +46,6 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
     const [deletingService, setDeletingService] = useState(false);
 
     const typeOfTransportationOptions = useMemo(() => lookupTables?.typeOfTransportations || [], [lookupTables]);
-
-    const serviceFactory = useMemo(
-        () => getServiceFactory(serviceType, typeOfTransportationOptions, isEditMode),
-        [serviceType, typeOfTransportationOptions, isEditMode]
-    );
 
     useEffect(() => {
         if (!selectedImages.length) {
@@ -171,37 +72,54 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
             setExistingImages([]);
 
             try {
-                if (service && !serviceId) {
-                    const nextType = service.type || inferServiceType(service);
-                    if (!nextType) throw new Error("Không xác định được loại dịch vụ.");
-                    if (!cancelled) {
-                        setServiceType(nextType);
-                        setForm(buildFormFromService(service, nextType));
-                        setExistingImages(service?.baseInfo?.images || []);
-                    }
-                    return;
+                if (!providerType || providerType < 1 || providerType > 3) {
+                    throw new Error("Không nhận diện được phân loại của nhà cung cấp hợp lệ.");
                 }
 
                 if (serviceId) {
-                    const response = await getServiceById(serviceId);
-                    if (!response?.service) throw new Error("Không tìm thấy dịch vụ cần chỉnh sửa.");
-                    
-                    const nextType = response.type || inferServiceType(response.service);
-                    if (!nextType) throw new Error("Không xác định được loại dịch vụ.");
+                    let responseData;
+                    if (providerType === 1) {
+                        responseData = await getTourismById(serviceId);
+                    } else if (providerType === 2) {
+                        responseData = await getAccommodationById(serviceId);
+                    } else if (providerType === 3) {
+                        responseData = await getTransportationById(serviceId);
+                    }
+
+                    if (!responseData) throw new Error("Không tìm thấy dịch vụ cần chỉnh sửa.");
                     
                     if (!cancelled) {
-                        setServiceType(nextType);
-                        setForm(buildFormFromService(response.service, nextType));
-                        setExistingImages(response.service?.baseInfo?.images || []);
-                    }
-                    return;
-                }
+                        const baseInfo = responseData?.baseInfo || {};
+                        const nextForm = {
+                            ...EMPTY_FORM,
+                            name: baseInfo.name || "",
+                            description: baseInfo.description || "",
+                            price: baseInfo.price ?? "",
+                            quantity: baseInfo.quantity ?? "",
+                        };
 
-                const nextType = PROVIDER_TYPE_MAP[Number(providerTypeId)] || "";
-                if (!cancelled) {
-                    setServiceType(nextType);
-                    setForm({ ...EMPTY_FORM });
-                    if (!nextType) setError("Không nhận diện được phân loại của nhà cung cấp. Vui lòng kiểm tra lại tài khoản.");
+                        if (providerType === 1) {
+                            nextForm.tourDuration = responseData.tourDuration ?? "";
+                            nextForm.location = responseData.location ?? "";
+                        } else if (providerType === 2) {
+                            nextForm.quantityOfBed = responseData.quantityOfBed ?? "";
+                            nextForm.area = responseData.area ?? "";
+                            nextForm.location = responseData.location ?? "";
+                        } else if (providerType === 3) {
+                            nextForm.arrivalLocation = responseData.arrivalLocation ?? "";
+                            nextForm.departureLocation = responseData.departureLocation ?? "";
+                            nextForm.arrivalTime = responseData.arrivalTime ?? "";
+                            nextForm.departureTime = responseData.departureTime ?? "";
+                            nextForm.typeOfTransportation = responseData.typeOfTransportation ?? "";
+                        }
+
+                        setForm(nextForm);
+                        setExistingImages(baseInfo.images || []);
+                    }
+                } else {
+                    if (!cancelled) {
+                        setForm({ ...EMPTY_FORM });
+                    }
                 }
             } catch (err) {
                 if (!cancelled) {
@@ -216,7 +134,7 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
 
         bootstrap();
         return () => { cancelled = true; };
-    }, [authLoading, navigate, onHide, providerTypeId, serviceId, service, show, isEditMode]);
+    }, [authLoading, navigate, onHide, providerType, serviceId, show, isEditMode]);
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files || []);
@@ -268,19 +186,19 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
 
         selectedImages.forEach((img) => payload.append("baseInfo.imgFiles", img));
 
-        if (serviceType === SERVICE_TYPES.TRANSPORTATION) {
+        if (providerType === 1) {
+            append("tourDuration", form.tourDuration);
+            append("location", form.location.trim());
+        } else if (providerType === 2) {
+            append("quantityOfBed", form.quantityOfBed);
+            append("area", form.area);
+            append("location", form.location.trim());
+        } else if (providerType === 3) {
             append("arrivalLocation", form.arrivalLocation);
             append("departureLocation", form.departureLocation.trim());
             append("arrivalTime", form.arrivalTime);
             append("departureTime", form.departureTime);
             append("typeOfTransportation", form.typeOfTransportation);
-        } else if (serviceType === SERVICE_TYPES.TOURISM) {
-            append("tourDuration", form.tourDuration);
-            append("location", form.location.trim());
-        } else {
-            append("quantityOfBed", form.quantityOfBed);
-            append("area", form.area);
-            append("location", form.location.trim());
         }
 
         return payload;
@@ -294,7 +212,15 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
         try {
             setDeletingService(true);
             setError("");
-            await deleteServiceByType(serviceType, serviceId);
+            
+            if (providerType === 1) {
+                await deleteTourism(serviceId);
+            } else if (providerType === 2) {
+                await deleteAccommodation(serviceId);
+            } else if (providerType === 3) {
+                await deleteTransportation(serviceId);
+            }
+
             queryClient.invalidateQueries({ queryKey: ["provider-services"] });
             onSuccess ? onSuccess() : closeModal();
         } catch (err) {
@@ -307,26 +233,39 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        const requiredValidation = validateRequiredFields(
-            form,
-            [
-                { name: "name", label: "name" }, { name: "description", label: "description" },
-                { name: "price", label: "price" }, { name: "quantity", label: "quantity" },
-                ...serviceFactory.fields.filter((f) => f.required),
-            ],
-            { messagePrefix: "Vui lòng nhập", messageSuffix: "." }
-        );
+        let requiredFields = [
+            { name: "name", label: "name" }, 
+            { name: "description", label: "description" },
+            { name: "price", label: "price" }, 
+            { name: "quantity", label: "quantity" },
+        ];
+
+        if (providerType === 1) {
+            requiredFields.push({ name: "tourDuration", label: "Thời lượng" }, { name: "location", label: "Địa điểm" });
+        } else if (providerType === 2) {
+            requiredFields.push({ name: "quantityOfBed", label: "Số giường" }, { name: "area", label: "Diện tích" }, { name: "location", label: "Vị trí" });
+        } else if (providerType === 3) {
+            requiredFields.push({ name: "arrivalLocation", label: "Điểm đến" }, { name: "departureLocation", label: "Khởi hành" }, { name: "arrivalTime", label: "Giờ đến" }, { name: "departureTime", label: "Giờ đi" }, { name: "typeOfTransportation", label: "Loại phương tiện" });
+        }
+
+        const requiredValidation = validateRequiredFields(form, requiredFields, { messagePrefix: "Vui lòng nhập", messageSuffix: "." });
 
         if (!requiredValidation.valid) return setError(requiredValidation.message);
 
         try {
-            const creator = isEditMode ? (payload) => updateServiceByType(serviceType, serviceId, payload) : CREATORS_MAP[serviceType];
-            if (!creator) return setError("Loại dịch vụ không hợp lệ.");
-
             setError("");
             setSubmitting(true);
+            const payload = buildPayload();
+            let response;
 
-            const response = await creator(buildPayload());
+            if (providerType === 1) {
+                response = isEditMode ? await updateTourism(serviceId, payload) : await createTourism(payload);
+            } else if (providerType === 2) {
+                response = isEditMode ? await updateAccommodation(serviceId, payload) : await createAccommodation(payload);
+            } else if (providerType === 3) {
+                response = isEditMode ? await updateTransportation(serviceId, payload) : await createTransportation(payload);
+            }
+
             if (response?.status >= 200 && response?.status < 300) {
                 queryClient.invalidateQueries({ queryKey: ["provider-services"] });
                 onSuccess ? onSuccess() : closeModal();
@@ -340,10 +279,28 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
         }
     };
 
+    let modalTitle = "";
+    let submitLabel = "";
+    let serviceTypeName = "";
+
+    if (providerType === 1) {
+        modalTitle = isEditMode ? "Chỉnh sửa dịch vụ tour" : "Tạo tour";
+        submitLabel = isEditMode ? "Lưu thay đổi" : "Tạo tour";
+        serviceTypeName = "Tour";
+    } else if (providerType === 2) {
+        modalTitle = isEditMode ? "Chỉnh sửa dịch vụ lưu trú" : "Tạo lưu trú";
+        submitLabel = isEditMode ? "Lưu thay đổi" : "Tạo lưu trú";
+        serviceTypeName = "Lưu trú";
+    } else if (providerType === 3) {
+        modalTitle = isEditMode ? "Chỉnh sửa dịch vụ vận chuyển" : "Tạo vận chuyển";
+        submitLabel = isEditMode ? "Lưu thay đổi" : "Tạo vận chuyển";
+        serviceTypeName = "Vận chuyển";
+    }
+
     return (
         <Modal show={show} onHide={closeModal} centered size="xl" scrollable backdrop="static">
             <Modal.Header closeButton>
-                <Modal.Title>{serviceFactory.title}</Modal.Title>
+                <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
 
             <Modal.Body className="p-4 p-md-5">
@@ -356,12 +313,11 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
                         <Card.Body className="p-0">
                             <Form id="provider-service-form" onSubmit={handleSubmit}>
                                 <div className="d-flex flex-column gap-3 p-3 p-md-4">
-                                    
                                     <Row className="g-3">
                                         <Col xs={12}>
                                             <Form.Group>
                                                 <Form.Label>Loại dịch vụ</Form.Label>
-                                                <Form.Control value={resolveServiceTypeLabel(serviceType)} readOnly disabled />
+                                                <Form.Control value={serviceTypeName} readOnly disabled />
                                             </Form.Group>
                                         </Col>
                                     </Row>
@@ -407,7 +363,6 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
                                             {!existingImages.length && !selectedImagePreviews.length && <div className="text-muted small mb-2">Chưa có ảnh nào.</div>}
 
                                             <Row className="g-3">
-                                                {/* Existing Images */}
                                                 {existingImages.map((img, idx) => {
                                                     const id = getImageId(img);
                                                     return (
@@ -438,23 +393,85 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
                                             </Row>
                                         </Col>
 
-                                        {serviceFactory.fields.map((field) => (
-                                            <Col xs={12} md={field.name === "location" ? 12 : 6} key={field.name}>
-                                                <Form.Group controlId={field.name}>
-                                                    <Form.Label>{field.label}</Form.Label>
-                                                    {field.type === "select" ? (
-                                                        <Form.Select name={field.name} value={form[field.name]} onChange={handleChange}>
-                                                            <option value="">Chọn {field.label.toLowerCase()}</option>
-                                                            {(field.options || []).map((opt) => (
+                                        {providerType === 1 && (
+                                            <>
+                                                <Col xs={12} md={6}>
+                                                    <Form.Group controlId="tourDuration">
+                                                        <Form.Label>Thời lượng (ngày)</Form.Label>
+                                                        <Form.Control name="tourDuration" type="number" min="1" step="1" value={form.tourDuration} onChange={handleChange} placeholder="Thời lượng" />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col xs={12} md={12}>
+                                                    <Form.Group controlId="location">
+                                                        <Form.Label>Địa điểm</Form.Label>
+                                                        <Form.Control name="location" type="text" value={form.location} onChange={handleChange} placeholder="Địa điểm" />
+                                                    </Form.Group>
+                                                </Col>
+                                            </>
+                                        )}
+
+                                        {providerType === 2 && (
+                                            <>
+                                                <Col xs={12} md={6}>
+                                                    <Form.Group controlId="quantityOfBed">
+                                                        <Form.Label>Số giường</Form.Label>
+                                                        <Form.Control name="quantityOfBed" type="number" min="1" step="1" value={form.quantityOfBed} onChange={handleChange} placeholder="Số giường" />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col xs={12} md={6}>
+                                                    <Form.Group controlId="area">
+                                                        <Form.Label>Diện tích (m²)</Form.Label>
+                                                        <Form.Control name="area" type="number" min="0" step="0.1" value={form.area} onChange={handleChange} placeholder="Diện tích (m²)" />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col xs={12} md={12}>
+                                                    <Form.Group controlId="location">
+                                                        <Form.Label>Vị trí</Form.Label>
+                                                        <Form.Control name="location" type="text" value={form.location} onChange={handleChange} placeholder="Vị trí" />
+                                                    </Form.Group>
+                                                </Col>
+                                            </>
+                                        )}
+
+                                        {providerType === 3 && (
+                                            <>
+                                                <Col xs={12} md={6}>
+                                                    <Form.Group controlId="departureLocation">
+                                                        <Form.Label>Điểm khởi hành</Form.Label>
+                                                        <Form.Control name="departureLocation" type="text" value={form.departureLocation} onChange={handleChange} placeholder="Điểm khởi hành" />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col xs={12} md={6}>
+                                                    <Form.Group controlId="arrivalLocation">
+                                                        <Form.Label>Điểm đến</Form.Label>
+                                                        <Form.Control name="arrivalLocation" type="text" value={form.arrivalLocation} onChange={handleChange} placeholder="Điểm đến" />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col xs={12} md={6}>
+                                                    <Form.Group controlId="departureTime">
+                                                        <Form.Label>Giờ khởi hành</Form.Label>
+                                                        <Form.Control name="departureTime" type="number" min="0" max="23" step="1" value={form.departureTime} onChange={handleChange} placeholder="Giờ khởi hành" />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col xs={12} md={6}>
+                                                    <Form.Group controlId="arrivalTime">
+                                                        <Form.Label>Giờ đến</Form.Label>
+                                                        <Form.Control name="arrivalTime" type="number" min="0" max="23" step="1" value={form.arrivalTime} onChange={handleChange} placeholder="Giờ đến" />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col xs={12} md={6}>
+                                                    <Form.Group controlId="typeOfTransportation">
+                                                        <Form.Label>Loại phương tiện</Form.Label>
+                                                        <Form.Select name="typeOfTransportation" value={form.typeOfTransportation} onChange={handleChange}>
+                                                            <option value="">Chọn loại phương tiện</option>
+                                                            {(typeOfTransportationOptions || []).map((opt) => (
                                                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
                                                             ))}
                                                         </Form.Select>
-                                                    ) : (
-                                                        <Form.Control name={field.name} type={field.type} min={field.min} step={field.step} value={form[field.name]} onChange={handleChange} placeholder={field.label} />
-                                                    )}
-                                                </Form.Group>
-                                            </Col>
-                                        ))}
+                                                    </Form.Group>
+                                                </Col>
+                                            </>
+                                        )}
                                     </Row>
                                 </div>
                             </Form>
@@ -476,7 +493,7 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
                         Hủy
                     </Button>
                     <Button type="submit" form="provider-service-form" variant="primary" disabled={submitting || deletingService}>
-                        {submitting ? <MySpinner /> : serviceFactory.submitLabel}
+                        {submitting ? <MySpinner /> : submitLabel}
                     </Button>
                 </div>
             </Modal.Footer>

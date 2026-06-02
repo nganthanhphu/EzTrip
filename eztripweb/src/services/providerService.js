@@ -90,57 +90,6 @@ export async function deleteTourism(id) {
     return axiosClient.delete(`/api/secure/tourisms/${id}`);
 }
 
-export async function deleteServiceByType(serviceType, id) {
-    const deletions = {
-        ACCOMMODATION: deleteAccommodation,
-        TRANSPORTATION: deleteTransportation,
-        TOURISM: deleteTourism,
-    };
-
-    const deleter = deletions[serviceType];
-    if (!deleter) {
-        throw new Error("Loại dịch vụ không hợp lệ.");
-    }
-
-    return deleter(id);
-}
-
-export async function getServiceById(id) {
-    const serviceFetchers = [
-        { type: "ACCOMMODATION", fetcher: getAccommodationById },
-        { type: "TRANSPORTATION", fetcher: getTransportationById },
-        { type: "TOURISM", fetcher: getTourismById },
-    ];
-
-    for (const item of serviceFetchers) {
-        try {
-            const service = await item.fetcher(id);
-            return { type: item.type, service };
-        } catch (error) {
-            if (error?.response?.status !== 404) {
-                throw error;
-            }
-        }
-    }
-
-    return null;
-}
-
-export async function updateServiceByType(serviceType, id, payload) {
-    const updates = {
-        ACCOMMODATION: updateAccommodation,
-        TRANSPORTATION: updateTransportation,
-        TOURISM: updateTourism,
-    };
-
-    const updater = updates[serviceType];
-    if (!updater) {
-        throw new Error("Loại dịch vụ không hợp lệ.");
-    }
-
-    return updater(id, payload);
-}
-
 export async function getProviderServices(params = {}) {
     const [accommodations, transportations, tourisms] = await Promise.all([
         getAccommodations(params),
@@ -187,10 +136,7 @@ const providerService = {
     createTourism,
     updateTourism,
     deleteTourism,
-    deleteServiceByType,
     getProviderServices,
-    getServiceById,
-    updateServiceByType,
     deleteImage,
     getBookings,
     updateBooking,
