@@ -89,6 +89,10 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Override
     public void addTourism(TourismCreateDTO tourism) throws ParseException {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         BaseServiceCreateDTO baseInfo = tourism.baseInfo();
         Integer providerId = UserUtils.getCurrentUserDetails().getProviderId();
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
@@ -131,6 +135,10 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Override
     public void updateTourism(Integer id, TourismUpdateDTO tourism) throws ParseException {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         com.hp.pojo.Service svc = this.resourceAuthorizationService.getServiceForUpdate(id);
 
         BaseServiceUpdateDTO baseInfo = tourism.baseInfo();
@@ -182,6 +190,10 @@ public class TourismSvcServiceImpl implements TourismSvcService {
 
     @Override
     public void deleteTourism(Integer id) {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         com.hp.pojo.Service svc = this.resourceAuthorizationService.getServiceForUpdate(id);
         svc.setIsActive(false);
         this.baseServiceRepository.addOrUpdateService(svc);

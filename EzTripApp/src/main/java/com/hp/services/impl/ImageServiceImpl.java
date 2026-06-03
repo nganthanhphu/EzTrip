@@ -12,6 +12,7 @@ import com.hp.pojo.Image;
 import com.hp.repositories.ImageRepository;
 import com.hp.services.ImageService;
 import com.hp.services.ResourceAuthorizationService;
+import com.hp.utils.UserUtils;
 
 /**
  *
@@ -29,6 +30,10 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void deleteImageById(Integer id) {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         Image image = this.resourceAuthorizationService.getImageForUpdate(id);
         this.imageRepository.deleteImage(image);
     }

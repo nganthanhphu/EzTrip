@@ -40,7 +40,7 @@ public class JwtUtils {
         this.EXPIRATION_MS = Long.parseLong(env.getProperty("JWT_EXPIRATION"));
     }
 
-    public String generateToken(int id, Integer customerId, Integer providerId, String providerType, String username, String role) throws KeyLengthException, JOSEException {
+    public String generateToken(int id, Integer customerId, Integer providerId, String providerType, Boolean isActive, String username, String role) throws KeyLengthException, JOSEException {
         JWSSigner signer = new MACSigner(SECRET);
 
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
@@ -51,6 +51,7 @@ public class JwtUtils {
                 .claim("customerId", customerId)
                 .claim("providerId", providerId)
                 .claim("providerType", providerType)
+                .claim("isActive", isActive)
                 .claim("role", role)
                 .build();
 

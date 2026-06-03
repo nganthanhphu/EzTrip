@@ -52,6 +52,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public void addBooking(BookingCreateDTO bk) {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         Object[] service = this.serviceRepository.getServiceForBookingValidation(bk.serviceId());
         if (service == null) {
             throw new IllegalArgumentException("Dịch vụ không tồn tại!");

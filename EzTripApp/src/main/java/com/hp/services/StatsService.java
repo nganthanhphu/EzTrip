@@ -11,5 +11,6 @@ import com.hp.dto.stats.BaseStatsDTO;
  * @author Joon
  */
 public interface StatsService {
-    BaseStatsDTO getStats(String statsType, int year, Integer serviceId, Integer month);
+    int getActiveServiceCount(String statsType, int year, Integer serviceId, Integer month);
+    BaseStatsDTO getStats(String statsType, int year, Integer serviceId, Integer month, boolean isOnlyActive);
 }

@@ -33,7 +33,7 @@ public class ApiStatsController {
             @RequestParam(name = "year") int year,
             @RequestParam(name = "serviceId", required = false) Integer serviceId,
             @RequestParam(name = "month", required = false) Integer month) {
-        BaseStatsDTO stats = this.statsService.getStats(statsType, year, serviceId, month);
+        BaseStatsDTO stats = this.statsService.getStats(statsType, year, serviceId, month, false);
         return new ResponseEntity<>(stats, HttpStatus.OK);
     }
 }

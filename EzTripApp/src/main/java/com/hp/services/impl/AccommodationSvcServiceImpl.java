@@ -89,6 +89,10 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Override
     public void addAccommodation(AccommodationCreateDTO accommodation) throws ParseException {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         BaseServiceCreateDTO baseInfo = accommodation.baseInfo();
         Integer providerId = UserUtils.getCurrentUserDetails().getProviderId();
         com.hp.pojo.Service svc = new com.hp.pojo.Service();
@@ -133,6 +137,10 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Override
     public void updateAccommodation(Integer id, AccommodationUpdateDTO accommodation) throws ParseException {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         com.hp.pojo.Service svc = this.resourceAuthorizationService.getServiceForUpdate(id);
 
         BaseServiceUpdateDTO baseInfo = accommodation.baseInfo();
@@ -186,6 +194,10 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
     @Override
     public void deleteAccommodation(Integer id) {
+        if (!UserUtils.getCurrentUserDetails().getIsActive())
+            throw new RuntimeException(
+                    "Tài khoản của bạn không có quyền do chưa được kích hoạt. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+
         com.hp.pojo.Service svc = this.resourceAuthorizationService.getServiceForUpdate(id);
         svc.setIsActive(false);
         this.baseServiceRepository.addOrUpdateService(svc);
@@ -219,11 +231,11 @@ public class AccommodationSvcServiceImpl implements AccommodationSvcService {
 
         if (accommodations.size() > 0) {
             try {
-            String prompt = String.format("Thực hiện so sánh các loại dịch vụ lưu trú sau: %s", mapper.writeValueAsString(accommodations));
+                String prompt = String.format("Thực hiện so sánh các loại dịch vụ lưu trú sau: %s",
+                        mapper.writeValueAsString(accommodations));
 
-            result  = this.chatClient.prompt().user(prompt).call().content();
-            }
-            catch (JsonProcessingException e) {
+                result = this.chatClient.prompt().user(prompt).call().content();
+            } catch (JsonProcessingException e) {
 
             }
 

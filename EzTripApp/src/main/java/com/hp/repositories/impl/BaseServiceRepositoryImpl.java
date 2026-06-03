@@ -4,8 +4,10 @@
  */
 package com.hp.repositories.impl;
 
+import com.hp.pojo.BaseUser;
 import com.hp.pojo.Booking;
 import com.hp.pojo.BookingStatus;
+import com.hp.pojo.ProviderProfile;
 import com.hp.pojo.Service;
 import com.hp.repositories.BaseServiceRepository;
 
@@ -41,6 +43,8 @@ public class BaseServiceRepositoryImpl implements BaseServiceRepository {
         CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
         Root<Service> root = q.from(Service.class);
         Join<Service, Booking> booking = root.join("bookingSet", JoinType.LEFT);
+        Join<Service, ProviderProfile> providerProfile = root.join("providerId", JoinType.INNER);
+        Join<ProviderProfile, BaseUser> providerUser = providerProfile.join("userId", JoinType.INNER);
         Join<Booking, BookingStatus> bookingStatus = booking.join("statusId", JoinType.LEFT);
 
         Expression<Integer> confirmedCount = b.sum(
@@ -56,7 +60,7 @@ public class BaseServiceRepositoryImpl implements BaseServiceRepository {
                 b.coalesce(confirmedCount, 0));
 
         q.multiselect(root.get("id"), root.get("isActive"), root.get("price").as(Integer.class), remainingQuantity);
-        q.where(b.equal(root.get("id"), id));
+        q.where(b.and(b.equal(root.get("id"), id), b.isTrue(providerUser.get("isActive"))));
         q.groupBy(root.get("id"));
 
         Query<Object[]> query = s.createQuery(q);

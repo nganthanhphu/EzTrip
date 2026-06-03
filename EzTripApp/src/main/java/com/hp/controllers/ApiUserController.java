@@ -63,7 +63,7 @@ public class ApiUserController {
             }
 
             try {
-                String token = this.jwtUtils.generateToken(user.getId(), customerId, providerId, providerType, user.getPhoneNumber(),
+                String token = this.jwtUtils.generateToken(user.getId(), customerId, providerId, providerType, user.getIsActive(), user.getPhoneNumber(),
                         user.getRoleId().getName());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {

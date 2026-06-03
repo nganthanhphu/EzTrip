@@ -17,23 +17,28 @@ public class MyUserDetails extends User {
     private Integer customerId;
     private Integer providerId;
     private String providerType;
+    private Boolean isActive;
 
-    public MyUserDetails(Integer id, Integer customerId, Integer providerId, String providerType, String username, String password,
+    public MyUserDetails(Integer id, Integer customerId, Integer providerId, String providerType, Boolean isActive,
+            String username, String password,
             Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.id = id;
         this.customerId = customerId;
         this.providerId = providerId;
+        this.isActive = isActive;
         this.providerType = providerType;
     }
 
-    public MyUserDetails(Integer id, Integer customerId, Integer providerId, String providerType, String username, String password,
+    public MyUserDetails(Integer id, Integer customerId, Integer providerId, String providerType, Boolean isActive,
+            String username, String password,
             boolean enabled, boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
             Collection<? extends GrantedAuthority> authorities) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
         this.id = id;
         this.customerId = customerId;
         this.providerId = providerId;
+        this.isActive = isActive;
         this.providerType = providerType;
     }
 
@@ -65,4 +70,10 @@ public class MyUserDetails extends User {
         return providerType;
     }
 
+    /**
+     * @return the isActive
+     */
+    public Boolean getIsActive() {
+        return isActive;
+    }
 }

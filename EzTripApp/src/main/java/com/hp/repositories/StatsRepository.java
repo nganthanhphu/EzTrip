@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface StatsRepository {
 
-    int getServiceCount(int year, Integer providerId, Integer serviceId, Integer month);
+    int getServiceCount(int year, Integer providerId, Integer serviceId, Integer month, boolean isOnlyActive);
 
     List<Object[]> getStats(String statsType, int year, Integer providerId, Integer serviceId, Integer month);
     

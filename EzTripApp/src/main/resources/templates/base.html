@@ -31,10 +31,6 @@
                                 người dùng</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/admin/services}" sec:authorize="isAuthenticated() && hasRole('ADMIN')">Quản lý
-                                dịch vụ</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" th:href="@{/admin/stats}" sec:authorize="isAuthenticated() && hasRole('ADMIN')">Thống kê</a>
                         </li>
 

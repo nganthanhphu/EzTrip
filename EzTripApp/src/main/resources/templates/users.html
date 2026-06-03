@@ -69,10 +69,10 @@
                     <td>
                         <button
                             th:onclick="'setActiveUser(\'' + @{/admin/api/users/} + ${user.id} + '?active=true' + '\')'"
-                            th:if="${!user.getIsActive()}" class="btn btn-sm btn-success">Kích hoạt</button>
+                            th:if="${!user.getIsActive() && user.getRoleId().getName() != 'ADMIN'}" class="btn btn-sm btn-success">Kích hoạt</button>
                         <button
                             th:onclick="'setActiveUser(\'' + @{/admin/api/users/} + ${user.id} + '?active=false' + '\')'"
-                            th:unless="${!user.getIsActive()}" class="btn btn-sm btn-danger">Hủy kích hoạt</button>
+                            th:if="${user.getIsActive() && user.getRoleId().getName() != 'ADMIN'}" class="btn btn-sm btn-danger">Hủy kích hoạt</button>
                     </td>
                 </tr>
             </tbody>

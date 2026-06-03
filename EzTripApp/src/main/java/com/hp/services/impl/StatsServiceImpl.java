@@ -35,7 +35,12 @@ public class StatsServiceImpl implements StatsService {
     private StatsRepository statsRepository;
 
     @Override
-    public BaseStatsDTO getStats(String statsType, int year, Integer serviceId, Integer month) {
+    public int getActiveServiceCount(String statsType, int year, Integer serviceId, Integer month) {
+        return this.statsRepository.getServiceCount(year, null, serviceId, month, true);
+    }
+
+    @Override
+    public BaseStatsDTO getStats(String statsType, int year, Integer serviceId, Integer month, boolean isOnlyActive) {
         Integer providerId = null;
         MyUserDetails userDetails = UserUtils.getCurrentUserDetails();
 
@@ -46,7 +51,7 @@ public class StatsServiceImpl implements StatsService {
             }
         }
 
-        int totalService = this.statsRepository.getServiceCount(year, providerId, serviceId, month);
+        int totalService = this.statsRepository.getServiceCount(year, providerId, serviceId, month, isOnlyActive);
 
         List<Object[]> statsData = this.statsRepository.getStats(statsType, year, providerId, serviceId, month);
 
