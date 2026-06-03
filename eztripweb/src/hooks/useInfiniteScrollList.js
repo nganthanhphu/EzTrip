@@ -1,23 +1,21 @@
 import { useMemo } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
-function useInfiniteScrollList({ queryKey, fetchPage, pageSize = 5 }) {
+function useInfiniteScrollList({ queryKey, fetchPage }) {
     const query = useInfiniteQuery({
         queryKey,
         queryFn: ({ pageParam = 1 }) => fetchPage(pageParam),
         initialPageParam: 1,
         getNextPageParam: (lastPage, allPages) => {
-            const lastPageItems = lastPage;
-            if (lastPageItems.length < pageSize) {
-                return undefined;
+            if (!lastPage || lastPage.length === 0) {
+                return undefined; 
             }
-
             return allPages.length + 1;
         },
     });
 
     const items = useMemo(
-        () => query.data?.pages.flatMap((page) => page) || [],
+        () => query.data?.pages.flat() || [],
         [query.data]
     );
 
@@ -31,7 +29,7 @@ function useInfiniteScrollList({ queryKey, fetchPage, pageSize = 5 }) {
         items,
         loading: query.isLoading,
         loadingMore: query.isFetchingNextPage,
-        hasMore: Boolean(query.hasNextPage),
+        hasMore: query.hasNextPage,
         loadMore,
         refetch: query.refetch,
         error: query.error,

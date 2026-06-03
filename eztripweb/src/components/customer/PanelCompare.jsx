@@ -58,8 +58,7 @@ function PanelCompare({ currentService, serviceType = "accommodation" }) {
         error: fetchError
     } = useInfiniteScrollList({
         queryKey: ["compare-services", serviceType, debouncedQueryInput],
-        fetchPage,
-        pageSize: 5
+        fetchPage
     });
 
     const services = useMemo(() => {

@@ -26,13 +26,11 @@ function HistoryBookingList() {
 
     const { lookupTables } = useLookupTables();
     const typeOfServiceOptions = lookupTables.typeOfServices || [];
-    const pageSize = 5;
 
     const fetchBookings = React.useCallback(
         (nextPage) => {
             const params = new URLSearchParams();
             params.append("page", nextPage);
-            params.append("size", pageSize);
 
             if (typeOfService)
                 params.append("typeOfService", typeOfService);
@@ -42,7 +40,7 @@ function HistoryBookingList() {
 
             return getBookings(params.toString());
         },
-        [currentUser?.id, typeOfService, status, debouncedServiceName, pageSize],
+        [currentUser?.id, typeOfService, status, debouncedServiceName],
     );
 
     const {
@@ -53,9 +51,8 @@ function HistoryBookingList() {
         loadMore,
         refetch,
     } = useInfiniteScrollList({
-        queryKey: ["bookings", currentUser?.id, typeOfService, status, debouncedServiceName, pageSize],
-        fetchPage: fetchBookings,
-        pageSize,
+        queryKey: ["bookings", currentUser?.id, typeOfService, status, debouncedServiceName],
+        fetchPage: fetchBookings
     });
 
     useEffect(() => {

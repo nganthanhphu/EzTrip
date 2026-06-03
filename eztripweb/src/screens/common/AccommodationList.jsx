@@ -29,7 +29,6 @@ function AccommodationList() {
 
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
-    const pageSize = 5;
     const fetchPage = useCallback(
     (nextPage) => {
         const params = new URLSearchParams();
@@ -43,11 +42,10 @@ function AccommodationList() {
         if (order) params.append("order", order);
         
         params.append("page", nextPage);
-        params.append("size", pageSize);
 
         return getAccommodations(params.toString());
     },
-    [debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize]
+    [debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order]
 );
 
     const {
@@ -57,9 +55,8 @@ function AccommodationList() {
         hasMore,
         loadMore, 
     } = useInfiniteScrollList({
-        queryKey: ["accommodations", debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize],
-        fetchPage,
-        pageSize,
+        queryKey: ["accommodations", debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order],
+        fetchPage
     });
 
     const handleSortChange = (event) => {

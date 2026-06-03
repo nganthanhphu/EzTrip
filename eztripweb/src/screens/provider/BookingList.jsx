@@ -47,14 +47,12 @@ function BookingList() {
     
     const { lookupTables } = useLookupTables();
     const statusOptions = lookupTables.bookingStatuses || [];
-    const pageSize = 5;
 
     const fetchBookings = useCallback(
         (nextPage) => {
             const params = {
                 serviceId: id,
-                page: nextPage,
-                size: pageSize,
+                page: nextPage
             };
 
             if (debouncedCustomerName) params.customerName = debouncedCustomerName;
@@ -62,7 +60,7 @@ function BookingList() {
 
             return getBookings(params);
         },
-        [id, debouncedCustomerName, debouncedStatus, pageSize]
+        [id, debouncedCustomerName, debouncedStatus]
     );
 
     const {
@@ -73,9 +71,8 @@ function BookingList() {
         loadMore,
         refetch,
     } = useInfiniteScrollList({
-        queryKey: ["providerBookings", id, debouncedCustomerName, debouncedStatus, pageSize],
-        fetchPage: fetchBookings,
-        pageSize,
+        queryKey: ["providerBookings", id, debouncedCustomerName, debouncedStatus],
+        fetchPage: fetchBookings
     });
 
     useEffect(() => {

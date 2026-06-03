@@ -39,7 +39,7 @@ function TransportationList() {
     const [showBookingModal, setShowBookingModal] = useState(false);
     const [selectedTransportation, setSelectedTransportation] = useState(null);
     const { lookupTables } = useLookupTables();
-    const pageSize = 5;
+
     const { currentUser } = useAuth();
 
     function buildBookingTransportation(option) {
@@ -75,7 +75,6 @@ function TransportationList() {
             if (order) params.append("order", order);
             
             params.append("page", nextPage);
-            params.append("size", pageSize);
 
             return getTransportations(params.toString()).then((response) => {
                 return Array.isArray(response)
@@ -92,8 +91,7 @@ function TransportationList() {
             debouncedToPrice,
             debouncedRating,
             sortBy,
-            order,
-            pageSize
+            order
         ]
     );
 
@@ -114,11 +112,9 @@ function TransportationList() {
             debouncedToPrice, 
             debouncedRating, 
             sortBy, 
-            order, 
-            pageSize
+            order
         ],
-        fetchPage, 
-        pageSize,
+        fetchPage
     });
 
     useEffect(() => {

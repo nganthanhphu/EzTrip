@@ -31,7 +31,6 @@ function TourList() {
 
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
-    const pageSize = 5;
     const fetchPage = useCallback(
     (nextPage) => {
         const params = new URLSearchParams();
@@ -46,11 +45,10 @@ function TourList() {
         if (order) params.append("order", order);
         
         params.append("page", nextPage);
-        params.append("size", pageSize);
 
         return getTourisms(params.toString());
     },
-    [debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize]
+    [debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order]
 );
 
     const {
@@ -60,9 +58,8 @@ function TourList() {
         hasMore,
         loadMore,
     } = useInfiniteScrollList({
-        queryKey: ["tourisms", debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order, pageSize],
-        fetchPage,
-        pageSize,
+        queryKey: ["tourisms", debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order],
+        fetchPage
     });
 
     useEffect(() => {
