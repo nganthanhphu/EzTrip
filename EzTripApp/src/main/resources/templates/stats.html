@@ -1,0 +1,344 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Thống kê</title>
+    <th:block th:replace="base :: css"></th:block>
+
+</head>
+
+<body class="mb-5 pb-5">
+    <div th:replace="base :: header"></div>
+
+    <section class="container">
+        <h1 class="text-center text-uppercase mb-2">Báo cáo thống kê</h1>
+        <div class="row g3 mb-4">
+            <div class="col-xs-12 col-sm-6 col-lg-3">
+                <div class="card h-100 shadow">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div class="text-secondary fw-semibold">Tổng số dịch vụ đang hoạt động</div>
+                        <div class="fs-1 fw-bold text-primary mt-3" th:text="${totalActiveService}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-lg-3">
+                <div class="card h-100 shadow">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div class="text-secondary fw-semibold">Booking đã xác nhận</div>
+                        <div class="fs-1 fw-bold text-info mt-3" th:text="${stats.totalConfirmedBooking}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-lg-3">
+                <div class="card h-100 shadow">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div class="text-secondary fw-semibold">Booking đã hoàn thành</div>
+                        <div class="fs-1 fw-bold text-success mt-3" th:text="${stats.totalCompletedBooking}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 col-lg-3">
+                <div class="card h-100 shadow">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div class="text-secondary fw-semibold">Booking đã hủy</div>
+                        <div class="fs-1 fw-bold text-danger mt-3" th:text="${stats.totalCancelledBooking}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <form class="d-flex gap-2 justify-content-center mb-4">
+            <div class="form-group">
+                <select class="form-control" name="statsType" required onchange="handleStatsTypeChange()">
+                    <option value="DAY" th:selected="${#strings.equals(statsType, 'DAY')}">Theo ngày
+                    </option>
+                    <option value="MONTH" th:selected="${#strings.equals(statsType, 'MONTH')}">Theo tháng
+                    </option>
+                    <option value="QUARTER" th:selected="${#strings.equals(statsType, 'QUARTER')}">Theo quý
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group" th:hidden="${!#strings.equals(statsType, 'DAY')}">
+                <select class="form-control" name="month" th:disabled="${!#strings.equals(statsType, 'DAY')}">
+                    <option value="1" th:selected="${month == 1}">Tháng 1</option>
+                    <option value="2" th:selected="${month == 2}">Tháng 2</option>
+                    <option value="3" th:selected="${month == 3}">Tháng 3</option>
+                    <option value="4" th:selected="${month == 4}">Tháng 4</option>
+                    <option value="5" th:selected="${month == 5}">Tháng 5</option>
+                    <option value="6" th:selected="${month == 6}">Tháng 6</option>
+                    <option value="7" th:selected="${month == 7}">Tháng 7</option>
+                    <option value="8" th:selected="${month == 8}">Tháng 8</option>
+                    <option value="9" th:selected="${month == 9}">Tháng 9</option>
+                    <option value="10" th:selected="${month == 10}">Tháng 10</option>
+                    <option value="11" th:selected="${month == 11}">Tháng 11</option>
+                    <option value="12" th:selected="${month == 12}">Tháng 12</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <select class="form-control" name="year">
+                    <option
+                        th:each="y : ${#numbers.sequence(#dates.year(#dates.createNow()), #dates.year(#dates.createNow())-4)}"
+                        th:value="${y}" th:text="${y}" th:selected="${year == y}">
+                        >
+                    </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    Xem
+                </button>
+            </div>
+
+        </form>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-md-6">
+                <div class="card h-100 border-0 shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="card-title mb-1 fs-4 fw-bold">Biểu đồ doanh thu</h5>
+                                <p class="card-subtitle text-secondary fw-semibold">
+                                    Doanh thu theo <span th:switch="${statsType}">
+                                        <span th:case="'DAY'">ngày</span>
+                                        <span th:case="'MONTH'">tháng</span>
+                                        <span th:case="'QUARTER'">quý</span>
+                                </p>
+                            </div>
+                            <div class="text-md-end">
+                                <div class="text-secondary small">Tổng doanh thu kỳ này</div>
+                                <div class="fs-3 fw-bold text-success">
+                                    <span
+                                        th:text="${#numbers.formatDecimal(stats.totalRevenue, 1, 'POINT', 0, 'COMMA')} + ' VNĐ'"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height: 360px;">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="card h-100 border-0 shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="card-title mb-1 fs-4 fw-bold">Biểu đồ số lượng booking</h5>
+                                <p class="card-subtitle text-secondary fw-semibold">
+                                    Số lượng booking theo <span th:switch="${statsType}">
+                                        <span th:case="'DAY'">ngày</span>
+                                        <span th:case="'MONTH'">tháng</span>
+                                        <span th:case="'QUARTER'">quý</span>
+                                </p>
+                            </div>
+                            <div class="text-md-end">
+                                <div class="text-secondary small">Tổng số lượng booking kỳ này</div>
+                                <div class="fs-3 fw-bold text-success">
+                                    <span
+                                        th:text="${stats.totalConfirmedBooking + stats.totalCompletedBooking + stats.totalCancelledBooking} + ' vé'"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="height: 360px;">
+                            <canvas id="bookingChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <div class="card h-100 border-0 shadow">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="card-title mb-1 fs-4 fw-bold">Biểu đồ trạng thái booking</h5>
+                                <p class="card-subtitle text-secondary fw-semibold">
+                                    Trạng thái booking theo <span th:switch="${statsType}">
+                                        <span th:case="'DAY'">ngày</span>
+                                        <span th:case="'MONTH'">tháng</span>
+                                        <span th:case="'QUARTER'">quý</span>
+                                </p>
+                            </div>
+                            <div class="text-md-end">
+                                <div class="text-secondary small">Tổng số lượng booking kỳ này</div>
+                                <div class="fs-3 fw-bold text-success">
+                                    <span
+                                        th:text="${stats.totalConfirmedBooking + stats.totalCompletedBooking + stats.totalCancelledBooking} + ' vé'"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center" style="height: 360px;">
+                            <canvas id="bookingStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </section>
+
+    <div th:replace="base :: footer"></div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+    <script th:inline="javascript">
+
+        document.addEventListener('DOMContentLoaded', function () {
+            handleStatsTypeChange();
+            const { dateLabels, revenueData, bookingCountData, bookingStatusLabels, bookingStatusData } = processStatsData();
+            renderLineChart("revenueChart", dateLabels, "Doanh thu", revenueData, "#0d6efd", "rgba(13, 110, 253, 0.15)", "revenue");
+            renderLineChart("bookingChart", dateLabels, "Số lượng booking", bookingCountData, "#198754", "rgba(25, 135, 84, 0.15)", "bookingCount");
+            renderPieChart("bookingStatusChart", bookingStatusLabels, bookingStatusData, ["#0d6efd", "#198754", "#dc3545"]);
+        });
+
+        function handleStatsTypeChange() {
+            const statsType = document.querySelector('select[name="statsType"]');
+            const monthSelect = document.querySelector('select[name="month"]');
+            if (statsType.value === 'DAY') {
+                monthSelect.disabled = false;
+                monthSelect.parentElement.toggleAttribute('hidden', false);
+            } else {
+                monthSelect.disabled = true;
+                monthSelect.parentElement.toggleAttribute('hidden', true);
+            }
+        }
+
+        function processStatsData() {
+            const statsType = document.querySelector('select[name="statsType"]').value;
+            var dateLabels = [];
+            var revenueData = [];
+            var bookingCountData = [];
+            var bookingStatusLabels = ["Đã xác nhận", "Đã hoàn thành", "Đã hủy"];
+            var bookingStatusData = [
+                /*[[${stats.totalConfirmedBooking}]]*/ 0,
+                /*[[${stats.totalCompletedBooking}]]*/ 0,
+                /*[[${stats.totalCancelledBooking}]]*/ 0
+            ];
+            switch (statsType) {
+                case 'DAY':
+                    let daysStats = /*[[${#strings.equals(statsType, 'DAY') ? stats.days : null}]]*/[];
+                    daysStats = daysStats || [];
+                    daysStats.forEach(stat => {
+                        dateLabels.push("Ngày " + stat.day);
+                        revenueData.push(stat.revenue);
+                        bookingCountData.push(stat.confirmedBookingCount + stat.completedBookingCount + stat.cancelledBookingCount);
+                    });
+                    break;
+                case 'MONTH':
+                    let monthStats = /*[[${#strings.equals(statsType, 'MONTH') ? stats.months : null}]]*/[];
+                    monthStats = monthStats || [];
+                    monthStats.forEach(stat => {
+                        dateLabels.push("Tháng " + stat.month);
+                        revenueData.push(stat.revenue);
+                        bookingCountData.push(stat.confirmedBookingCount + stat.completedBookingCount + stat.cancelledBookingCount);
+                    });
+                    break;
+                case 'QUARTER':
+                    let quarterStats = /*[[${#strings.equals(statsType, 'QUARTER') ? stats.quarters : null}]]*/[];
+                    quarterStats = quarterStats || [];
+                    quarterStats.forEach(stat => {
+                        dateLabels.push("Quý " + stat.quarter);
+                        revenueData.push(stat.revenue);
+                        bookingCountData.push(stat.confirmedBookingCount + stat.completedBookingCount + stat.cancelledBookingCount);
+                    });
+                    break;
+                default:
+                    break;
+            }
+            return { dateLabels, revenueData, bookingCountData, bookingStatusLabels, bookingStatusData };
+        }
+
+        function formatCurrency(value) {
+            return value.toLocaleString('vi-VN', { style: "currency", currency: "VND" });
+        }
+
+        function renderLineChart(canvasId, labels, label, data, borderColor, backgroundColor, statsType) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const revenueChart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: label,
+                            data: data,
+                            borderColor: borderColor,
+                            backgroundColor: backgroundColor,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => statsType === "revenue" ? formatCurrency(context.parsed.y) : context.parsed.y,
+                            },
+                        },
+                    },
+                    scales: {
+                        y: {
+                            ticks: { callback: (value) => statsType === "revenue" ? formatCurrency(value) : value },
+                            grid: { color: "rgba(0,0,0,0.06)" },
+                        },
+                        x: { grid: { display: false } },
+                    },
+                }
+            });
+        }
+
+        function renderPieChart(canvasId, labels, data, backgroundColors) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const pieChart = new Chart(ctx, {
+                type: "pie",
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            data: data,
+                            backgroundColor: backgroundColors,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: "bottom" },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const total = context.dataset.data.reduce((sum, value) => sum + value, 0);
+                                    const count = context.parsed;
+                                    const percentage = total > 0 ? (count / total * 100).toFixed(2) : 0;
+                                    return `${count} vé (${percentage}%)`;
+                                }
+                            },
+                        },
+                    },
+                }
+            });
+        }
+    </script>
+
+</body>
+
+
+
+</html>
