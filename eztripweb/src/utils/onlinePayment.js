@@ -6,7 +6,7 @@ const PAYMENT_STRATEGIES = {
         buildRedirectUrl: () => `${window.location.origin}/history`,
     },
     3: {
-        name: "Chuyển khoản ngân hàng",
+        name: "VNPay",
         buildRedirectUrl: () => `${window.location.origin}/history`,
     },
     4: {

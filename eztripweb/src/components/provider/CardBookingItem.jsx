@@ -16,7 +16,8 @@ const STATUS_META = {
 const PAYMENT_METHOD_LABELS = {
 	1: "Tiền mặt",
 	2: "Momo",
-	3: "Chuyển khoản"
+	3: "VNPay",
+    4: "ZaloPay"
 };
 
 function CardBookingItem(props) {

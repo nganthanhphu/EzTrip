@@ -8,7 +8,7 @@ import customerService from "@services/customerService";
 const PAYMENT_METHODS = [
     { id: 1, label: "Tiền mặt" },
     { id: 2, label: "Momo" },
-    { id: 3, label: "Chuyển khoản" },
+    { id: 3, label: "VNPay" },
     { id: 4, label: "ZaloPay" }
 ];
 
