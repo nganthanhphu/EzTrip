@@ -128,15 +128,9 @@ public class ZaloPayPaymentHandler implements PaymentHandler {
 
             Booking booking = this.bookingRepository.getBookingById(bookingId);
             if (booking == null || !booking.getStatusId().getName().equals("PENDING"))
-                return;
+                throw new RuntimeException("Đơn hàng không hợp lệ!");
 
             booking.setStatusId(new BookingStatus(2));
-
-            RestClient client = RestClient.create(this.env.getProperty("ZALOPAY_PAYMENT_URL"));
-            client.post()
-                    .body(Map.of(
-                            "return_code", 1,
-                            "return_message", "Xác nhận thanh toán thành công!"));
 
         } catch (JsonProcessingException ex) {
             throw new RuntimeException("Lỗi khi xử lý kết quả thanh toán!");
