@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hp.pojo.Booking;
 import com.hp.services.PaymentService;
 import com.hp.services.ResourceAuthorizationService;
@@ -31,7 +32,7 @@ public class PaymentServiceimpl implements PaymentService {
     private Map<String, PaymentHandler> paymentHandlers;
 
     @Override
-    public String createPaymentLink(int bookingId, String redirectUrl) {
+    public String createPaymentLink(int bookingId, String redirectUrl) throws JsonProcessingException {
         Booking booking = this.resourceAuthorizationService.getBookingForPayment(bookingId);
 
         if (!booking.getStatusId().getName().equals("PENDING"))

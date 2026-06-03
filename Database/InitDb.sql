@@ -43,7 +43,7 @@ CREATE TABLE payment_method (
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-INSERT INTO payment_method (name) VALUES ('CASH'), ("MOMO"), ('BANK_TRANSFER');
+INSERT INTO payment_method (name) VALUES ('CASH'), ("MOMO"), ('BANK_TRANSFER'), ('ZALOPAY');
 
 CREATE TABLE booking_status (
     id int PRIMARY KEY AUTO_INCREMENT,
