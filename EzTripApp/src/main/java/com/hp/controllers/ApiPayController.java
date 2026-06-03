@@ -50,8 +50,18 @@ public class ApiPayController {
     }
 
     @PostMapping("/callback/zalopay")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void handleZaloPayPaymentCallback(@RequestBody Map<String, String> callbackRequest) {
-        this.paymentService.handlePaymentResult(callbackRequest, "ZALOPAY");
+    public ResponseEntity<Map<String, Object>> handleZaloPayPaymentCallback(
+            @RequestBody Map<String, String> callbackRequest) {
+        try {
+            this.paymentService.handlePaymentResult(callbackRequest, "ZALOPAY");
+            return new ResponseEntity<>(Map.of(
+                    "return_code", 1,
+                    "return_message", "Xác nhận thanh toán thành công!"), HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(Map.of(
+                    "return_code", 0,
+                    "return_message", e.getMessage()), HttpStatus.OK);
+        }
+
     }
 }

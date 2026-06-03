@@ -4,12 +4,15 @@
  */
 package com.hp.dto.service;
 
+import jakarta.validation.constraints.Positive;
+
 /**
  *
  * @author Joon
  */
 public record TourismUpdateDTO(
         BaseServiceUpdateDTO baseInfo,
+        @Positive(message = "Thời lượng tour phải là số dương")
         Integer tourDuration,
         String location) {
 

@@ -31,6 +31,8 @@ import com.hp.dto.service.TourismUpdateDTO;
 import com.hp.dto.service.TourismViewDTO;
 import com.hp.services.TourismSvcService;
 
+import jakarta.validation.Valid;
+
 /**
  *
  * @author Joon
@@ -62,7 +64,7 @@ public class ApiTourismController {
     @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'TRAVEL_AGENCY'")
     @PostMapping(path = "/secure/tourisms", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void addTourism(@ModelAttribute TourismCreateDTO tourism) throws ParseException {
+    public void addTourism(@Valid @ModelAttribute TourismCreateDTO tourism) throws ParseException {
         this.tourismService.addTourism(tourism);
     }
 
@@ -70,7 +72,7 @@ public class ApiTourismController {
     @PatchMapping(path = "/secure/tourisms/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTourism(@PathVariable(value = "id") int id,
-            @ModelAttribute TourismUpdateDTO tourism) throws ParseException {
+            @Valid @ModelAttribute TourismUpdateDTO tourism) throws ParseException {
         this.tourismService.updateTourism(id, tourism);
     }
 

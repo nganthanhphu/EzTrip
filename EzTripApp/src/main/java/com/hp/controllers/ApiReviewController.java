@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.hp.services.ReviewService;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +48,7 @@ public class ApiReviewController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/secure/bookings/{id}/reviews")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addReview(@RequestBody ReviewCreateDTO review, @PathVariable(value = "id") int id) {
+    public void addReview(@Valid @RequestBody ReviewCreateDTO review, @PathVariable(value = "id") int id) {
         this.reviewService.addReview(review, id);
     }
 

@@ -6,19 +6,23 @@ package com.hp.dto.user;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+
 /**
  *
  * @author Joon
  */
 public record UserUpdateDTO(
-        String fullname,
-        String email,
-        String oldPassword,
-        String newPassword,
-        Integer gender,
-        String dob,
-        String companyName,
-        String companyAddress,
-        MultipartFile avatar) {
+                String fullname,
+                @Email(message = "Email không hợp lệ")
+                String email,
+                String oldPassword,
+                @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$", message = "Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm cả chữ hoa, chữ thường và số") String newPassword,
+                Integer gender,
+                String dob,
+                String companyName,
+                String companyAddress,
+                MultipartFile avatar) {
 
 }

@@ -4,14 +4,26 @@
  */
 package com.hp.dto.service;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 /**
  *
  * @author Joon
  */
 public record AccommodationCreateDTO(
+        @NotNull(message = "Các thông tin cơ bản không được để trống")
+        @Valid
         BaseServiceCreateDTO baseInfo,
-        int quantityOfBed,
-        float area,
+        @NotNull(message = "Số lượng giường không được để trống")
+        @Positive(message = "Số lượng giường phải là số dương")
+        Integer quantityOfBed,
+        @NotNull(message = "Diện tích không được để trống")
+        @Positive(message = "Diện tích phải là số dương")
+        Float area,
+        @NotBlank(message = "Vị trí không được để trống")
         String location
 ) {
 }

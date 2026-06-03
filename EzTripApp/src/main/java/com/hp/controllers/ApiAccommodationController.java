@@ -31,6 +31,8 @@ import com.hp.dto.service.AccommodationUpdateDTO;
 import com.hp.dto.service.AccommodationViewDTO;
 import com.hp.services.AccommodationSvcService;
 
+import jakarta.validation.Valid;
+
 /**
  *
  * @author Joon
@@ -63,7 +65,7 @@ public class ApiAccommodationController {
     @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'ACCOMMODATION'")
     @PostMapping(path = "/secure/accommodations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void addAccommodation(@ModelAttribute AccommodationCreateDTO accommodation) throws ParseException {
+    public void addAccommodation(@Valid @ModelAttribute AccommodationCreateDTO accommodation) throws ParseException {
         this.accommodationService.addAccommodation(accommodation);
     }
 
@@ -71,7 +73,7 @@ public class ApiAccommodationController {
     @PatchMapping(path = "/secure/accommodations/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateAccommodation(@PathVariable(value = "id") int id,
-            @ModelAttribute AccommodationUpdateDTO accommodation) throws ParseException {
+            @Valid @ModelAttribute AccommodationUpdateDTO accommodation) throws ParseException {
         this.accommodationService.updateAccommodation(id, accommodation);
     }
 

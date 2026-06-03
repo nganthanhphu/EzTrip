@@ -31,6 +31,8 @@ import com.hp.dto.service.TransportationUpdateDTO;
 import com.hp.dto.service.TransportationViewDTO;
 import com.hp.services.TransportationSvcService;
 
+import jakarta.validation.Valid;
+
 /**
  *
  * @author Joon
@@ -64,7 +66,7 @@ public class ApiTransportationController {
     @PreAuthorize("hasRole('PROVIDER') and principal.providerType == 'TRANSPORTATION'")
     @PostMapping(path = "/secure/transportations", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void addTransportation(@ModelAttribute TransportationCreateDTO transportation) throws ParseException {
+    public void addTransportation(@Valid @ModelAttribute TransportationCreateDTO transportation) throws ParseException {
         this.transportationService.addTransportation(transportation);
     }
 
@@ -72,7 +74,7 @@ public class ApiTransportationController {
     @PatchMapping(path = "/secure/transportations/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateTransportation(@PathVariable(value = "id") int id,
-            @ModelAttribute TransportationUpdateDTO transportation) throws ParseException {
+            @Valid @ModelAttribute TransportationUpdateDTO transportation) throws ParseException {
         this.transportationService.updateTransportation(id, transportation);
     }
 

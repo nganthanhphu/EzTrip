@@ -24,6 +24,9 @@ import com.hp.dto.booking.BookingCreateDTO;
 import com.hp.dto.booking.BookingUpdateDTO;
 import com.hp.dto.booking.BookingViewDTO;
 import com.hp.services.BookingService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
@@ -40,7 +43,7 @@ public class ApiBookingController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/secure/bookings")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createBooking(@RequestBody BookingCreateDTO booking) {
+    public void createBooking(@Valid @RequestBody BookingCreateDTO booking) {
         this.bookingService.addBooking(booking);
     }
 
@@ -54,7 +57,7 @@ public class ApiBookingController {
     @PreAuthorize("hasRole('PROVIDER')")
     @PatchMapping("/secure/bookings/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateBooking(@PathVariable(value = "id") int id, @RequestBody BookingUpdateDTO booking) {
+    public void updateBooking(@PathVariable(value = "id") int id,@Valid @RequestBody BookingUpdateDTO booking) {
         this.bookingService.updateBooking(id, booking);
     }
 }

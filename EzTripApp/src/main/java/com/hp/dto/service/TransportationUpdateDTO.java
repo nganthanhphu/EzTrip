@@ -4,16 +4,23 @@
  */
 package com.hp.dto.service;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+
 /**
  *
  * @author Joon
  */
 public record TransportationUpdateDTO(
-        BaseServiceUpdateDTO baseInfo,
-        String arrivalLocation,
-        String departureLocation,
-        Integer arrivalTime,
-        Integer departureTime,
-        Integer typeOfTransportation) {
+                BaseServiceUpdateDTO baseInfo,
+                String arrivalLocation,
+                String departureLocation,
+                @Min(value = 0, message = "Thời gian đến phải là số từ 0 đến 23")
+                @Max(value = 23, message = "Thời gian đến phải là số từ 0 đến 23")
+                Integer arrivalTime,
+                @Min(value = 0, message = "Thời gian đón phải là số từ 0 đến 23")
+                @Max(value = 23, message = "Thời gian đón phải là số từ 0 đến 23")
+                Integer departureTime,
+                Integer typeOfTransportation) {
 
 }

@@ -14,6 +14,9 @@ import com.hp.utils.JwtUtils;
 import java.security.Principal;
 import java.text.ParseException;
 import java.util.Collections;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,7 +43,7 @@ public class ApiUserController {
     private UserService userService;
 
     @PostMapping(path = "/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserViewDTO> create(@ModelAttribute UserCreateDTO user) throws ParseException {
+    public ResponseEntity<UserViewDTO> create(@Valid @ModelAttribute UserCreateDTO user) throws ParseException {
         UserViewDTO u = this.userService.addUser(user);
 
         return new ResponseEntity<>(u, HttpStatus.CREATED);
@@ -87,7 +90,7 @@ public class ApiUserController {
     }
 
     @PatchMapping(path = "/secure/users", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserViewDTO> update(@ModelAttribute UserUpdateDTO user) throws ParseException {
+    public ResponseEntity<UserViewDTO> update(@Valid@ModelAttribute UserUpdateDTO user) throws ParseException {
         UserViewDTO u = this.userService.updateUser(user);
 
         return new ResponseEntity<>(u, HttpStatus.OK);
