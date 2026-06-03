@@ -1,9 +1,163 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Container, Row, Col, Form } from "react-bootstrap";
+import InfiniteScroll from "react-infinite-scroll-component";
 import CustomerLayout from "@layouts/CustomerLayout";
+import CardHistoryBookingItem from "@components/customer/CardHistoryBookingItem";
+import { useLookupTables } from "@contexts/LookupTablesContext";
+import MySpinner from "@components/common/MySpinner";
+import customerService from "@services/customerService";
+import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
+import useDebounce from "@hooks/useDebounce";
+import { useAuth } from "@hooks/useAuth";
 
 function HistoryBookingList() {
+    const { currentUser } = useAuth();
+
+    const nav = useNavigate();
+    const [searchParams] = useSearchParams();
+    const searchParamsString = searchParams.toString();
+
+    const [typeOfService, setServiceType] = useState(() => searchParams.get("typeOfService") || "");
+    const [status, setStatus] = useState(() => searchParams.get("status") || "");
+    const [serviceName, setServiceName] = useState(() => searchParams.get("serviceName") || "");
+
+    const debouncedServiceName = useDebounce(serviceName);
+
+    const { lookupTables } = useLookupTables();
+    const typeOfServiceOptions = lookupTables.typeOfServices || [];
+
+    const fetchBookings = React.useCallback(
+        (nextPage) => {
+            const params = {};
+            
+            if (typeOfService) params.typeOfService = typeOfService;
+            if (status) params.status = status;
+            if (debouncedServiceName) params.serviceName = debouncedServiceName;
+
+            params.page = nextPage;
+
+            return customerService.getBookings(params);
+        },
+        [currentUser?.id, typeOfService, status, debouncedServiceName],
+    );
+
+    const {
+        items: bookings,
+        loading,
+        hasMore,
+        loadMore,
+        refetch,
+    } = useInfiniteScrollList({
+        queryKey: ["bookings", currentUser?.id, typeOfService, status, debouncedServiceName],
+        fetchPage: fetchBookings
+    });
+
+    useEffect(() => {
+        const t = searchParams.get("typeOfService") || "";
+        const s = searchParams.get("status") || "";
+        const n = searchParams.get("serviceName") || "";
+
+        if (t !== typeOfService) setServiceType(t);
+        if (s !== status) setStatus(s);
+        if (n !== serviceName) setServiceName(n);
+    }, [searchParams.toString()]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(searchParamsString);
+        const nextServiceType = typeOfService.trim();
+        const nextStatus = status.trim();
+        const nextServiceName = debouncedServiceName.trim();
+
+        if (nextServiceType) params.set("typeOfService", nextServiceType); else params.delete("typeOfService");
+        if (nextStatus) params.set("status", nextStatus); else params.delete("status");
+        if (nextServiceName) params.set("serviceName", nextServiceName); else params.delete("serviceName");
+        params.delete("page");
+
+        const nextSearch = params.toString();
+        if (nextSearch !== searchParamsString) {
+            nav({ pathname: window.location.pathname, search: nextSearch ? `?${nextSearch}` : "" }, { replace: true });
+        }
+    }, [typeOfService, status, debouncedServiceName, searchParamsString, nav]);
+
     return (
         <CustomerLayout>
-            <h1>History Booking List</h1>
+            <Container className="p-4">
+                <Form className="mb-3">
+                    <Row className="g-2 align-items-center">
+                        <Col md={4}>
+                            <Form.Control
+                                type="text"
+                                placeholder="Tên dịch vụ"
+                                value={serviceName}
+                                onChange={(e) => setServiceName(e.target.value)}
+                            />
+                        </Col>
+                        <Col md={4}>
+                            <Form.Select
+                                value={typeOfService}
+                                onChange={(e) => setServiceType(e.target.value)}
+                            >
+                                <option value="">Loại dịch vụ</option>
+                                {typeOfServiceOptions.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+
+                        <Col md={4}>
+                            <Form.Select
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                            >
+                                <option value="">Trạng thái</option>
+                                {(lookupTables.bookingStatuses || []).map(
+                                    (option) => (
+                                        <option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.label}
+                                        </option>
+                                    ),
+                                )}
+                            </Form.Select>
+                        </Col>
+                    </Row>
+                </Form>
+
+                {loading ? (
+                    <div className="py-5 d-flex justify-content-center">
+                        <MySpinner />
+                    </div>
+                ) : (
+                    <InfiniteScroll
+                        dataLength={bookings.length}
+                        next={loadMore}
+                        hasMore={hasMore || false}
+                        loader={
+                            <div className="py-4 d-flex justify-content-center">
+                                <MySpinner />
+                            </div>
+                        }
+                    >
+                        <div className="d-flex flex-column gap-3">
+                            {bookings.map((item) => (
+                                <CardHistoryBookingItem
+                                    key={item.id}
+                                    {...item}
+                                    onUpdated={() => refetch()}
+                                />
+                            ))}
+                        </div>
+                    </InfiniteScroll>
+                )}
+            </Container>
         </CustomerLayout>
     );
 }

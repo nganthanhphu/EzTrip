@@ -3,9 +3,16 @@
     "baseUrl": "src",
     "ignoreDeprecations": "6.0",
     "paths": {
+        "@assets/*": ["assets/*"],
+        "@configs/*": ["configs/*"],
         "@components/*": ["components/*"],
+        "@contexts/*": ["contexts/*"],
+        "@hooks/*": ["hooks/*"],
         "@layouts/*": ["layouts/*"],
+        "@reducers/*": ["reducers/*"],
+        "@routes/*": ["routes/*"],
         "@screens/*": ["screens/*"],
+        "@services/*": ["services/*"],
         "@utils/*": ["utils/*"]
     }
     },

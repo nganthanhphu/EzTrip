@@ -1,0 +1,191 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@hooks/useAuth";
+import { Alert, Badge, Button, Card, Col, Container, ListGroup, Row } from "react-bootstrap";
+import { useParams } from "react-router-dom";
+import CustomerLayout from "@layouts/CustomerLayout";
+import PanelAlbum from "@components/customer/PanelAlbum";
+import PanelProviderInfo from "@components/customer/PanelProviderInfo";
+import PanelReview from "@components/customer/PanelReview";
+import PanelCompare from "@components/customer/PanelCompare";
+import ModalConfirmAccommodationBooking from "@components/customer/ModalConfirmAccommodationBooking";
+import MySpinner from "@components/common/MySpinner";
+import customerService from "@services/customerService";
+import { formatCurrency } from "@utils/formatters";
+
+function AccommodationDetail() {
+    const [showBookingModal, setShowBookingModal] = useState(false);
+	const { id } = useParams();
+    const { currentUser } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState("");
+	const [accommodationDetail, setAccommodationDetail] = useState(null);
+	const [reviews, setReviews] = useState([]);
+
+	const loadAccommodationDetail = async (id) => {
+		try {
+			setError("");
+			setLoading(true);
+			const response = await customerService.getAccommodationById(id);
+			console.log("Accommodation detail:", response);
+			setAccommodationDetail(response);
+
+			const serviceId = response?.baseInfo?.id ?? id;
+			const reviewResponse = await customerService.getReviewsByServiceId(serviceId).catch(() => []);
+			setReviews(Array.isArray(reviewResponse) ? reviewResponse : reviewResponse?.content ?? []);
+		} catch (error) {
+			console.error("Error fetching accommodations:", error);
+			setError("Không thể tải thông tin chỗ nghỉ. Vui lòng thử lại sau.");
+		} finally {
+			setLoading(false);
+		}
+	}
+
+	useEffect(() => {
+		loadAccommodationDetail(id);
+	}, [id]);
+
+	if (loading) {
+		return (
+			<CustomerLayout>
+				<Container className="py-5 d-flex justify-content-center align-items-center">
+					<MySpinner />
+				</Container>
+			</CustomerLayout>
+		);
+	}
+
+	if (error || !accommodationDetail) {
+		return (
+			<CustomerLayout>
+				<Container className="py-4">
+					<Alert variant="warning" className="mb-0">
+						{error || "Không tìm thấy thông tin chỗ nghỉ."}
+					</Alert>
+				</Container>
+			</CustomerLayout>
+		);
+	}
+
+	return (
+        <CustomerLayout>
+            <Container className="py-4">
+                <Row className="g-4 mb-4 align-items-stretch">
+                    <Col xs={12} lg={4}>
+                        <PanelAlbum
+                            images={accommodationDetail.baseInfo.images}
+                        />
+                    </Col>
+
+                    <Col xs={12} lg={5}>
+                        <Card className="h-100 shadow-sm">
+                            <Card.Header className="bg-white fw-semibold">
+                                Thông tin dịch vụ
+                            </Card.Header>
+                            <Card.Body className="d-flex flex-column justify-content-between gap-3">
+                                <div>
+                                    <h1 className="h3 fw-semibold mb-2">
+                                        {accommodationDetail.baseInfo.name}
+                                    </h1>
+                                    <div className="text-body-secondary mb-3">
+                                        {accommodationDetail.location}
+                                    </div>
+
+                                    <ListGroup variant="flush" className="mb-3">
+                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+                                            <span>Số giường</span>
+                                            <Badge bg="secondary">
+                                                {
+                                                    accommodationDetail.quantityOfBed
+                                                }
+                                            </Badge>
+                                        </ListGroup.Item>
+                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+                                            <span>Diện tích</span>
+                                            <Badge bg="secondary">
+                                                {accommodationDetail.area} m²
+                                            </Badge>
+                                        </ListGroup.Item>
+                                        <ListGroup.Item className="px-0 d-flex justify-content-between align-items-center">
+                                            <span>Giá</span>
+                                            <Badge bg="success">
+                                                {formatCurrency(
+                                                    accommodationDetail.baseInfo
+                                                        .price,
+                                                )}
+                                            </Badge>
+                                        </ListGroup.Item>
+                                    </ListGroup>
+                                </div>
+
+                                <div className="d-grid">
+                                    <Button
+                                        variant="primary"
+                                        size="lg"
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                navigate("/login", { state: { from: location.pathname } });
+                                                return;
+                                            }
+                                            
+                                            if (currentUser.isActive === false) {
+                                                window.alert("Tài khoản của bạn đang bị khóa. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+                                                return;
+                                            }
+
+                                            setShowBookingModal(true);
+                                        }}
+                                    >
+                                        Book ngay!!!
+                                    </Button>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    <Col xs={12} lg={3}>
+                        <PanelProviderInfo
+                            key={accommodationDetail.id}
+                            {...accommodationDetail.baseInfo?.providerInfo}
+                        />
+                    </Col>
+                </Row>
+
+                <Row className="g-4 align-items-stretch">
+                    <Col xs={12} lg={4}>
+						<PanelCompare
+							currentService={accommodationDetail}
+							serviceType="accommodation"
+						/>
+					</Col>
+                    <Col xs={12} lg={5}>
+                        <Card className="h-100 shadow-sm">
+                            <Card.Header className="bg-white fw-semibold">
+                                Mô tả dịch vụ
+                            </Card.Header>
+                            <Card.Body>
+                                <p className="mb-0">
+                                    {accommodationDetail.baseInfo.description}
+                                </p>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    <Col xs={12} lg={3}>
+                        <PanelReview reviews={reviews} />
+                    </Col>
+                </Row>
+
+                <ModalConfirmAccommodationBooking
+                    show={showBookingModal}
+                    onHide={() => setShowBookingModal(false)}
+                    accommodation={accommodationDetail}
+                />
+            </Container>
+        </CustomerLayout>
+    );
+}
+
+export default AccommodationDetail;
