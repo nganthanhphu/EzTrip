@@ -197,7 +197,6 @@ function ModalProfile({ show, onHide }) {
                                         )}
                                     </div>
                                     <div className="fw-semibold fs-5">{displayName}</div>
-                                    <div className="text-muted small mb-3">{currentUser?.role}</div>
                                     <Badge bg="secondary" className="mb-3">{currentUser?.email || "Chưa có email"}</Badge>
                                     
                                     <Form.Group controlId="profileAvatar" className="text-start mt-3">
