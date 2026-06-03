@@ -1,39 +1,75 @@
-import { Badge, Card, Image, ListGroup } from "react-bootstrap";
+import { useState } from "react";
+import { Badge, Card, Image, ListGroup, Button, Alert, Spinner } from "react-bootstrap";
 import moment from "moment";
 import "moment/locale/vi";
+import geminiService from "@services/geminiService";
 
 function PanelReview({ reviews = [] }) {
-	const reviewList = reviews;
+    const reviewList = reviews;
 
-	return (
+    const [aiSummary, setAiSummary] = useState("");
+    const [isSummarizing, setIsSummarizing] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleGenerateSummary = async () => {
+        try {
+            setIsSummarizing(true);
+            setError("");
+            const summary = await geminiService.summarizeReviews(reviewList);
+            setAiSummary(summary);
+        } catch (err) {
+            setError(err.message || "Không thể tóm tắt lúc này.");
+        } finally {
+            setIsSummarizing(false);
+        }
+    };
+
+    return (
         <Card className="h-100 shadow-sm">
-            <Card.Header className="bg-white fw-semibold">Đánh giá</Card.Header>
+            <Card.Header className="bg-white fw-semibold d-flex justify-content-between align-items-center">
+                <span>Đánh giá khách hàng</span>
+                {reviewList.length > 0 && (
+                    <Button 
+                        variant="outline-primary" 
+                        size="sm" 
+                        onClick={handleGenerateSummary}
+                        disabled={isSummarizing}
+                    >
+                        {isSummarizing ? (
+                            <><Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-1"/> Đang phân tích...</>
+                        ) : (
+                            "Xem tổng quan"
+                        )}
+                    </Button>
+                )}
+            </Card.Header>
             <Card.Body className="p-0">
+                {error && <Alert variant="danger" className="m-3 p-2 text-center small">{error}</Alert>}
+
+                {aiSummary && (
+                    <div className="m-3 p-3 bg-primary-subtle border border-primary rounded text-dark">
+                        <div className="fw-semibold mb-1 d-flex align-items-center gap-2">
+                            <span>Tổng quan đánh giá</span>
+                        </div>
+                        <p className="mb-0 small">{aiSummary}</p>
+                    </div>
+                )}
+
                 {reviewList.length > 0 ? (
                     <ListGroup variant="flush">
                         {reviewList.map((review, index) => (
                             <ListGroup.Item
-                                key={
-                                    review.id ??
-                                    `${review.reviewName ?? "review"}-${index}`
-                                }
+                                key={review.id ?? `${review.reviewName ?? "review"}-${index}`}
                                 className="py-3"
                             >
                                 <div className="d-flex align-items-start gap-3">
                                     {review.reviewAvatar ? (
                                         <Image
                                             src={review.reviewAvatar}
-                                            alt={
-                                                review.reviewName ||
-                                                "Avatar khách hàng"
-                                            }
+                                            alt={review.reviewName || "Avatar khách hàng"}
                                             roundedCircle
                                             className="flex-shrink-0 border"
-                                            style={{
-                                                width: 52,
-                                                height: 52,
-                                                objectFit: "cover",
-                                            }}
+                                            style={{ width: 52, height: 52, objectFit: "cover" }}
                                         />
                                     ) : (
                                         <div
@@ -49,21 +85,13 @@ function PanelReview({ reviews = [] }) {
                                         <div className="d-flex justify-content-between align-items-start gap-3">
                                             <div className="min-w-0">
                                                 <div className="fw-semibold text-truncate">
-                                                    {review.reviewName ||
-                                                        "Khách hàng"}
+                                                    {review.reviewName || "Khách hàng"}
                                                 </div>
                                                 <div className="text-body-secondary small">
-                                                    {moment(
-                                                        review.reviewDate,
-                                                        "DD/MM/YYYY HH:mm",
-                                                    ).fromNow() || ""}
+                                                    {moment(review.reviewDate, "DD/MM/YYYY HH:mm").fromNow() || ""}
                                                 </div>
                                             </div>
-                                            <Badge
-                                                bg="warning"
-                                                text="dark"
-                                                className="flex-shrink-0 px-3 py-2"
-                                            >
+                                            <Badge bg="warning" text="dark" className="flex-shrink-0 px-3 py-2">
                                                 {Number(review.rating) || 0}/10
                                             </Badge>
                                         </div>

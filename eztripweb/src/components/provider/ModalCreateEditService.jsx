@@ -7,6 +7,7 @@ import { useAuth } from "@hooks/useAuth";
 import { validateRequiredFields } from "@utils/validators";
 import providerService from "@services/providerService";
 import { useQueryClient } from "@tanstack/react-query";
+import geminiService from "@services/geminiService";
 
 const EMPTY_FORM = {
     name: "", description: "", price: "", quantity: "",
@@ -33,6 +34,7 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
     const [error, setError] = useState("");
     const [initializing, setInitializing] = useState(true);
     const [submitting, setSubmitting] = useState(false);
+    const [isGenerating, setIsGenerating] = useState(false);
     
     const [selectedImages, setSelectedImages] = useState([]);
     const [selectedImagePreviews, setSelectedImagePreviews] = useState([]);
@@ -165,6 +167,25 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
             setError(err?.response?.data?.message || err?.response?.data?.error || "Không thể xóa ảnh.");
         } finally {
             setDeletingImageId("");
+        }
+    };
+
+    const handleGenerateAI = async () => {
+        if (!form.name.trim()) {
+            setError("Vui lòng nhập 'Tên dịch vụ' trước khi nhờ AI viết mô tả.");
+            return;
+        }
+
+        try {
+            setIsGenerating(true);
+            setError("");
+            const generatedDescription = await geminiService.generateDescription(form, providerType);
+            
+            setForm((curr) => ({ ...curr, description: generatedDescription }));
+        } catch (err) {
+            setError(err.message || "Lỗi khi gọi AI. Vui lòng thử lại.");
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -327,8 +348,31 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
                                     <Row className="g-3">
                                         <Col xs={12}>
                                             <Form.Group controlId="description">
-                                                <Form.Label>Mô tả</Form.Label>
-                                                <Form.Control name="description" as="textarea" rows={4} value={form.description} onChange={handleChange} placeholder="Mô tả ngắn gọn dịch vụ" />
+                                                <div className="d-flex justify-content-between align-items-center mb-1">
+                                                    <Form.Label className="mb-0">Mô tả</Form.Label>
+                                                    <Button 
+                                                        variant="outline-info" 
+                                                        size="sm" 
+                                                        onClick={handleGenerateAI} 
+                                                        disabled={isGenerating || submitting}
+                                                        className="d-flex align-items-center gap-1"
+                                                    >
+                                                        {isGenerating ? (
+                                                            <><MySpinner size="sm" /> Đang sáng tác...</>
+                                                        ) : (
+                                                            <>✨ Nhờ AI viết</>
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                                <Form.Control 
+                                                    name="description" 
+                                                    as="textarea" 
+                                                    rows={4} 
+                                                    value={form.description} 
+                                                    onChange={handleChange} 
+                                                    placeholder="Mô tả ngắn gọn dịch vụ" 
+                                                    disabled={isGenerating}
+                                                />
                                             </Form.Group>
                                         </Col>
                                     </Row>
