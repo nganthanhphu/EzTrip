@@ -1,4 +1,4 @@
-export const SERVER_URL = "http://localhost:8080/EzTripApp";
+export const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:8080";
 
 export const endpoints = {
     login: "/api/login",
