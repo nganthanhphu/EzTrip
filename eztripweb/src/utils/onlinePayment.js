@@ -12,10 +12,6 @@ const PAYMENT_STRATEGIES = {
     4: {
         name: "ZaloPay",
         buildRedirectUrl: () => `${window.location.origin}/history`,
-    },
-    5: {
-        name: "VNPay",
-        buildRedirectUrl: () => `${window.location.origin}/history`,
     }
 };
 

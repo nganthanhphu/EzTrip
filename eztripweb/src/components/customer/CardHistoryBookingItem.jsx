@@ -26,12 +26,11 @@ const PAYMENT_METHOD_LABELS = {
     1: "Tiền mặt",
     2: "Momo",
     3: "Chuyển khoản",
-    4: "ZaloPay",
-    5: "VNPay"
+    4: "ZaloPay"
 };
 
-const ONLINE_PAYMENT_IDS = [2, 3, 4, 5]; 
-const ONLINE_PAYMENT_KEYS = ["MOMO", "BANK_TRANSFER", "ZALOPAY", "VNPAY"];
+const ONLINE_PAYMENT_IDS = [2, 3, 4]; 
+const ONLINE_PAYMENT_KEYS = ["MOMO", "BANK_TRANSFER", "ZALOPAY"];
 
 function resolveStatusMeta(status) {
     return STATUS_META[status] || STATUS_META[String(status).toUpperCase()] || {

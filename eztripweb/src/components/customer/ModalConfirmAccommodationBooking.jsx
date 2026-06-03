@@ -9,8 +9,7 @@ const PAYMENT_METHODS = [
 	{ id: 1, label: "Tiền mặt" },
 	{ id: 2, label: "Momo" },
 	{ id: 3, label: "Chuyển khoản" },
-	{ id: 4, label: "ZaloPay" },
-	{ id: 5, label: "VNPay" },
+	{ id: 4, label: "ZaloPay" }
 ];
 
 function getDateInputValue(offsetDays = 0) {
