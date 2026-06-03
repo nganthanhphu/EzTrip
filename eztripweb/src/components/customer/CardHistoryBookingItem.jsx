@@ -72,7 +72,6 @@ function CardHistoryBookingItem(props) {
         status,
         customerId,
         customerName,
-        customerPhone,
         customerAvatar,
         companyId,
         companyName,
@@ -89,8 +88,6 @@ function CardHistoryBookingItem(props) {
     const paymentMethodLabel = resolvePaymentMethodLabel(paymentMethod);
     const createdDateLabel = formatDateTime(createdDate) || createdDate || "-";
     const bookingDayLabel = formatDateTime(bookingDay) || bookingDay || "-";
-    const isProviderViewing = Boolean(currentUser?.id && String(currentUser.id) === String(companyId));
-    const canChat = Boolean(currentUser?.id && (isProviderViewing ? customerId : companyId));
 
     const isPending = statusMeta.key === "PENDING";
     const isCompleted = statusMeta.key === "COMPLETED";
@@ -182,7 +179,6 @@ function CardHistoryBookingItem(props) {
                             <Button
                                 variant="outline-secondary"
                                 onClick={() => setShowChatModal(true)}
-                                disabled={!canChat}
                             >
                                 Chat ngay
                             </Button>
@@ -284,19 +280,11 @@ function CardHistoryBookingItem(props) {
                 show={showChatModal}
                 onHide={() => setShowChatModal(false)}
                 currentUserId={currentUser?.id}
-                partnerUserId={isProviderViewing ? customerId : companyId}
+                partnerUserId={companyId}
                 currentName={currentUser?.fullname || "Tôi"}
-                partnerName={
-                    isProviderViewing
-                        ? customerName || "Khách hàng"
-                        : companyName || "Nhà cung cấp"
-                }
+                partnerName={ companyName || "Đối tác"}
                 currentAvatar={currentUser?.avatar || ""}
-                partnerAvatar={
-                    isProviderViewing
-                        ? customerAvatar || ""
-                        : props.companyAvatar || ""
-                }
+                partnerAvatar={serviceImage || ""}
             />
             <ModalReview
                 show={showReviewModal}
