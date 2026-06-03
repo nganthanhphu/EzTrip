@@ -272,22 +272,17 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
             setError("");
             setSubmitting(true);
             const payload = buildPayload();
-            let response;
 
             if (providerType === 1) {
-                response = isEditMode ? await providerService.updateTourism(serviceId, payload) : await providerService.createTourism(payload);
+                isEditMode ? await providerService.updateTourism(serviceId, payload) : await providerService.createTourism(payload);
             } else if (providerType === 2) {
-                response = isEditMode ? await providerService.updateAccommodation(serviceId, payload) : await providerService.createAccommodation(payload);
+                isEditMode ? await providerService.updateAccommodation(serviceId, payload) : await providerService.createAccommodation(payload);
             } else if (providerType === 3) {
-                response = isEditMode ? await providerService.updateTransportation(serviceId, payload) : await providerService.createTransportation(payload);
+                isEditMode ? await providerService.updateTransportation(serviceId, payload) : await providerService.createTransportation(payload);
             }
 
-            if (response?.status >= 200 && response?.status < 300) {
-                queryClient.invalidateQueries({ queryKey: ["provider-services"] });
-                onSuccess ? onSuccess() : closeModal();
-                return;
-            }
-            setError("Hệ thống không phản hồi đúng mong đợi.");
+            onSuccess ? onSuccess() : closeModal();
+
         } catch (err) {
             setError(err?.response?.data?.message || err?.response?.data?.error || (isEditMode ? "Không thể cập nhật dịch vụ." : "Không thể tạo dịch vụ."));
         } finally {
