@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Container, Navbar, Nav, Image } from "react-bootstrap";
+import { Button, Container, Navbar, Nav, Image, Badge } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useAuth } from "@hooks/useAuth";
 import ModalProfile from "@components/common/ModalProfile";
@@ -49,6 +49,17 @@ function HeaderProvider() {
                                     >
                                         {currentUser.fullname || "Hồ sơ"}
                                     </Button>
+                                    {currentUser?.isActive === false && (
+                                        <Badge bg="danger" className="ms-2">
+                                            Tài khoản bị khóa
+                                        </Badge>
+                                    )}
+                                    {currentUser?.isActive === true && (
+                                        <Badge bg="success" className="ms-2">
+                                            Đang hoạt động
+                                        </Badge>
+                                    )}
+
                                 </div>
                                 <Link className="nav-link" to="/provider/logout">
                                     Đăng xuất
