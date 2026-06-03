@@ -130,6 +130,11 @@ function AccommodationDetail() {
                                                 navigate("/login", { state: { from: location.pathname } });
                                                 return;
                                             }
+                                            
+                                            if (currentUser.isActive === false) {
+                                                window.alert("Tài khoản của bạn đang bị khóa. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.");
+                                                return;
+                                            }
 
                                             setShowBookingModal(true);
                                         }}

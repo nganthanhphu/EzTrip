@@ -225,8 +225,13 @@ function CardHistoryBookingItem(props) {
                             >
                                 {statusMeta.label}
                             </Badge>
+                            {currentUser?.isActive === false && (
+                                <div className="small text-danger">
+                                    Tài khoản của bạn đang bị khóa. Không thể thực hiện hành động này. Vui lòng liên hệ quản trị viên để biết thêm chi tiết.
+                                </div>
+                            )}
 
-                            {isPending ? (
+                            {isPending && currentUser?.isActive === true ? (
                                 <>
                                     <div className="d-flex w-100 gap-2">
                                         {isMomoPayment && (
@@ -259,7 +264,7 @@ function CardHistoryBookingItem(props) {
                                         </Button>
                                     </div>
                                 </>
-                            ) : isCompleted ? (
+                            ) : isCompleted && currentUser?.isActive === true ? (
                                 <Button
                                     variant="success"
                                     onClick={() => setShowReviewModal(true)}
