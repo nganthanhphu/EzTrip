@@ -260,7 +260,7 @@ function CardHistoryBookingItem(props) {
                                         </Button>
                                     </div>
                                 </>
-                            ) : isCompleted && currentUser?.isActive === true ? (
+                            ) : isCompleted && currentUser?.isActive === true && serviceType !== 3 ? (
                                 <Button
                                     variant="success"
                                     onClick={() => setShowReviewModal(true)}
