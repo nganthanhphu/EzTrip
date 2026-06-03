@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Alert, Badge, Modal } from "react-bootstrap";
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { getDatabase, onValue, push, ref } from "firebase/database";
@@ -8,18 +8,8 @@ import defaultAvatar from "@assets/images/default_avatar.jpg";
 import { MessageBubble, ChatInput } from "@components/common/ChatComponents";
 import { useAuth } from "@hooks/useAuth";
 
-function ModalChat({
-	show = true,
-	onHide,
-	currentUserId,
-	partnerUserId,
-	currentName,
-	partnerName,
-	currentAvatar,
-	partnerAvatar,
-}) {
+function ModalChat({show = true, onHide, currentUserId,	partnerUserId, currentName, partnerName, currentAvatar,	partnerAvatar}) {
 	const navigate = useNavigate();
-	const location = useLocation();
 	const { currentUser } = useAuth();
 	const scrollRef = useRef(null);
 	const [messages, setMessages] = useState([]);
@@ -44,7 +34,7 @@ function ModalChat({
 		}
 	}, [messages]);
 
-	const currentId = currentUserId;
+	const currentId = currentUserId || currentUser?.id;
 	const partnerId = partnerUserId;
 	const roomId = (currentId && partnerId ? [currentId, partnerId].sort().join("__") : "");
 

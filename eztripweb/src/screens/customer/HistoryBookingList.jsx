@@ -45,7 +45,6 @@ function HistoryBookingList() {
     const {
         items: bookings,
         loading,
-        loadingMore,
         hasMore,
         loadMore,
         refetch,

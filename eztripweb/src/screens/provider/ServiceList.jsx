@@ -40,7 +40,6 @@ function ServiceList() {
     const {
         items: services,
         loading,
-        loadingMore,
         hasMore,
         loadMore,
         error,

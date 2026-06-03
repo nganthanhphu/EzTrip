@@ -55,7 +55,6 @@ function BookingList() {
     const {
         items: bookings,
         loading: loadingBookings,
-        loadingMore,
         hasMore,
         loadMore,
         refetch,

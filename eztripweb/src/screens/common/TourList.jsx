@@ -54,7 +54,6 @@ function TourList() {
     const {
         items: tourList,
         loading,
-        loadingMore,
         hasMore,
         loadMore,
     } = useInfiniteScrollList({

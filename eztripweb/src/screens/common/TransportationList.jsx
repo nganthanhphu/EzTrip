@@ -84,7 +84,6 @@ function TransportationList() {
     const {
         items: transportationList,
         loading,
-        loadingMore,
         hasMore,
         loadMore,
     } = useInfiniteScrollList({
