@@ -43,7 +43,7 @@ public class ApiPayController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/momo/ipn")
+    @PostMapping("/callback/momo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void handleMomoPaymentIpn(@RequestBody Map<String, String> ipnRequest) {
         this.paymentService.handlePaymentResult(ipnRequest, "MOMO");

@@ -50,7 +50,7 @@ public class MomoPaymentHandler implements PaymentHandler {
         String orderId = String.format("%s%s", dateTime, String.valueOf(booking.getId()));
         String orderInfo = "Thanh toán cho dịch vụ: " + booking.getServiceId().getName();
         String ipnUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/momo/ipn").toUriString();
+                .path("/api/callback/momo").toUriString();
         String requestType = "captureWallet";
         String extraData = "";
         String lang = "vi";
