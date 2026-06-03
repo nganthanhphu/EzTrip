@@ -56,7 +56,15 @@ public class ApiSecurityConfigs {
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        CorsConfiguration callbackConfig = new CorsConfiguration();
+        callbackConfig.setAllowedOrigins(List.of("*"));
+        callbackConfig.setAllowedMethods(List.of("POST", "OPTIONS"));
+        callbackConfig.setAllowedHeaders(List.of("*"));
+
+
         source.registerCorsConfiguration("/api/**", config);
+        source.registerCorsConfiguration("/api/callback/**", callbackConfig);
 
         return source;
     }
