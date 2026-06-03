@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, Modal, Spinner } from "react-bootstrap";
-import { compareAccommodations, compareTourisms } from "@services/customerService";
+import customerService from "@services/customerService";
 
 function getServiceInfo(service) {
 	return service?.baseInfo ?? service ?? {};
@@ -12,7 +12,7 @@ function ModalResultCompare({ show, onHide, currentService, selectedServices = [
 	const [result, setResult] = useState("");
 
 	const currentServiceInfo = useMemo(() => getServiceInfo(currentService), [currentService]);
-	const compareService = serviceType === "tourism" ? compareTourisms : compareAccommodations;
+	const compareService = serviceType === "tourism" ? customerService.compareTourisms : customerService.compareAccommodations;
 	const selectedServiceInfos = useMemo(() => selectedServices.map(getServiceInfo), [selectedServices]);
 
 	useEffect(() => {

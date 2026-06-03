@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import { createBooking } from "@services/customerService";
+import customerService from "@services/customerService";
 import { formatBookingDate, formatCurrency } from "@utils/formatters";
 import {useQueryClient} from "@tanstack/react-query";
 
@@ -65,7 +65,7 @@ function ModalConfirmAccommodationBooking({ show, onHide, accommodation }) {
 		setSubmitSuccess("");
 
 		try {
-			await createBooking({
+			await customerService.createBooking({
 				serviceId: accommodation.baseInfo.id,
 				paymentMethodId,
 				bookingDay,

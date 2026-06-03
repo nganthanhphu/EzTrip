@@ -1,31 +1,31 @@
-import axiosClient from "@services/axiosClient";
+import { apiHelper } from "@services/axiosClient";
 
 const lookupEndpoints = {
     genders: "/api/genders",
     roles: "/api/roles",
-	typeOfProviders: "/api/type-of-providers",
-	typeOfServices: "/api/type-of-services",
+    typeOfProviders: "/api/type-of-providers",
+    typeOfServices: "/api/type-of-services",
     typeOfTransportations: "/api/type-of-transportations",
     bookingStatuses: "/api/booking-statuses",
 };
 
-async function requestLookup(endpoint) {
-	const response = await axiosClient.get(endpoint);
-	return response.data;
-}
-
 export async function fetchLookupTables() {
-	const entries = Object.entries(lookupEndpoints);
-	const settledResults = await Promise.allSettled(
-		entries.map(([, endpoint]) => requestLookup(endpoint)),
-	);
+    const entries = Object.entries(lookupEndpoints);
 
-	return settledResults.reduce((tables, result, index) => {
-		if (result.status === "fulfilled") {
-			const [key] = entries[index];
-			tables[key] = Array.isArray(result.value) ? result.value : [];
-		}
+    const settledResults = await Promise.allSettled(
+        entries.map(([, endpoint]) => apiHelper.get(endpoint))
+    );
 
-		return tables;
-	}, {});
+    return settledResults.reduce((tables, result, index) => {
+        const [key] = entries[index];
+        
+        if (result.status === "fulfilled") {
+            tables[key] = Array.isArray(result.value) ? result.value : [];
+        } else {
+            console.warn(`[LookupService] Lỗi khi tải bảng tra cứu '${key}':`, result.reason);
+            tables[key] = []; 
+        }
+
+        return tables;
+    }, {});
 }

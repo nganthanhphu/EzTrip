@@ -7,7 +7,7 @@ import TransportationItem from "@components/customer/CardTransportationItem";
 import ModalConfirmTransportationBooking from "@components/customer/ModalConfirmTransportationBooking";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import MySpinner from "@components/common/MySpinner";
-import { getTransportations } from "@services/customerService";
+import customerService from "@services/customerService";
 
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@hooks/useAuth";
@@ -76,7 +76,7 @@ function TransportationList() {
             
             params.append("page", nextPage);
 
-            return getTransportations(params.toString()).then((response) => {
+            return customerService.getTransportations(params.toString()).then((response) => {
                 return Array.isArray(response)
                     ? response
                     : response?.content || response?.items || response?.results || [];

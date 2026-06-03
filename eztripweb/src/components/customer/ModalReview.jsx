@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Alert, Badge, Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
-import { createReview } from "@services/customerService";
+import customerService from "@services/customerService";
 import {formatDateTime} from "@utils/formatters";
 
 function ModalReview({ show, onHide, bookingId, serviceName, review, onSaved }) {
@@ -46,7 +46,7 @@ function ModalReview({ show, onHide, bookingId, serviceName, review, onSaved }) 
 		setError("");
 
 		try {
-			await createReview(bookingId, {
+			await customerService.createReview(bookingId, {
 				rating: Number(draft.rating),
 				comment: draft.comment.trim(),
 			});

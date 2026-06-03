@@ -5,12 +5,7 @@ import MySpinner from "@components/common/MySpinner";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import { useAuth } from "@hooks/useAuth";
 import { validateRequiredFields } from "@utils/validators";
-import {
-    deleteImage,
-    createAccommodation, updateAccommodation, getAccommodationById, deleteAccommodation,
-    createTourism, updateTourism, getTourismById, deleteTourism,
-    createTransportation, updateTransportation, getTransportationById, deleteTransportation
-} from "@services/providerService";
+import providerService from "@services/providerService";
 import { useQueryClient } from "@tanstack/react-query";
 
 const EMPTY_FORM = {
@@ -79,11 +74,11 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
                 if (serviceId) {
                     let responseData;
                     if (providerType === 1) {
-                        responseData = await getTourismById(serviceId);
+                        responseData = await providerService.getTourismById(serviceId);
                     } else if (providerType === 2) {
-                        responseData = await getAccommodationById(serviceId);
+                        responseData = await providerService.getAccommodationById(serviceId);
                     } else if (providerType === 3) {
-                        responseData = await getTransportationById(serviceId);
+                        responseData = await providerService.getTransportationById(serviceId);
                     }
 
                     if (!responseData) throw new Error("Không tìm thấy dịch vụ cần chỉnh sửa.");
@@ -164,7 +159,7 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
         try {
             setDeletingImageId(imageId);
             setError("");
-            await deleteImage(imageId);
+            await providerService.deleteImage(imageId);
             setExistingImages((curr) => curr.filter((img) => getImageId(img) !== imageId));
         } catch (err) {
             setError(err?.response?.data?.message || err?.response?.data?.error || "Không thể xóa ảnh.");
@@ -214,11 +209,11 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
             setError("");
             
             if (providerType === 1) {
-                await deleteTourism(serviceId);
+                await providerService.deleteTourism(serviceId);
             } else if (providerType === 2) {
-                await deleteAccommodation(serviceId);
+                await providerService.deleteAccommodation(serviceId);
             } else if (providerType === 3) {
-                await deleteTransportation(serviceId);
+                await providerService.deleteTransportation(serviceId);
             }
 
             queryClient.invalidateQueries({ queryKey: ["provider-services"] });
@@ -259,11 +254,11 @@ export default function ModalCreateEditService({ show = true, onHide, onSuccess,
             let response;
 
             if (providerType === 1) {
-                response = isEditMode ? await updateTourism(serviceId, payload) : await createTourism(payload);
+                response = isEditMode ? await providerService.updateTourism(serviceId, payload) : await providerService.createTourism(payload);
             } else if (providerType === 2) {
-                response = isEditMode ? await updateAccommodation(serviceId, payload) : await createAccommodation(payload);
+                response = isEditMode ? await providerService.updateAccommodation(serviceId, payload) : await providerService.createAccommodation(payload);
             } else if (providerType === 3) {
-                response = isEditMode ? await updateTransportation(serviceId, payload) : await createTransportation(payload);
+                response = isEditMode ? await providerService.updateTransportation(serviceId, payload) : await providerService.createTransportation(payload);
             }
 
             if (response?.status >= 200 && response?.status < 300) {

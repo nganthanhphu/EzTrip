@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { Badge, Button, Card, Col, Form, Image, InputGroup, Row, Stack, Spinner } from "react-bootstrap";
 import ModalResultCompare from "@components/customer/ModalResultCompare";
-import { getAccommodations, getTourisms } from "@services/customerService";
+import customerService from "@services/customerService";
 import defaultAccommodationImage from "@assets/images/default_accommodation_item.jpg";
 import defaultTourImage from "@assets/images/default_tour_item.jpg";
 import { formatCurrency } from "@utils/formatters";
@@ -11,12 +11,12 @@ import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 const SERVICE_CONFIG = {
 	accommodation: {
 		label: "chỗ nghỉ",
-		loadList: getAccommodations,
+		loadList: customerService.getAccommodations,
 		defaultImage: defaultAccommodationImage,
 	},
 	tourism: {
 		label: "tour",
-		loadList: getTourisms,
+		loadList: customerService.getTourisms,
 		defaultImage: defaultTourImage,
 	},
 };

@@ -1,23 +1,13 @@
-import axiosClient from "@services/axiosClient";
+import { apiHelper } from "@services/axiosClient";
 import { endpoints } from "@configs/Apis";
 
-export async function loginWithPassword(phoneNumber, password) {
-	const response = await axiosClient.post(endpoints.login, {
-		phoneNumber,
-		password,
-	});
+export const loginWithPassword = (phoneNumber, password) =>
+    apiHelper.post(endpoints.login, { phoneNumber, password });
 
-	return response.data;
-}
+export const fetchCurrentUser = () => apiHelper.get(endpoints.profile);
 
-export async function fetchCurrentUser() {
-	const response = await axiosClient.get(endpoints.profile);
+export const updateCurrentUserProfile = (formData) =>
+    apiHelper.patchForm(endpoints.users, formData);
 
-	return response.data;
-}
-
-export async function updateCurrentUserProfile(formData) {
-	const response = await axiosClient.patch(endpoints.users, formData);
-
-	return response.data;
-}
+export const registerUser = (formData) =>
+    apiHelper.postForm(endpoints.register, formData);

@@ -6,7 +6,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TourItem from "@components/customer/CardTourItem";
 import MySpinner from "@components/common/MySpinner";
-import { getTourisms } from "@services/customerService";
+import customerService from "@services/customerService";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
 
@@ -46,7 +46,7 @@ function TourList() {
         
         params.append("page", nextPage);
 
-        return getTourisms(params.toString());
+        return customerService.getTourisms(params.toString());
     },
     [debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order]
 );

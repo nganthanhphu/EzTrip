@@ -6,7 +6,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
 import CardAccommodationItem from "@components/customer/CardAccommodationItem";
-import { getAccommodations } from "@services/customerService";
+import customerService from "@services/customerService";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
 
@@ -43,7 +43,7 @@ function AccommodationList() {
         
         params.append("page", nextPage);
 
-        return getAccommodations(params.toString());
+        return customerService.getAccommodations(params.toString());
     },
     [debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order]
 );

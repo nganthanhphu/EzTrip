@@ -6,7 +6,7 @@ import CustomerLayout from "@layouts/CustomerLayout";
 import CardHistoryBookingItem from "@components/customer/CardHistoryBookingItem";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import MySpinner from "@components/common/MySpinner";
-import { getBookings } from "@services/customerService";
+import customerService from "@services/customerService";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
 import useDebounce from "@hooks/useDebounce";
 import { useAuth } from "@hooks/useAuth";
@@ -38,7 +38,7 @@ function HistoryBookingList() {
             if (debouncedServiceName)
                 params.append("serviceName", debouncedServiceName);
 
-            return getBookings(params.toString());
+            return customerService.getBookings(params.toString());
         },
         [currentUser?.id, typeOfService, status, debouncedServiceName],
     );

@@ -1,4 +1,4 @@
-import { getBookings, payBooking } from "@services/customerService";
+import customerService from "@services/customerService";
 
 const MOMO_PAYMENT_METHOD_ID = 2;
 
@@ -23,7 +23,7 @@ export function buildMomoRedirectUrl() {
 }
 
 export async function openMomoPaymentForBooking(expectedBooking) {
-	const response = await getBookings({ page: 1 });
+	const response = await customerService.getBookings({ page: 1 });
 	const bookings = response || [];
 	const booking = bookings.find((item) => isMatchingBooking(item, expectedBooking));
 
@@ -31,7 +31,7 @@ export async function openMomoPaymentForBooking(expectedBooking) {
 		throw new Error("Không tìm thấy booking vừa tạo để thanh toán Momo.");
 	}
 
-	const paymentResponse = await payBooking(booking.id, {
+	const paymentResponse = await customerService.payBooking(booking.id, {
 		redirectUrl: buildMomoRedirectUrl(),
 	});
 	const paymentUrl = paymentResponse?.paymentUrl || paymentResponse?.data?.paymentUrl;

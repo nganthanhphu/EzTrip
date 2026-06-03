@@ -1,6 +1,3 @@
-import axios from "axios";
-import cookies from "react-cookies";
-
 export const SERVER_URL = "http://localhost:8080/EzTripApp";
 
 export const endpoints = {
@@ -8,17 +5,11 @@ export const endpoints = {
     register: "/api/users",
     profile: "/api/secure/profile",
     users: "/api/secure/users",
+    accommodations: "/api/accommodations",
+    secureAccommodations: "/api/secure/accommodations",
+    tourisms: "/api/tourisms",
+    secureTourisms: "/api/secure/tourisms",
+    transportations: "/api/transportations",
+    secureTransportations: "/api/secure/transportations",
+    bookings: "/api/secure/bookings",
 };
-
-export const authApis = () => {
-    return axios.create({
-        baseURL: SERVER_URL,
-        headers: {
-            Authorization: `Bearer ${cookies.load("token")}`,
-        },
-    });
-};
-
-export default axios.create({
-    baseURL: SERVER_URL,
-});

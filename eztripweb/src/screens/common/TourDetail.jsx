@@ -10,7 +10,7 @@ import ReviewPanel from "@components/customer/PanelReview";
 import PanelCompare from "@components/customer/PanelCompare";
 import ModalConfirmTourBooking from "@components/customer/ModalConfirmTourBooking";
 import MySpinner from "@components/common/MySpinner";
-import { getReviewsByServiceId, getTourismById } from "@services/customerService";
+import customerService from "@services/customerService";
 import { formatCurrency } from "@utils/formatters";
 
 function TourDetail() {
@@ -28,11 +28,11 @@ function TourDetail() {
 		try {
 			setError("");
 			setLoading(true);
-			const response = await getTourismById(tourismId);
+			const response = await customerService.getTourismById(tourismId);
 			setTourDetail(response);
 
 			const serviceId = response?.baseInfo?.id ?? tourismId;
-			const reviewResponse = await getReviewsByServiceId(serviceId).catch(() => []);
+			const reviewResponse = await customerService.getReviewsByServiceId(serviceId).catch(() => []);
             setReviews(reviewResponse || []);
 		} catch (requestError) {
 			console.error("Error fetching tours:", requestError);

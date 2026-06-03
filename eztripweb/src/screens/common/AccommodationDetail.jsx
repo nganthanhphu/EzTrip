@@ -10,8 +10,7 @@ import PanelReview from "@components/customer/PanelReview";
 import PanelCompare from "@components/customer/PanelCompare";
 import ModalConfirmAccommodationBooking from "@components/customer/ModalConfirmAccommodationBooking";
 import MySpinner from "@components/common/MySpinner";
-import { getAccommodationById } from "@services/customerService";
-import { getReviewsByServiceId } from "@services/customerService";
+import customerService from "@services/customerService";
 import { formatCurrency } from "@utils/formatters";
 
 function AccommodationDetail() {
@@ -29,12 +28,12 @@ function AccommodationDetail() {
 		try {
 			setError("");
 			setLoading(true);
-			const response = await getAccommodationById(id);
+			const response = await customerService.getAccommodationById(id);
 			console.log("Accommodation detail:", response);
 			setAccommodationDetail(response);
 
 			const serviceId = response?.baseInfo?.id ?? id;
-			const reviewResponse = await getReviewsByServiceId(serviceId).catch(() => []);
+			const reviewResponse = await customerService.getReviewsByServiceId(serviceId).catch(() => []);
 			setReviews(Array.isArray(reviewResponse) ? reviewResponse : reviewResponse?.content ?? []);
 		} catch (error) {
 			console.error("Error fetching accommodations:", error);

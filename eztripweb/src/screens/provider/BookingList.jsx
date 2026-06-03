@@ -2,22 +2,11 @@ import React, { useCallback, useEffect, useState, useRef, useMemo } from "react"
 import { useParams } from "react-router-dom";
 import { Alert, Container, Row, Col, Form, Badge, ProgressBar, Card } from "react-bootstrap";
 import InfiniteScroll from "react-infinite-scroller";
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    LineController,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, LineController, PointElement, LineElement, Title, Tooltip, Legend, Filler } from "chart.js";
 import ProviderLayout from "@layouts/ProviderLayout";
 import CardBookingItem from "@components/provider/CardBookingItem";
 import MySpinner from "@components/common/MySpinner";
-import { getBookings, getStatistics } from "@services/providerService";
+import providerService from "@services/providerService";
 import { formatCurrency } from "@utils/formatters";
 import useDebounce from "@hooks/useDebounce";
 import useInfiniteScrollList from "@hooks/useInfiniteScrollList";
@@ -58,7 +47,7 @@ function BookingList() {
             if (debouncedCustomerName) params.customerName = debouncedCustomerName;
             if (debouncedStatus) params.status = debouncedStatus;
 
-            return getBookings(params);
+            return providerService.getBookings(params);
         },
         [id, debouncedCustomerName, debouncedStatus]
     );
@@ -84,7 +73,7 @@ function BookingList() {
                 const params = { statsType: statType, year, serviceId: id };
                 if (statType === "DAY") params.month = month;
 
-                const response = await getStatistics(params);
+                const response = await providerService.getStatistics(params);
                 setStatsData(response);
             } catch (error) {
                 setErrorStats("Lỗi khi tải dữ liệu thống kê dịch vụ.");

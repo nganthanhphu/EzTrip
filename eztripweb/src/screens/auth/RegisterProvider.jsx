@@ -3,9 +3,10 @@ import { Alert, Button, Card, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
-import Apis, { endpoints } from "@configs/Apis";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import { validatePasswordConfirmation, validateRequiredFields } from "@utils/validators";
+
+import { registerUser } from "@services/authService";
 
 const providerFields = [
 	{
@@ -83,52 +84,29 @@ const RegisterProvider = () => {
 	};
 
 	const handleSubmit = async (event) => {
-		event.preventDefault();
+        event.preventDefault();
 
-		if (!validate()) {
-			return;
-		}
+        if (!validate()) return;
 
-		const form = new FormData();
-		form.append("fullname", user.fullname);
-		form.append("email", user.email);
-		form.append("phoneNumber", user.phoneNumber);
-		form.append("password", user.password);
-		form.append("role", user.role);
-		form.append("companyName", user.companyName);
-		form.append("companyAddress", user.companyAddress || "");
-		form.append("typeOfProvider", user.typeOfProvider);
+        const form = new FormData();
 
-		if (avatar.current?.files?.length > 0) {
-			form.append("avatar", avatar.current.files[0]);
-		}
+        try {
+            setErr("");
+            setLoading(true);
 
-		try {
-			setErr("");
-			setLoading(true);
+            await registerUser(form);
 
-			const response = await Apis.post(endpoints.register, form, {
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			});
-
-			if (response.status === 201) {
-				nav("/login");
-				return;
-			}
-
-			setErr("Hệ thống bị lỗi!");
-		} catch (exception) {
-			setErr(
-				exception?.response?.data?.message ||
-					exception?.response?.data?.error ||
-					"Đăng ký thất bại",
-			);
-		} finally {
-			setLoading(false);
-		}
-	};
+            nav("/login");
+        } catch (exception) {
+            setErr(
+                exception?.response?.data?.message ||
+                    exception?.response?.data?.error ||
+                    "Đăng ký thất bại",
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
 	return (
 		<CustomerLayout>

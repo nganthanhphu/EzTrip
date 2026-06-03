@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
 import { formatCurrency, formatBookingDate} from "@utils/formatters";
-import { createBooking } from "@services/customerService";
+import customerService from "@services/customerService";
 
 const PAYMENT_METHODS = [
 	{ id: 1, label: "Tiền mặt" },
@@ -76,7 +76,7 @@ function ModalConfirmTransportationBooking({ show, onHide, transportation }) {
 		setSubmitSuccess("");
 
 		try {
-			await createBooking({
+			await customerService.createBooking({
 				serviceId,
 				paymentMethodId,
 				bookingDay,

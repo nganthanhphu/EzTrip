@@ -9,7 +9,7 @@ import useDebounce from "@hooks/useDebounce";
 import { useAuth } from "@hooks/useAuth";
 
 import ProviderLayout from "@layouts/ProviderLayout";
-import { getProviderServices } from "@services/providerService";
+import providerService from "@services/providerService";
 
 import { useQueryClient } from "@tanstack/react-query"; 
 
@@ -27,11 +27,11 @@ function ServiceList() {
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
     const fetchServices = async (pageNumber = 1) => {
-        const response = await getProviderServices({
+        const response = await providerService.getProviderServices({
             name: debouncedSearchText,
             sortBy,
             order,
-            page: pageNumber
+            page: pageNumber,
         });
 
         return response || [];

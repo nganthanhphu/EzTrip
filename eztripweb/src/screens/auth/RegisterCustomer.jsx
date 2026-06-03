@@ -3,9 +3,10 @@ import { Alert, Button, Card, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
-import Apis, { endpoints } from "@configs/Apis";
 import { useLookupTables } from "@contexts/LookupTablesContext";
 import { validatePasswordConfirmation, validateRequiredFields } from "@utils/validators";
+
+import { registerUser } from "@services/authService";
 
 const customerFields = [
 	{
@@ -78,51 +79,40 @@ const RegisterCustomer = () => {
 	};
 
 	const handleSubmit = async (event) => {
-		event.preventDefault();
+        event.preventDefault();
 
-		if (!validate()) {
-			return;
-		}
+        if (!validate()) return;
 
-		const form = new FormData();
-		form.append("fullname", user.fullname);
-		form.append("email", user.email);
-		form.append("phoneNumber", user.phoneNumber);
-		form.append("password", user.password);
-		form.append("role", user.role);
-		form.append("gender", user.gender);
-		form.append("dob", user.dob);
+        const form = new FormData();
+        form.append("fullname", user.fullname);
+        form.append("email", user.email);
+        form.append("phoneNumber", user.phoneNumber);
+        form.append("password", user.password);
+        form.append("role", user.role);
+        form.append("gender", user.gender);
+        form.append("dob", user.dob);
 
-		if (avatar.current?.files?.length > 0) {
-			form.append("avatar", avatar.current.files[0]);
-		}
+        if (avatar.current?.files?.length > 0) {
+            form.append("avatar", avatar.current.files[0]);
+        }
 
-		try {
-			setErr("");
-			setLoading(true);
+        try {
+            setErr("");
+            setLoading(true);
 
-			const response = await Apis.post(endpoints.register, form, {
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			});
+            await registerUser(form);
 
-			if (response.status === 201) {
-				nav("/login");
-				return;
-			}
-
-			setErr("Hệ thống bị lỗi!");
-		} catch (exception) {
-			setErr(
-				exception?.response?.data?.message ||
-					exception?.response?.data?.error ||
-					"Đăng ký thất bại",
-			);
-		} finally {
-			setLoading(false);
-		}
-	};
+            nav("/login");
+        } catch (exception) {
+            setErr(
+                exception?.response?.data?.message ||
+                    exception?.response?.data?.error ||
+                    "Đăng ký thất bại",
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
 
 	return (
 		<CustomerLayout>

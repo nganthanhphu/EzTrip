@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button, Col, Form, Modal, Row } from "react-bootstrap";
-import { createBooking } from "@services/customerService";
+import customerService from "@services/customerService";
 import { formatCurrency, formatBookingDate } from "@utils/formatters";
 
 const PAYMENT_METHODS = [
@@ -67,7 +67,7 @@ function ModalConfirmTourBooking({ show, onHide, tour }) {
 		setSubmitSuccess("");
 
 		try {
-			await createBooking({
+			await customerService.createBooking({
 				serviceId,
 				paymentMethodId,
 				bookingDay,

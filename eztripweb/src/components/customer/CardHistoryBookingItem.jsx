@@ -5,7 +5,7 @@ import { formatCurrency, formatDateTime } from "@utils/formatters";
 import ModalReview from "@components/customer/ModalReview";
 import ModalChat from "@components/common/ModalChat";
 import { useAuth } from "@hooks/useAuth";
-import { updateBooking } from "@services/customerService";
+import customerService from "@services/customerService";
 import { openMomoPaymentForBooking } from "@utils/onlinePayment";
 
 const SERVICE_TYPE_LABELS = {
@@ -102,7 +102,7 @@ function CardHistoryBookingItem(props) {
         setActionError("");
 
         try {
-            await updateBooking(id, { status: "CANCELLED" });
+            await customerService.updateBooking(id, { status: "CANCELLED" });
             props.onUpdated?.();
         } catch (error) {
             setActionError(error?.response?.data?.error || "Không thể hủy booking.");

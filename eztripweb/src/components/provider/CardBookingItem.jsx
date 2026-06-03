@@ -4,7 +4,7 @@ import defaultImage from "@assets/images/default_accommodation_item.jpg";
 import { formatCurrency, formatDateTime } from "@utils/formatters";
 import ModalChat from "@components/common/ModalChat";
 import { useAuth } from "@hooks/useAuth";
-import { updateBooking } from "@services/providerService";
+import providerService from "@services/providerService";
 
 const STATUS_META = {
 	1: { key: "PENDING", label: "Đang chờ", badge: "warning" },
@@ -52,7 +52,7 @@ function CardBookingItem(props) {
 		setActionError("");
 
 		try {
-			await updateBooking(id, { status: nextStatus });
+			await providerService.updateBooking(id, { status: nextStatus });
 			props.onUpdated?.();
 		} catch (error) {
 			setActionError(error?.response?.data?.error || "Không thể cập nhật trạng thái booking.");
