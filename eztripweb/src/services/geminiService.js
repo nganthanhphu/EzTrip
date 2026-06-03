@@ -63,7 +63,7 @@ const summarizeReviews = async (reviews) => {
         (r, index) => `${index + 1}. Điểm: ${r.rating}/10 - Nhận xét: "${r.comment}"`
     ).join("\n");
 
-    const prompt = `Bạn là chuyên gia phân tích trải nghiệm khách hàng. Hãy đọc danh sách đánh giá sau và viết một đoạn tóm tắt ngắn gọn (khoảng 3-5 câu), nêu bật ưu điểm và nhược điểm chung của dịch vụ. Văn phong khách quan, chuyên nghiệp.
+    const prompt = `Bạn là chuyên gia phân tích trải nghiệm khách hàng. Hãy đọc danh sách đánh giá sau và viết một đoạn tóm tắt ngắn gọn (khoảng 3-5 câu), nêu bật ưu điểm và nhược điểm chung của dịch vụ. Văn phong khách quan, chuyên nghiệp. Viết cho khách hàng đang cân nhắc sử dụng dịch vụ này.\n
     
 Danh sách đánh giá:
 ${reviewsText}
