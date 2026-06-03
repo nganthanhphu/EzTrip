@@ -6,7 +6,8 @@ import ModalReview from "@components/customer/ModalReview";
 import ModalChat from "@components/common/ModalChat";
 import { useAuth } from "@hooks/useAuth";
 import customerService from "@services/customerService";
-import { openMomoPaymentForBooking } from "@utils/onlinePayment";
+
+import { processOnlinePayment } from "@utils/onlinePayment";
 
 const SERVICE_TYPE_LABELS = {
     1: "Tour",
@@ -18,21 +19,19 @@ const STATUS_META = {
     1: { key: "PENDING", label: "Đang chờ", badge: "warning" },
     2: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
     3: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
-    4: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
-    PENDING: { key: "PENDING", label: "Đang chờ", badge: "warning" },
-    CONFIRMED: { key: "CONFIRMED", label: "Đã xác nhận", badge: "primary" },
-    COMPLETED: { key: "COMPLETED", label: "Hoàn thành", badge: "success" },
-    CANCELLED: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" },
+    4: { key: "CANCELLED", label: "Đã hủy", badge: "secondary" }
 };
 
 const PAYMENT_METHOD_LABELS = {
     1: "Tiền mặt",
     2: "Momo",
     3: "Chuyển khoản",
-    CASH: "Tiền mặt",
-    MOMO: "Momo",
-    BANK_TRANSFER: "Chuyển khoản",
+    4: "ZaloPay",
+    5: "VNPay"
 };
+
+const ONLINE_PAYMENT_IDS = [2, 3, 4, 5]; 
+const ONLINE_PAYMENT_KEYS = ["MOMO", "BANK_TRANSFER", "ZALOPAY", "VNPAY"];
 
 function resolveStatusMeta(status) {
     return STATUS_META[status] || STATUS_META[String(status).toUpperCase()] || {
@@ -70,9 +69,6 @@ function CardHistoryBookingItem(props) {
         totalAmount,
         note,
         status,
-        customerId,
-        customerName,
-        customerAvatar,
         companyId,
         companyName,
         paymentMethod,
@@ -91,7 +87,10 @@ function CardHistoryBookingItem(props) {
 
     const isPending = statusMeta.key === "PENDING";
     const isCompleted = statusMeta.key === "COMPLETED";
-    const isMomoPayment = Number(paymentMethod) === 2 || String(paymentMethod).toUpperCase() === "MOMO";
+
+    const isOnlinePayment = ONLINE_PAYMENT_IDS.includes(Number(paymentMethod)) || 
+                            ONLINE_PAYMENT_KEYS.includes(String(paymentMethod).toUpperCase());
+    
     const isProcessing = savingStatus || payingStatus;
 
     const handleCancelBooking = async () => {
@@ -108,7 +107,7 @@ function CardHistoryBookingItem(props) {
         }
     };
 
-    const handleMomoPaymentClick = async () => {
+    const handleOnlinePaymentClick = async () => {
         setPayingStatus(true);
         setActionError("");
 
@@ -117,13 +116,13 @@ function CardHistoryBookingItem(props) {
                 serviceName,
                 bookingDay,
                 note,
-                paymentMethodId: paymentMethod, 
+                paymentMethodId: paymentMethod,
                 quantity
             };
             
-            await openMomoPaymentForBooking(expectedBooking);
+            await processOnlinePayment(expectedBooking);
         } catch (error) {
-            setActionError(error?.message || "Lỗi khi khởi tạo thanh toán Momo.");
+            setActionError(error?.message || "Lỗi khi khởi tạo thanh toán trực tuyến.");
         } finally {
             setPayingStatus(false);
         }
@@ -230,10 +229,10 @@ function CardHistoryBookingItem(props) {
                             {isPending && currentUser?.isActive === true ? (
                                 <>
                                     <div className="d-flex w-100 gap-2">
-                                        {isMomoPayment && (
+                                        {isOnlinePayment && (
                                             <Button
                                                 variant="primary"
-                                                onClick={handleMomoPaymentClick}
+                                                onClick={handleOnlinePaymentClick}
                                                 className="w-100 rounded-0"
                                                 disabled={isProcessing}
                                             >
@@ -247,11 +246,7 @@ function CardHistoryBookingItem(props) {
                                         <Button
                                             variant="danger"
                                             onClick={handleCancelBooking}
-                                            className={
-                                                isMomoPayment
-                                                    ? "w-100 rounded-0"
-                                                    : "w-100 rounded-0"
-                                            }
+                                            className="w-100 rounded-0"
                                             disabled={isProcessing}
                                         >
                                             {savingStatus
