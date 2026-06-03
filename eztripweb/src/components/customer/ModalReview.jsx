@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Alert, Badge, Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import customerService from "@services/customerService";
-import {formatDateTime} from "@utils/formatters";
+import { formatDateTime } from "@utils/formatters";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 function ModalReview({ show, onHide, bookingId, serviceName, review, onSaved }) {
 	const initialReview = review ?? null;
@@ -9,6 +11,8 @@ function ModalReview({ show, onHide, bookingId, serviceName, review, onSaved }) 
 	const [currentReview, setCurrentReview] = useState(initialReview);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		if (!show) {
@@ -59,6 +63,9 @@ function ModalReview({ show, onHide, bookingId, serviceName, review, onSaved }) 
 
 			setCurrentReview(nextReview);
 			onSaved?.(nextReview);
+			queryClient.invalidateQueries({ queryKey: ["bookings"] });
+            navigate("/history");
+
 		} catch (submitError) {
 			setError(submitError?.response?.data?.error || "Không thể gửi đánh giá.");
 		} finally {
