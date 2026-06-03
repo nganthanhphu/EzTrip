@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import InfiniteScroll from "react-infinite-scroller";
 import CardServiceItem from "@components/provider/CardServiceItem";
@@ -23,46 +22,19 @@ function ServiceList() {
     const [selectedEditServiceId, setSelectedEditServiceId] = useState("");
 
     const queryClient = useQueryClient(); 
-
     const debouncedSearchText = useDebounce(searchText);
-    const nav = useNavigate();
-    const [searchParams] = useSearchParams();
-    const pageSize = 5;
-    const [sortBy, order] = sortOption ? sortOption.split("|") : [];
-    const searchParamsString = searchParams.toString();
-    const serviceCacheRef = useRef([]);
-    const serviceCacheKeyRef = useRef("");
 
-    useEffect(() => {
-        serviceCacheRef.current = [];
-        serviceCacheKeyRef.current = "";
-    }, [currentUser?.id]);
+    const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
     const fetchServices = async (pageNumber = 1) => {
-        const cacheKey = [debouncedSearchText, sortBy, order].join("|");
+        const response = await getProviderServices({
+            name: debouncedSearchText,
+            sortBy,
+            order,
+            page: pageNumber
+        });
 
-        if (serviceCacheKeyRef.current !== cacheKey) {
-            serviceCacheKeyRef.current = cacheKey;
-            serviceCacheRef.current = [];
-        }
-
-        if (serviceCacheRef.current.length === 0) {
-            const response = await getProviderServices({
-                name: debouncedSearchText,
-                sortBy,
-                order,
-            });
-
-            serviceCacheRef.current = Array.isArray(response)
-                ? response
-                : response?.content ||
-                response?.items ||
-                response?.results ||
-                [];
-        }
-
-        const startIndex = (pageNumber - 1) * pageSize;
-        return serviceCacheRef.current.slice(startIndex, startIndex + pageSize);
+        return response || [];
     };
 
     const {
@@ -78,47 +50,14 @@ function ServiceList() {
             currentUser?.id,
             debouncedSearchText,
             sortBy,
-            order,
-            pageSize,
+            order
         ],
-        fetchPage: fetchServices,
-        pageSize,
+        fetchPage: fetchServices
     });
-
-    useEffect(() => {
-        const params = new URLSearchParams(searchParamsString);
-        const q = params.get("q") || "";
-        const sort = params.get("sort") || "";
-
-        setSearchText(q);
-        setSortOption(sort);
-    }, [searchParamsString]);
 
     function handleSortChange(event) {
         setSortOption(event.target.value);
     }
-
-    useEffect(() => {
-        const params = new URLSearchParams(searchParamsString);
-        const q = debouncedSearchText;
-
-        if (q) params.set("q", q);
-        else params.delete("q");
-        if (sortOption) params.set("sort", sortOption);
-        else params.delete("sort");
-        params.delete("page");
-
-        const nextSearch = params.toString();
-        if (nextSearch !== searchParamsString) {
-            nav(
-                {
-                    pathname: window.location.pathname,
-                    search: nextSearch ? `?${nextSearch}` : "",
-                },
-                { replace: true },
-            );
-        }
-    }, [debouncedSearchText, sortOption, searchParamsString, nav]);
 
     function handleOpenCreate() {
         setSelectedEditServiceId("");
@@ -132,10 +71,6 @@ function ServiceList() {
 
     function handleSuccess() {
         setShowCreateEditModal(false);
-        
-        serviceCacheRef.current = [];
-        serviceCacheKeyRef.current = "";
-
         queryClient.invalidateQueries({ queryKey: ["provider-services"] });
     }
 
@@ -159,18 +94,10 @@ function ServiceList() {
                                 onChange={handleSortChange}
                             >
                                 <option value="">Sắp xếp</option>
-                                <option value="price|asc">
-                                    Giá thấp đến cao
-                                </option>
-                                <option value="price|desc">
-                                    Giá cao đến thấp
-                                </option>
-                                <option value="hot|desc">
-                                    Hot nhất đến thấp
-                                </option>
-                                <option value="hot|asc">
-                                    Hot thấp đến cao
-                                </option>
+                                <option value="price|asc">Giá thấp đến cao</option>
+                                <option value="price|desc">Giá cao đến thấp</option>
+                                <option value="hot|desc">Hot nhất đến thấp</option>
+                                <option value="hot|asc">Hot thấp đến cao</option>
                             </Form.Select>
                         </Col>
 
