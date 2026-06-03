@@ -4,11 +4,14 @@
  */
 package com.hp.dto.booking;
 
+import jakarta.validation.constraints.NotBlank;
+
 /**
  *
  * @author Joon
  */
 public record BookingUpdateDTO(
+    @NotBlank(message = "Trạng thái không được để trống")
     String status
 ) {
 

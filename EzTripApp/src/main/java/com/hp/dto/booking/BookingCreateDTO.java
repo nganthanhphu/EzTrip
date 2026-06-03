@@ -4,15 +4,24 @@
  */
 package com.hp.dto.booking;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 /**
  *
  * @author Joon
  */
 public record BookingCreateDTO(
+        @NotNull(message = "Dịch vụ không được để trống")
         Integer serviceId,
+        @NotNull(message = "Phương thức thanh toán không được để trống")
         Integer paymentMethodId,
+        @NotBlank(message = "Ngày đặt chỗ không được để trống")
         String bookingDay,
-        int quantity,
+        @NotNull(message = "Số lượng không được để trống")
+        @Positive(message = "Số lượng phải là số dương")
+        Integer quantity,
         String note
 ) {
 }
