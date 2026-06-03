@@ -226,7 +226,7 @@ function CardHistoryBookingItem(props) {
                                 </div>
                             )}
 
-                            {isPending && currentUser?.isActive === true ? (
+                            {isPending && currentUser?.isActive === true && paymentMethod !== 1 && paymentMethod !== 3 ? (
                                 <>
                                     <div className="d-flex w-100 gap-2">
                                         {isOnlinePayment && (
