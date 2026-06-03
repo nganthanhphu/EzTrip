@@ -62,9 +62,9 @@ public class ApiSecurityConfigs {
         callbackConfig.setAllowedMethods(List.of("POST", "OPTIONS"));
         callbackConfig.setAllowedHeaders(List.of("*"));
 
+        source.registerCorsConfiguration("/api/callback/**", callbackConfig);
 
         source.registerCorsConfiguration("/api/**", config);
-        source.registerCorsConfiguration("/api/callback/**", callbackConfig);
 
         return source;
     }
