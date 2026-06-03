@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Row, Col, Form } from "react-bootstrap";
-import InfiniteScroll from "react-infinite-scroller";
+import InfiniteScroll from "react-infinite-scroll-component";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TourItem from "@components/customer/CardTourItem";
 import MySpinner from "@components/common/MySpinner";
@@ -32,21 +32,21 @@ function TourList() {
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
     const fetchPage = useCallback(
-    (nextPage) => {
-        const params = new URLSearchParams();
+        (nextPage) => {
+            const params = {};
 
-        if (debouncedName.trim()) params.append("name", debouncedName.trim());
-        if (debouncedLocation.trim()) params.append("location", debouncedLocation.trim());
-        if (debouncedTourDuration) params.append("tourDuration", debouncedTourDuration);
-        if (debouncedFromPrice) params.append("fromPrice", debouncedFromPrice);
-        if (debouncedToPrice) params.append("toPrice", debouncedToPrice);
-        if (debouncedRating) params.append("rating", debouncedRating);
-        if (sortBy) params.append("sortBy", sortBy);
-        if (order) params.append("order", order);
+        if (debouncedName.trim()) params.name = debouncedName.trim();
+        if (debouncedLocation.trim()) params.location = debouncedLocation.trim();
+        if (debouncedTourDuration) params.tourDuration = debouncedTourDuration;
+        if (debouncedFromPrice) params.fromPrice = debouncedFromPrice;
+        if (debouncedToPrice) params.toPrice = debouncedToPrice;
+        if (debouncedRating) params.rating = debouncedRating;
+        if (sortBy) params.sortBy = sortBy;
+        if (order) params.order = order;
         
-        params.append("page", nextPage);
+        params.page = nextPage;
 
-        return customerService.getTourisms(params.toString());
+        return customerService.getTourisms(params);
     },
     [debouncedName, debouncedLocation, debouncedTourDuration, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order]
 );
@@ -191,18 +191,16 @@ function TourList() {
                     <MySpinner />
                 ) : (
                     <InfiniteScroll
-                        pageStart={0}
-                        loadMore={loadMore}
-                        hasMore={hasMore}
-                        initialLoad={false}
-                        threshold={250}
+                        dataLength={tourList.length}
+                        next={loadMore}
+                        hasMore={hasMore || false}
+                        loader={<div className="py-4 d-flex justify-content-center"><MySpinner /></div>}
                     >
                         <div className="d-flex flex-column gap-3">
                             {tourList.map((tour) => (
                                 <TourItem key={tour.id} {...tour} />
                             ))}
                         </div>
-                        {loadingMore ? <MySpinner /> : null}
                     </InfiniteScroll>
                 )}
             </Container>

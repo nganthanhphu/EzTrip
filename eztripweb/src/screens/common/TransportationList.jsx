@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useCallback } from "react"; // Đã thêm useCallback
 import { Container, Row, Col, Form } from "react-bootstrap";
-import InfiniteScroll from "react-infinite-scroller";
+import InfiniteScroll from "react-infinite-scroll-component";
 import CustomerLayout from "@layouts/CustomerLayout";
 import TransportationItem from "@components/customer/CardTransportationItem";
 import ModalConfirmTransportationBooking from "@components/customer/ModalConfirmTransportationBooking";
@@ -62,37 +62,23 @@ function TransportationList() {
 
     const fetchPage = useCallback(
         (nextPage) => {
-            const params = new URLSearchParams();
+            const params = {};
 
-            if (debouncedDepartureLocation.trim()) params.append("departureLocation", debouncedDepartureLocation.trim());
-            if (debouncedArrivalLocation.trim()) params.append("arrivalLocation", debouncedArrivalLocation.trim());
-            if (typeOfTransportation) params.append("type", typeOfTransportation);
-            if (debouncedDepartureTime) params.append("departureTime", debouncedDepartureTime);
-            if (debouncedFromPrice) params.append("fromPrice", debouncedFromPrice);
-            if (debouncedToPrice) params.append("toPrice", debouncedToPrice);
-            if (debouncedRating) params.append("rating", debouncedRating);
-            if (sortBy) params.append("sortBy", sortBy);
-            if (order) params.append("order", order);
+            if (debouncedDepartureLocation.trim()) params.departureLocation = debouncedDepartureLocation.trim();
+            if (debouncedArrivalLocation.trim()) params.arrivalLocation = debouncedArrivalLocation.trim();
+            if (typeOfTransportation) params.type = typeOfTransportation;
+            if (debouncedDepartureTime) params.departureTime = debouncedDepartureTime;
+            if (debouncedFromPrice) params.fromPrice = debouncedFromPrice;
+            if (debouncedToPrice) params.toPrice = debouncedToPrice;
+            if (debouncedRating) params.rating = debouncedRating;
+            if (sortBy) params.sortBy = sortBy;
+            if (order) params.order = order;
             
-            params.append("page", nextPage);
+            params.page = nextPage;
 
-            return customerService.getTransportations(params.toString()).then((response) => {
-                return Array.isArray(response)
-                    ? response
-                    : response?.content || response?.items || response?.results || [];
-            });
+            return customerService.getTransportations(params);
         },
-        [
-            debouncedDepartureLocation,
-            debouncedArrivalLocation,
-            typeOfTransportation,
-            debouncedDepartureTime,
-            debouncedFromPrice,
-            debouncedToPrice,
-            debouncedRating,
-            sortBy,
-            order
-        ]
+        [ debouncedDepartureLocation, debouncedArrivalLocation, typeOfTransportation, debouncedDepartureTime, debouncedFromPrice,            debouncedToPrice, debouncedRating, sortBy, order ]
     );
 
     const {
@@ -289,11 +275,10 @@ function TransportationList() {
                     <MySpinner />
                 ) : (
                     <InfiniteScroll
-                        pageStart={0}
-                        loadMore={loadMore}
-                        hasMore={hasMore}
-                        initialLoad={false}
-                        threshold={250}
+                        dataLength={transportationList.length}
+                        next={loadMore}
+                        hasMore={hasMore || false}
+                        loader={<div className="py-4 d-flex justify-content-center"><MySpinner /></div>}
                     >
                         <div className="d-flex flex-column gap-3">
                             {transportationList.map((option) => (
@@ -309,7 +294,6 @@ function TransportationList() {
                                 />
                             ))}
                         </div>
-                        {loadingMore ? <MySpinner /> : null}
                     </InfiniteScroll>
                 )}
 

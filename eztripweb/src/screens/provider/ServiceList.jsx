@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
-import InfiniteScroll from "react-infinite-scroller";
+import InfiniteScroll from "react-infinite-scroll-component";
 import CardServiceItem from "@components/provider/CardServiceItem";
 import ModalCreateEditService from "@components/provider/ModalCreateEditService";
 import MySpinner from "@components/common/MySpinner";
@@ -120,11 +120,10 @@ function ServiceList() {
                     </div>
                 ) : (
                     <InfiniteScroll
-                        pageStart={0}
-                        loadMore={loadMore}
-                        hasMore={hasMore}
-                        initialLoad={false}
-                        threshold={250}
+                        dataLength={services.length}
+                        next={loadMore}
+                        hasMore={hasMore || false}
+                        loader={<div className="py-4 d-flex justify-content-center"><MySpinner /></div>}
                     >
                         <div className="d-flex flex-column gap-3">
                             {services.map((service) => (
@@ -145,11 +144,6 @@ function ServiceList() {
                                 </div>
                             ) : null}
                         </div>
-                        {loadingMore ? (
-                            <div className="py-4 d-flex justify-content-center">
-                                <MySpinner />
-                            </div>
-                        ) : null}
                     </InfiniteScroll>
                 )}
 

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { Alert, Container, Row, Col, Form, Badge, ProgressBar, Card } from "react-bootstrap";
-import InfiniteScroll from "react-infinite-scroller";
+import InfiniteScroll from "react-infinite-scroll-component";
 import { Chart as ChartJS, CategoryScale, LinearScale, LineController, PointElement, LineElement, Title, Tooltip, Legend, Filler } from "chart.js";
 import ProviderLayout from "@layouts/ProviderLayout";
 import CardBookingItem from "@components/provider/CardBookingItem";
@@ -272,11 +272,10 @@ function BookingList() {
                     </div>
                 ) : (
                     <InfiniteScroll
-                        pageStart={0}
-                        loadMore={loadMore}
-                        hasMore={hasMore}
-                        initialLoad={false}
-                        threshold={250}
+                        dataLength={bookings.length}
+                        next={loadMore}
+                        hasMore={hasMore || false}
+                        loader={<div className="py-4 d-flex justify-content-center"><MySpinner /></div>}
                     >
                         <div className="d-flex flex-column gap-3">
                             {bookings.map((item) => (
@@ -293,12 +292,6 @@ function BookingList() {
                             <div className="py-5 text-center bg-white rounded-4 shadow-sm mt-3 d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '200px' }}>
                                 <span className="fs-3 mb-2">📭</span>
                                 <p className="text-muted fw-medium mb-0">Chưa có booking nào phù hợp với tìm kiếm của bạn.</p>
-                            </div>
-                        )}
-
-                        {loadingMore && (
-                            <div className="py-4 d-flex justify-content-center">
-                                <MySpinner />
                             </div>
                         )}
                     </InfiniteScroll>

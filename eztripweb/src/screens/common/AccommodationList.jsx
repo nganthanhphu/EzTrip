@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Row, Col, Form } from "react-bootstrap";
-import InfiniteScroll from "react-infinite-scroller";
+import InfiniteScroll from "react-infinite-scroll-component";
 import CustomerLayout from "@layouts/CustomerLayout";
 import MySpinner from "@components/common/MySpinner";
 import CardAccommodationItem from "@components/customer/CardAccommodationItem";
@@ -30,20 +29,20 @@ function AccommodationList() {
     const [sortBy, order] = sortOption ? sortOption.split("|") : [];
 
     const fetchPage = useCallback(
-    (nextPage) => {
-        const params = new URLSearchParams();
+        (nextPage) => {
+            const params = {};
         
-        if (debouncedName.trim()) params.append("name", debouncedName.trim());
-        if (debouncedLocation.trim()) params.append("location", debouncedLocation.trim());
-        if (debouncedFromPrice) params.append("fromPrice", debouncedFromPrice);
-        if (debouncedToPrice) params.append("toPrice", debouncedToPrice);
-        if (debouncedRating) params.append("rating", debouncedRating);
-        if (sortBy) params.append("sortBy", sortBy);
-        if (order) params.append("order", order);
+        if (debouncedName.trim()) params.name = debouncedName.trim();
+        if (debouncedLocation.trim()) params.location = debouncedLocation.trim();
+        if (debouncedFromPrice) params.fromPrice = debouncedFromPrice;
+        if (debouncedToPrice) params.toPrice = debouncedToPrice;
+        if (debouncedRating) params.rating = debouncedRating;
+        if (sortBy) params.sortBy = sortBy;
+        if (order) params.order = order;
         
-        params.append("page", nextPage);
+        params.page = nextPage;
 
-        return customerService.getAccommodations(params.toString());
+        return customerService.getAccommodations(params);
     },
     [debouncedName, debouncedLocation, debouncedFromPrice, debouncedToPrice, debouncedRating, sortBy, order]
 );
@@ -51,7 +50,6 @@ function AccommodationList() {
     const {
         items: accommodationList,
         loading,
-        loadingMore,
         hasMore,
         loadMore, 
     } = useInfiniteScrollList({
@@ -178,11 +176,10 @@ function AccommodationList() {
                     <MySpinner />
                 ) : (
                     <InfiniteScroll
-                        pageStart={0}
-                        loadMore={loadMore}
-                        hasMore={hasMore}
-                        initialLoad={false}
-                        threshold={250}
+                        dataLength={accommodationList.length}
+                        next={loadMore}
+                        hasMore={hasMore || false}
+                        loader={<div className="py-4 d-flex justify-content-center"><MySpinner /></div>}
                     >
                         <div className="d-flex flex-column gap-3">
                             {accommodationList.map((accommodation) => (
@@ -192,7 +189,6 @@ function AccommodationList() {
                                 />
                             ))}
                         </div>
-                        {loadingMore ? <MySpinner /> : null}
                     </InfiniteScroll>
                 )}
             </Container>

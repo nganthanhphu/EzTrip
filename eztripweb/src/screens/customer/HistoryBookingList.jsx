@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Container, Row, Col, Form } from "react-bootstrap";
-import InfiniteScroll from "react-infinite-scroller";
+import InfiniteScroll from "react-infinite-scroll-component";
 import CustomerLayout from "@layouts/CustomerLayout";
 import CardHistoryBookingItem from "@components/customer/CardHistoryBookingItem";
 import { useLookupTables } from "@contexts/LookupTablesContext";
@@ -29,16 +29,15 @@ function HistoryBookingList() {
 
     const fetchBookings = React.useCallback(
         (nextPage) => {
-            const params = new URLSearchParams();
-            params.append("page", nextPage);
+            const params = {};
+            
+            if (typeOfService) params.typeOfService = typeOfService;
+            if (status) params.status = status;
+            if (debouncedServiceName) params.serviceName = debouncedServiceName;
 
-            if (typeOfService)
-                params.append("typeOfService", typeOfService);
-            if (status) params.append("status", status);
-            if (debouncedServiceName)
-                params.append("serviceName", debouncedServiceName);
+            params.page = nextPage;
 
-            return customerService.getBookings(params.toString());
+            return customerService.getBookings(params);
         },
         [currentUser?.id, typeOfService, status, debouncedServiceName],
     );
@@ -139,11 +138,14 @@ function HistoryBookingList() {
                     </div>
                 ) : (
                     <InfiniteScroll
-                        pageStart={0}
-                        loadMore={loadMore}
-                        hasMore={hasMore}
-                        initialLoad={false}
-                        threshold={250}
+                        dataLength={bookings.length}
+                        next={loadMore}
+                        hasMore={hasMore || false}
+                        loader={
+                            <div className="py-4 d-flex justify-content-center">
+                                <MySpinner />
+                            </div>
+                        }
                     >
                         <div className="d-flex flex-column gap-3">
                             {bookings.map((item) => (
@@ -154,11 +156,6 @@ function HistoryBookingList() {
                                 />
                             ))}
                         </div>
-                        {loadingMore ? (
-                            <div className="py-4 d-flex justify-content-center">
-                                <MySpinner />
-                            </div>
-                        ) : null}
                     </InfiniteScroll>
                 )}
             </Container>
