@@ -283,8 +283,8 @@ function CardHistoryBookingItem(props) {
             <ModalChat
                 show={showChatModal}
                 onHide={() => setShowChatModal(false)}
-                currentUserId={currentUser?.id || ""}
-                partnerUserId={isProviderViewing ? companyId : ""}
+                currentUserId={currentUser?.id}
+                partnerUserId={isProviderViewing ? customerId : companyId}
                 currentName={currentUser?.fullname || "Tôi"}
                 partnerName={
                     isProviderViewing
