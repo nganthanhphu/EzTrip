@@ -6,11 +6,14 @@ package com.hp.services;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 /**
  *
  * @author Joon
  */
 public interface PaymentService {
-    String createPaymentLink(int bookingId, String redirectUrl);
+    String createPaymentLink(int bookingId, String redirectUrl) throws JsonProcessingException;
+
     void handlePaymentResult(Map<String, String> ipnRequest, String paymentMethod);
 }

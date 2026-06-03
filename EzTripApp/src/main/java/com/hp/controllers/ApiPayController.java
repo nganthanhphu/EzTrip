@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hp.services.PaymentService;
 
 /**
@@ -33,7 +34,8 @@ public class ApiPayController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping("/secure/bookings/{id}/pay")
-    public ResponseEntity<Map<String, String>> payBookingOnline(@PathVariable(value = "id") int bookingId, @RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> payBookingOnline(@PathVariable(value = "id") int bookingId,
+            @RequestBody Map<String, String> request) throws JsonProcessingException {
         String redirectUrl = request.get("redirectUrl");
         String paymentUrl = this.paymentService.createPaymentLink(bookingId, redirectUrl);
         Map<String, String> response = new HashMap<>();
@@ -41,9 +43,15 @@ public class ApiPayController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PostMapping("/momo/ipn")
+    @PostMapping("/callback/momo")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void handleMomoPaymentIpn(@RequestBody Map<String, String> ipnRequest) {
         this.paymentService.handlePaymentResult(ipnRequest, "MOMO");
+    }
+
+    @PostMapping("/callback/zalopay")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void handleZaloPayPaymentCallback(@RequestBody Map<String, String> callbackRequest) {
+        this.paymentService.handlePaymentResult(callbackRequest, "ZALOPAY");
     }
 }

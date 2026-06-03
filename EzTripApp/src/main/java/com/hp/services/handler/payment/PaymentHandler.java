@@ -6,6 +6,7 @@ package com.hp.services.handler.payment;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hp.pojo.Booking;
 
 /**
@@ -13,7 +14,7 @@ import com.hp.pojo.Booking;
  * @author Joon
  */
 public interface PaymentHandler {
-    String createPaymentLink(Booking booking, String redirectUrl);
+    String createPaymentLink(Booking booking, String redirectUrl)  throws JsonProcessingException;
     
     void handlePaymentResult(Map<String, String> ipnRequest);
 }
