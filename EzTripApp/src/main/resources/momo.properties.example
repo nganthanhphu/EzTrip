@@ -1,0 +1,4 @@
+MOMO_PARTNER_CODE=your-momo-partner-code
+MOMO_ACCESS_KEY=your-momo-access-key
+MOMO_SECRET_KEY=your-momo-secret-key
+MOMO_PAYMENT_URL=https://test-payment.momo.vn/v2/gateway/api/create

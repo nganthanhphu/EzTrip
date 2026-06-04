@@ -1,0 +1,3 @@
+VNP_TMNCODE=your-vnpay-tmn-code
+VNP_HASHSECRET=your-vnpay-hash-secret
+VNP_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html

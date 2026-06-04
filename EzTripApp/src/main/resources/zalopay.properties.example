@@ -1,0 +1,4 @@
+ZALOPAY_APPID=your-zalopay-app-id
+ZALOPAY_KEY1=your-zalopay-key1
+ZALOPAY_KEY2=your-zalopay-key2
+ZALOPAY_PAYMENT_URL=https://sb-openapi.zalopay.vn/v2/create

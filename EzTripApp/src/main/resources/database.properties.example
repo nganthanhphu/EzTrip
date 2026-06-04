@@ -1,0 +1,6 @@
+hibernate.dialect=org.hibernate.dialect.MySQLDialect
+hibernate.showSql=true
+hibernate.connection.driverClass=com.mysql.cj.jdbc.Driver
+hibernate.connection.url=your-db-url
+hibernate.connection.username=your-db-username
+hibernate.connection.password=your-db-password
