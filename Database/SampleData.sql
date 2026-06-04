@@ -186,7 +186,7 @@ WHERE s.is_active = TRUE
 INSERT INTO review (booking_id, rating, comment, review_date)
 SELECT
   b.id,
-  3 + (b.id % 3),
+  1 + ((b.service_id + b.id) % 10),
   CONCAT('Review for booking ', b.id),
   DATE_ADD(b.created_date, INTERVAL 1 DAY)
 FROM booking b
