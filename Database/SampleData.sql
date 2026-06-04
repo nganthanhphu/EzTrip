@@ -24,6 +24,7 @@ INSERT INTO base_user (id, fullname, email, password, role_id, avatar, phone_num
   (118, 'Customer 118', 'customer118@eztrip.local', '$2b$10$bM0HYY/d82HQGJ8AIGPo.eIRF2IgQf2YBHrSunqsGbOQkgWFQRQ6.', 2, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '118', TRUE),
   (119, 'Customer 119', 'customer119@eztrip.local', '$2b$10$urKZSJjWO.ofg0lMb95E4efL/jqvuOw3e94q4qEXbQOMgEMMDmvRO', 2, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '119', TRUE),
   (120, 'Customer 120', 'customer120@eztrip.local', '$2b$10$sOB2vYtJz8ElTDfq/ch.AO6EmPGW2XdHvWk4x50OvNAGO7YUD6n0W', 2, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '120', TRUE),
+  (121, 'Customer 121 Inactive', 'customer121@eztrip.local', '$2b$10$sOB2vYtJz8ElTDfq/ch.AO6EmPGW2XdHvWk4x50OvNAGO7YUD6n0W', 2, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '121', FALSE),
   (201, 'Provider 201', 'provider201@eztrip.local', '$2b$10$6wjnNXycCsQu7Y6Calmr8uo.7iIPomlhyJj3iqQFzTgNFuyc6X1t.', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '201', TRUE),
   (202, 'Provider 202', 'provider202@eztrip.local', '$2b$10$X9yez3XWbrYnBgycwVHDVe0f.XVwT./XPAQRaOKT35rFi4L/jzJ/G', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '202', TRUE),
   (203, 'Provider 203', 'provider203@eztrip.local', '$2b$10$jmKc51ho6NcwMSpwQuZ31ehkbt0zOysCjA424x0JeWYsXrQ1VE.ba', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '203', TRUE),
@@ -35,7 +36,8 @@ INSERT INTO base_user (id, fullname, email, password, role_id, avatar, phone_num
   (209, 'Provider 209', 'provider209@eztrip.local', '$2b$10$9NWPkrqXIiuFq/e/qYjF5.pps92fm/192AgQvO488TbFtkdSxlDSu', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '209', TRUE),
   (210, 'Provider 210', 'provider210@eztrip.local', '$2b$10$NpNaT7nBQ5kgIa3HwuRenu0h.OY/FKftjx5vJZwD6DuzYP.Cf5e5K', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '210', TRUE),
   (211, 'Provider 211', 'provider211@eztrip.local', '$2b$10$2CaqFpoNafzYKI5XlFoA4OKzGq5eGTA24rs2i7.qq2Q1ETeevEV4y', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '211', TRUE),
-  (212, 'Provider 212', 'provider212@eztrip.local', '$2b$10$W1sooY1zGg0jAK3ndaytCOR85M.oUesbkenlTNBMow6YhBWbeN116', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '212', TRUE);
+  (212, 'Provider 212', 'provider212@eztrip.local', '$2b$10$W1sooY1zGg0jAK3ndaytCOR85M.oUesbkenlTNBMow6YhBWbeN116', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '212', TRUE),
+  (213, 'Provider 213 Inactive', 'provider213@eztrip.local', '$2b$10$W1sooY1zGg0jAK3ndaytCOR85M.oUesbkenlTNBMow6YhBWbeN116', 3, 'https://res.cloudinary.com/dkzzyue98/image/upload/v1767704642/avatar_ipfsn6.jpg', '213', FALSE);
 
 DROP TEMPORARY TABLE IF EXISTS tmp_numbers;
 CREATE TEMPORARY TABLE tmp_numbers (n INT PRIMARY KEY);
@@ -46,9 +48,9 @@ FROM (
   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9
 ) AS ones
 CROSS JOIN (
-  SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2
+  SELECT 0 AS n UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3
 ) AS tens
-WHERE ones.n + tens.n * 10 + 1 <= 30;
+WHERE ones.n + tens.n * 10 + 1 <= 36;
 
 INSERT INTO customer_profile (id, user_id, dob, gender_id)
 SELECT
@@ -57,7 +59,7 @@ SELECT
   DATE_ADD('1990-01-01', INTERVAL (n - 1) DAY),
   1 + ((99 + n) % 3)
 FROM tmp_numbers
-WHERE n <= 21;
+WHERE n <= 22;
 
 INSERT INTO provider_profile (id, user_id, company_name, company_address, type_of_provider_id)
 SELECT
@@ -71,20 +73,20 @@ SELECT
     ELSE 3
   END
 FROM tmp_numbers
-WHERE n <= 12;
+WHERE n <= 13;
 
 INSERT INTO service (id, provider_id, name, description, price, quantity, type_of_service_id, is_active)
 SELECT
   1000 + n,
-  201 + ((n - 1) % 3),
+  CASE WHEN n >= 22 THEN 213 ELSE 201 + ((n - 1) % 3) END,
   CONCAT('Tourism Package ', LPAD(n, 2, '0')),
   CONCAT('Tourism service sample ', n),
-  500 + (n * 10),
+  18000 + (n * 2000),
   10 + (n % 5),
   1,
   CASE WHEN n <= 15 THEN TRUE ELSE FALSE END
 FROM tmp_numbers
-WHERE n <= 20;
+WHERE n <= 23;
 
 INSERT INTO service_tourism (service_id, tour_duration, location)
 SELECT
@@ -92,20 +94,20 @@ SELECT
   1 + (n % 5),
   CONCAT('City ', n)
 FROM tmp_numbers
-WHERE n <= 20;
+WHERE n <= 23;
 
 INSERT INTO service (id, provider_id, name, description, price, quantity, type_of_service_id, is_active)
 SELECT
   2000 + n,
-  204 + ((n - 1) % 3),
+  CASE WHEN n >= 22 THEN 213 ELSE 204 + ((n - 1) % 3) END,
   CONCAT('Accommodation ', LPAD(n, 2, '0')),
   CONCAT('Accommodation service sample ', n),
-  300 + (n * 8),
-  1 + (n % 4),
+  28000 + (n * 2000),
+  4 + (n % 4),
   2,
   CASE WHEN n <= 15 THEN TRUE ELSE FALSE END
 FROM tmp_numbers
-WHERE n <= 20;
+WHERE n <= 23;
 
 INSERT INTO service_accommodation (service_id, quantity_of_bed, area, location)
 SELECT
@@ -114,20 +116,20 @@ SELECT
   20 + (n % 5) * 5,
   CONCAT('District ', n)
 FROM tmp_numbers
-WHERE n <= 20;
+WHERE n <= 23;
 
 INSERT INTO service (id, provider_id, name, description, price, quantity, type_of_service_id, is_active)
 SELECT
   3000 + n,
-  207 + ((n - 1) % 6),
+  CASE WHEN n >= 22 THEN 213 ELSE 207 + ((n - 1) % 6) END,
   CONCAT('Transportation ', LPAD(n, 2, '0')),
   CONCAT('Transportation service sample ', n),
-  100 + (n * 3),
+  8000 + (n * 2000),
   20 + (n % 10),
   3,
   CASE WHEN n <= 15 THEN TRUE ELSE FALSE END
 FROM tmp_numbers
-WHERE n <= 20;
+WHERE n <= 23;
 
 INSERT INTO service_transportation (service_id, type_of_transportation_id, departure_location, arrival_location, departure_time, arrival_time)
 SELECT
@@ -141,7 +143,7 @@ SELECT
   6 + (n % 12),
   8 + (n % 12)
 FROM tmp_numbers
-WHERE n <= 20;
+WHERE n <= 23;
 
 INSERT INTO image (service_id, url)
 SELECT
@@ -155,23 +157,31 @@ SELECT
   END
 FROM service s
 JOIN tmp_numbers i ON i.n <= (1 + (s.id % 5))
-WHERE s.id BETWEEN 1000 AND 3019;
+WHERE s.id BETWEEN 1000 AND 3023;
 
 INSERT INTO booking (id, customer_id, service_id, created_date, booking_day, payment_method_id, quantity, total_amount, status_id, note)
 SELECT
   (s.id * 10 + b.n),
   101 + ((s.id + b.n) % 20),
   s.id,
-  DATE_ADD('2026-05-01 09:00:00', INTERVAL ((s.id + (b.n * 7)) % 30) DAY),
-  DATE_ADD(DATE(DATE_ADD('2026-05-01 09:00:00', INTERVAL ((s.id + (b.n * 7)) % 30) DAY)), INTERVAL 3 DAY),
-  1 + (b.n % 3),
-  1 + (b.n % 3),
-  s.price * (1 + (b.n % 3)),
-  1 + ((s.id + b.n) % 4),
+  DATE_ADD('2024-06-15 09:00:00', INTERVAL ((s.id * 17 + b.n * 41) % 721) DAY),
+  DATE_ADD(DATE(DATE_ADD('2024-06-15 09:00:00', INTERVAL ((s.id * 17 + b.n * 41) % 721) DAY)), INTERVAL (3 + (b.n % 7)) DAY),
+  1 + ((b.n - 1) % 4),
+  CASE WHEN b.n IN (1, 2) THEN 1 ELSE 1 + (b.n % 3) END,
+  s.price * (CASE WHEN b.n IN (1, 2) THEN 1 ELSE 1 + (b.n % 3) END),
+  CASE
+    WHEN b.n = 1 THEN 1
+    WHEN b.n = 2 THEN 2
+    WHEN b.n IN (5, 7, 10) THEN 4
+    ELSE 3
+  END,
   CONCAT('Note ', b.n)
 FROM service s
+JOIN provider_profile pp ON s.provider_id = pp.id
+JOIN base_user u ON pp.user_id = u.id
 JOIN tmp_numbers b ON b.n <= 10
-WHERE s.id BETWEEN 1000 AND 3019;
+WHERE s.is_active = TRUE
+  AND u.is_active = TRUE;
 
 INSERT INTO review (booking_id, rating, comment, review_date)
 SELECT
