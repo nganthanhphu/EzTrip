@@ -166,11 +166,18 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalStateException("Không thể cập nhật booking đã hoàn thành hoặc đã hủy!");
         }
 
+        String role = UserUtils.getCurrentUserDetails().getAuthorities().stream().findFirst().get().getAuthority();
+
         String newStatusString = bk.status();
         if (statusName.equals("PENDING")) {
             if (!newStatusString.equals("CONFIRMED") && !newStatusString.equals("CANCELLED")) {
                 throw new IllegalArgumentException("Trạng thái mới không hợp lệ!");
             }
+
+            if (newStatusString.equals("CONFIRMED") && !role.equals("ROLE_PROVIDER")) {
+                throw new IllegalArgumentException("Bạn chỉ có thể thanh toán trực tuyến hoặc liên hệ nhà cung cấp để xác nhận booking!");
+            }
+
         } else if (statusName.equals("CONFIRMED")) {
             if (!newStatusString.equals("COMPLETED")) {
                 throw new IllegalArgumentException("Trạng thái mới không hợp lệ!");

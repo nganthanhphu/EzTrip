@@ -54,7 +54,7 @@ public class ApiBookingController {
         return new ResponseEntity<>(bookings, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('PROVIDER')")
+    @PreAuthorize("hasRole('PROVIDER') or hasRole('CUSTOMER')")
     @PatchMapping("/secure/bookings/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateBooking(@PathVariable(value = "id") int id,@Valid @RequestBody BookingUpdateDTO booking) {
